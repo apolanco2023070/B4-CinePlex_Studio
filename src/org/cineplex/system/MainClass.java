@@ -8,7 +8,7 @@ package org.cineplex.system;
  *
  * @author Polanco
  */
-public class ClasePrincipal {
+public class MainClass {
 
     /**
      * @param args the command line arguments
