@@ -17,7 +17,7 @@ import org.cineplex.system.MainClass;
  * @author informatica
  */
 public class ViewFactory {
-    private final String PATH_VIEWS = "/org/saulmartinez/system/view/";
+    private final String PATH_VIEWS = "/org/cineplex/system/view/";
 
     public Scene loadFileFXML(String nameFXML, int width, int height) {
         String filePath = PATH_VIEWS + nameFXML;
@@ -41,8 +41,8 @@ public class ViewFactory {
         try {
             switch (FXMLname) {
                 case "register" -> {
-                    SceneManager.getInstanciaSceneManager().getPrimaryStage().setTitle("Registro de Peliculas");
-                    SceneManager.getInstanciaSceneManager().getPrimaryStage().setResizable(false);
+                    SceneManager.getSceneManagerInstance().getPrimaryStage().setTitle("Registro de Peliculas");
+                    SceneManager.getSceneManagerInstance().getPrimaryStage().setResizable(false);
                     scene = loadFileFXML("MovieRegister.fxml", 650, 400);
                 }
 
@@ -50,14 +50,10 @@ public class ViewFactory {
 
                     scene = loadFileFXML("MovieRegister.fxml", 300, 400);
             }
-            SceneManager.getInstanciaSceneManager().changeScene(scene);
+            SceneManager.getSceneManagerInstance().changeScene(scene);
         } catch (NullPointerException objetonulo) {
             System.out.println("error loading the scene");
         }
-    }
-
-    public void viewLogin() {
-        loadScene("login");
     }
     
     public void viewMovieRegister(){

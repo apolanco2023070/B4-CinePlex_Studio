@@ -13,14 +13,14 @@ import javafx.stage.Stage;
  */
 public class SceneManager {
 
-    private static SceneManager instanciaSceneManager;
+    private static SceneManager sceneManagerInstance;
     private Stage primaryStage;
 
-    public static SceneManager getInstanciaSceneManager() {
-        if (instanciaSceneManager == null) {
-            instanciaSceneManager = new SceneManager();
+    public static SceneManager getSceneManagerInstance() {
+        if (sceneManagerInstance == null) {
+            sceneManagerInstance = new SceneManager();
         }
-        return instanciaSceneManager;
+        return sceneManagerInstance;
     }
 
     public void changeScene(Scene scene) {

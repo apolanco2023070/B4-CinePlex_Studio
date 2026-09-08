@@ -15,35 +15,32 @@ import java.sql.SQLException;
  */
 public class DatabaseConnection {
 
-    private static DatabaseConnection instanciaDataBaseConnection;
-    private Connection connectionDB;
+    private static DatabaseConnection databaseInstance;
 
     private DatabaseConnection() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            connectionDB = DriverManager.getConnection("jdbc:mysql://" + Enviroment.LOCATION_SERVICE + "/" + Enviroment.DATA_BASE,
-                    Enviroment.USER, Enviroment.PASSWORD);
-        } catch (ClassNotFoundException classNotFound) {
-            System.out.println("error de clases no encontrada");
-        } catch (SQLException sqlException) {
-            System.out.println("Error conexion sql");
-        } catch (Exception e) {
-            System.out.println("Error padre");
+        } catch (ClassNotFoundException e) {
+            System.err.println("Error: Driver de MySQL no encontrado. " + e.getMessage());
+            throw new RuntimeException("Driver de MySQL no encontrado", e);
         }
     }
 
-    public static DatabaseConnection getInstanciaDataBaseConnection() {
-        if(instanciaDataBaseConnection == null)
-            instanciaDataBaseConnection = new DatabaseConnection();
-        return instanciaDataBaseConnection;
+
+    public static DatabaseConnection getDatabaseInstance() {
+        if (databaseInstance == null) {
+            databaseInstance = new DatabaseConnection();
+        }
+        return databaseInstance;
     }
 
-    public Connection getConnectionDB() {
-        return connectionDB;
-    }
-
-    public void setConnectionDB(Connection connectionDB) {
-        this.connectionDB = connectionDB;
+   
+    public Connection getConnectionDB() throws SQLException {
+        return DriverManager.getConnection(
+            "jdbc:mysql://" + Enviroment.LOCATION_SERVICE + "/" + Enviroment.DATA_BASE + "?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true",
+            Enviroment.USER, 
+            Enviroment.PASSWORD
+        );
     }
 
 }

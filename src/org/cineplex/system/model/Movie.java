@@ -10,55 +10,63 @@ package org.cineplex.system.model;
  */
 public class Movie {
 
-    private String movieName;
-    private String rating;
-    private String genre;
-    private Integer length;
+    private Integer movieId;
+    private String title;
+    private Integer duration;
     private String director;
+    private Integer genreId;
+    private String rating;
     private String posterUrl;
+
+    private String genreName;
 
     public Movie() {
     }
 
-    public Movie(String movieName, String rating, String genre, Integer length, String director, String posterUrl) {
-        this.movieName = movieName;
-        this.rating = rating;
-        this.genre = genre;
-        this.length = length;
+    public Movie(String title, Integer duration, String director,
+            Integer genreId, String rating, String posterUrl) {
+        this.title = title;
+        this.duration = duration;
         this.director = director;
+        this.genreId = genreId;
+        this.rating = rating;
         this.posterUrl = posterUrl;
     }
 
-    public String getMovieName() {
-        return movieName;
-    }
-
-    public void setMovieName(String movieName) {
-        this.movieName = movieName;
-    }
-
-    public String getRating() {
-        return rating;
-    }
-
-    public void setRating(String rating) {
+    public Movie(Integer movieId, String title, Integer duration, String director,
+            String genreName, String rating, String posterUrl) {
+        this.movieId = movieId;
+        this.title = title;
+        this.duration = duration;
+        this.director = director;
+        this.genreName = genreName;
         this.rating = rating;
+        this.posterUrl = posterUrl;
     }
 
-    public String getGenre() {
-        return genre;
+    // Getters y Setters
+    public Integer getMovieId() {
+        return movieId;
     }
 
-    public void setGenre(String genre) {
-        this.genre = genre;
+    public void setMovieId(Integer movieId) {
+        this.movieId = movieId;
     }
 
-    public Integer getLength() {
-        return length;
+    public String getTitle() {
+        return title;
     }
 
-    public void setLength(Integer length) {
-        this.length = length;
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Integer duration) {
+        this.duration = duration;
     }
 
     public String getDirector() {
@@ -69,6 +77,22 @@ public class Movie {
         this.director = director;
     }
 
+    public Integer getGenreId() {
+        return genreId;
+    }
+
+    public void setGenreId(Integer genreId) {
+        this.genreId = genreId;
+    }
+
+    public String getRating() {
+        return rating;
+    }
+
+    public void setRating(String rating) {
+        this.rating = rating;
+    }
+
     public String getPosterUrl() {
         return posterUrl;
     }
@@ -77,4 +101,11 @@ public class Movie {
         this.posterUrl = posterUrl;
     }
 
+    public String getGenreName() {
+        return genreName;
+    }
+
+    public void setGenreName(String genreName) {
+        this.genreName = genreName;
+    }
 }
