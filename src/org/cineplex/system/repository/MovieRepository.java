@@ -19,6 +19,12 @@ import java.util.List;
  */
 public class MovieRepository {
 
+    /**
+     * 
+     * @param saveMovie 
+     * 
+     * Procedimiento que llama al SP en la database para guardar peliculas
+     */
     public void saveMovie(Movie movie) {
         String sql = "{call sp_insert_movie(?,?,?,?,?,?)}";
 
@@ -67,8 +73,7 @@ public class MovieRepository {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al consultar las películas: " + e.getMessage());
-            throw new RuntimeException("No se pudo cargar la cartelera.", e);
+            
         }
 
         return moviesList;

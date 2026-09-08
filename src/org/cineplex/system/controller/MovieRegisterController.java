@@ -11,6 +11,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import org.cineplex.system.model.Movie;
 import org.cineplex.system.repository.MovieRepository;
+import org.cineplex.system.utils.AlertInformation;
 
 /**
  *
@@ -68,25 +69,30 @@ public class MovieRegisterController {
 
     @FXML
     private void registerMovies() {
-
-        String title = txtTitle.getText().trim();
-        int duration = Integer.parseInt(txtLength.getText().trim());
-        String director = txtDirector.getText().trim();
-        String rating = txtRating.getText().trim().toUpperCase();
-        String posterUrl = txtPoster.getText().trim();
-
-        int genreId = obtenerGenreId(txtGenre.getText().trim());
-
-        Movie movie = new Movie(title, duration, director, genreId, rating, posterUrl);
-
-        // 4. Guardar en la base de datos
         try {
+            String title = txtTitle.getText().trim();
+            String lengthText = txtLength.getText().trim();
+            String director = txtDirector.getText().trim();
+            String rating = txtRating.getText().trim().toUpperCase();
+            String posterUrl = txtPoster.getText().trim();
+            String genreText = txtGenre.getText().trim();
+
+            int duration = Integer.parseInt(lengthText);
+            int genreId = obtenerGenreId(genreText);
+
+            Movie movie = new Movie(title, duration, director, genreId, rating, posterUrl);
+
             movieRepository.saveMovie(movie);
 
             limpiarFormulario();
+            AlertInformation.viewAlert("INFORMATION", "Éxito", "Registro completado", "La película se guardó correctamente en la base de datos.");
+
+        } catch (NumberFormatException e) {
+            AlertInformation.viewAlert("ERROR", "Datos inválidos", "Error de formato", "La duración debe ser un número válido (no puede estar vacía ni tener letras).");
 
         } catch (Exception e) {
-            System.err.println("Error al registrar: " + e.getMessage());
+            AlertInformation.viewAlert("ERROR", "Error al registrar", "Error de sistema",
+                    "No se pudo registrar la película. Detalle: " + e.getMessage());
             e.printStackTrace();
         }
     }
