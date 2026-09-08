@@ -37,7 +37,8 @@ public class DatabaseConnection {
    
     public Connection getConnectionDB() throws SQLException {
         return DriverManager.getConnection(
-            "jdbc:mysql://" + Enviroment.LOCATION_SERVICE + "/" + Enviroment.DATA_BASE + "?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true",
+            "jdbc:mysql://" + Enviroment.LOCATION_SERVICE + "/" +
+                    Enviroment.DATA_BASE,
             Enviroment.USER, 
             Enviroment.PASSWORD
         );

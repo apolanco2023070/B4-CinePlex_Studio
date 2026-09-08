@@ -74,70 +74,51 @@ CREATE TABLE users (
 
 -- ============================================================
 
-CREATE TABLE genre (
+USE cineplex_IN4AM;
 
+-- 1. Tabla GENRE (Padre)
+CREATE TABLE IF NOT EXISTS genre (
     genre_id INT AUTO_INCREMENT PRIMARY KEY,
-
     name VARCHAR(50) NOT NULL UNIQUE
-
 );
 
--- ============================================================
-
--- 4. TABLE: RATING
-
--- ============================================================
-
-CREATE TABLE rating (
+-- 2. Tabla RATING (Padre) - Usamos CHAR(1) como acordamos
+CREATE TABLE IF NOT EXISTS rating (
     rating_id CHAR(1) PRIMARY KEY
 );
--- ============================================================
 
--- 5. TABLE: MOVIE
-
--- ============================================================
-
-CREATE TABLE movie (
-
+-- 3. Tabla MOVIE (Hija) - ¡Aquí estaba el error! rating_id ahora es CHAR(1)
+CREATE TABLE IF NOT EXISTS movie (
     movie_id INT AUTO_INCREMENT PRIMARY KEY,
-
     title VARCHAR(200) NOT NULL,
-
     duration INT NOT NULL,
-
     director VARCHAR(150) NOT NULL,
-
     genre_id INT NOT NULL,
-
-    rating_id INT NOT NULL,
-
+    rating_id CHAR(1) NOT NULL,       -- <-- CORREGIDO: De INT a CHAR(1)
     poster_url VARCHAR(500),
-
+    
     CONSTRAINT fk_movie_genre
-
         FOREIGN KEY (genre_id)
-
         REFERENCES genre(genre_id)
-
         ON UPDATE CASCADE
-
         ON DELETE RESTRICT,
-
+        
     CONSTRAINT fk_movie_rating
-
         FOREIGN KEY (rating_id)
-
         REFERENCES rating(rating_id)
-
         ON UPDATE CASCADE
-
         ON DELETE RESTRICT,
-
+        
     CONSTRAINT chk_duration
-
         CHECK (duration > 0)
-
 );
+
+-- 4. Insertar datos iniciales (¡Importante hacerlo después de crear las tablas!)
+INSERT INTO genre (name) VALUES ('Action'), ('Drama'), ('Comedy')
+ON DUPLICATE KEY UPDATE name=name;
+
+INSERT INTO rating (rating_id) VALUES ('A'), ('B'), ('C')
+ON DUPLICATE KEY UPDATE rating_id=rating_id;
 
 -- ============================================================
 
@@ -366,14 +347,7 @@ INSERT INTO genre (name) VALUES
 
 -- ============================================================
 
-INSERT INTO rating (name) VALUES
 
-('A'), -- (Can be changed to 'G' for General audiences)
-
-('B'), -- (Can be changed to 'PG' for Parental Guidance)
-
-('C'); -- (Can be changed to 'R' for Restricted)
- 
 -- ============================================================
 
 -- INITIAL ADMINISTRATOR USER
@@ -460,3 +434,5 @@ BEGIN
 END 
 
 DELIMITER ;
+
+select * from movie;
