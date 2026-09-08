@@ -4,17 +4,37 @@
  */
 package org.cineplex.system;
 
-/**
- *
- * @author Polanco
- */
-public class ClasePrincipal {
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
-    }
+public class ClasePrincipal extends Application {
     
+    @Override
+    public void start(Stage primaryStage) {
+        try {
+        
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Login.fxml"));
+            Parent root = loader.load();
+            
+            Scene scene = new Scene(root);
+            
+            primaryStage.setTitle("CinePlex - Iniciar Sesión");
+            primaryStage.setScene(scene);
+            primaryStage.setResizable(false);
+            primaryStage.show();
+            
+        } catch (Exception e) {
+            System.err.println("ERROR: No se pudo cargar Login.fxml");
+            System.err.println("Ruta buscada: /view/Login.fxml");
+            System.err.println("Detalle: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
 }
