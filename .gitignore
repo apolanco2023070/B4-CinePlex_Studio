@@ -7,7 +7,11 @@ dist/*
 
 
 # Compiled class file
+<<<<<<< HEAD
 *.class 
+=======
+*.class
+>>>>>>> bfc7b5f49f5f9cd4109bd3a717bd3e8c5499e5ce
 src/org/cineplex/system/config/Enviroment.java
 
 # Log file

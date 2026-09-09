@@ -4,7 +4,7 @@
  */
 package org.cineplex.system.utils;
 
-/**
+/*
  * Clase de utilidades para validaciones de datos.
  * @author informatica
  */
@@ -13,7 +13,6 @@ public class Validations {
     public Validations() {
     }
 
-  
     public boolean equalsText(String textOriginal, String textCompare) {
         if (textOriginal == null || textCompare == null) return false;
         return textOriginal.equals(textCompare);
@@ -40,13 +39,13 @@ public class Validations {
         }
     }
 
-   
     public boolean isPositiveNumber(String text) {
-        if (!isNumeric(text)) return false;
+        if (!isNumeric(text)) {
+            return false;
+        }
         return Integer.parseInt(text) > 0;
     }
 
-   
     public boolean isValidRating(String rating) {
         if (emptyText(rating)) return false;
         String r = rating.trim().toUpperCase();
