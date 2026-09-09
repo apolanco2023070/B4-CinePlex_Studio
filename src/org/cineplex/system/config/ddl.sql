@@ -36,11 +36,6 @@ CREATE TABLE role (
 
 );
 
-INSERT INTO role (name) VALUES
-('ADMINISTRATOR'),
-('MANAGER');
-
-
 -- ============================================================
 
 -- 2. TABLE: USERS
@@ -79,75 +74,51 @@ CREATE TABLE users (
 
 -- ============================================================
 
-CREATE TABLE genre (
+USE cineplex_IN4AM;
 
+-- 1. Tabla GENRE (Padre)
+CREATE TABLE IF NOT EXISTS genre (
     genre_id INT AUTO_INCREMENT PRIMARY KEY,
-
     name VARCHAR(50) NOT NULL UNIQUE
-
 );
 
--- ============================================================
-
--- 4. TABLE: RATING
-
--- ============================================================
-
-CREATE TABLE rating (
-
-    rating_id INT AUTO_INCREMENT PRIMARY KEY,
-
-    name VARCHAR(5) NOT NULL UNIQUE
-
+-- 2. Tabla RATING (Padre) - Usamos CHAR(1) como acordamos
+CREATE TABLE IF NOT EXISTS rating (
+    rating_id CHAR(1) PRIMARY KEY
 );
 
--- ============================================================
-
--- 5. TABLE: MOVIE
-
--- ============================================================
-
-CREATE TABLE movie (
-
+-- 3. Tabla MOVIE (Hija) - ¡Aquí estaba el error! rating_id ahora es CHAR(1)
+CREATE TABLE IF NOT EXISTS movie (
     movie_id INT AUTO_INCREMENT PRIMARY KEY,
-
     title VARCHAR(200) NOT NULL,
-
     duration INT NOT NULL,
-
     director VARCHAR(150) NOT NULL,
-
     genre_id INT NOT NULL,
-
-    rating_id INT NOT NULL,
-
+    rating_id CHAR(1) NOT NULL,       -- <-- CORREGIDO: De INT a CHAR(1)
     poster_url VARCHAR(500),
-
+    
     CONSTRAINT fk_movie_genre
-
         FOREIGN KEY (genre_id)
-
         REFERENCES genre(genre_id)
-
         ON UPDATE CASCADE
-
         ON DELETE RESTRICT,
-
+        
     CONSTRAINT fk_movie_rating
-
         FOREIGN KEY (rating_id)
-
         REFERENCES rating(rating_id)
-
         ON UPDATE CASCADE
-
         ON DELETE RESTRICT,
-
+        
     CONSTRAINT chk_duration
-
         CHECK (duration > 0)
-
 );
+
+-- 4. Insertar datos iniciales (¡Importante hacerlo después de crear las tablas!)
+INSERT INTO genre (name) VALUES ('Action'), ('Drama'), ('Comedy')
+ON DUPLICATE KEY UPDATE name=name;
+
+INSERT INTO rating (rating_id) VALUES ('A'), ('B'), ('C')
+ON DUPLICATE KEY UPDATE rating_id=rating_id;
 
 -- ============================================================
 
@@ -243,6 +214,10 @@ CREATE TABLE screening (
 
         ON DELETE RESTRICT,
 
+    -- Prevents registering two exactly identical screenings 
+
+    -- in the same auditorium, date, and time
+
     CONSTRAINT uq_screening_auditorium_date_time
 
         UNIQUE (auditorium_id, show_date, show_time)
@@ -299,6 +274,7 @@ CREATE TABLE reservation (
 
         ON DELETE RESTRICT,
 
+    -- A seat can only be reserved once for the same screening
 
     CONSTRAINT uq_reservation_screening_seat
  
@@ -335,6 +311,135 @@ CREATE TABLE ticket (
 
 -- ============================================================
 
+-- INITIAL DATA
+
+-- ============================================================
+ 
+-- ============================================================
+
+-- ROLES
+
+-- ============================================================
+
+INSERT INTO role (name) VALUES
+
+('ADMINISTRATOR'),
+
+('MANAGER');
+
+-- ============================================================
+
+-- GENRES
+
+-- ============================================================
+ 
+INSERT INTO genre (name) VALUES
+
+('Action'),
+
+('Drama'),
+
+('Comedy');
+ 
+-- ============================================================
+
+-- RATINGS
+
+-- ============================================================
+
+
+-- ============================================================
+
+-- INITIAL ADMINISTRATOR USER
+
+-- ============================================================	
+
+INSERT INTO users (full_name, username, password, email, role_id)
+
+VALUES (
+
+    'CinePlex Administrator',
+
+    'admin',
+
+    'admin123',
+
+    'admin@cineplex.com',
+
+    1
+
+);
+ 
+-- ============================================================
+
+-- VERIFICATION
+
+-- ============================================================
+
+SELECT * FROM role;
+
+SELECT * FROM users;
+
+SELECT * FROM genre;
+
+SELECT * FROM rating;
+
+SELECT * FROM movie;
+
+SELECT * FROM auditorium;
+
+SELECT * FROM seat;
+
+SELECT * FROM screening;
+
+SELECT * FROM reservation;
+
+SELECT * FROM ticket;
+
+ # Stores Procedures
+ USE cineplex_IN4AM;
+
+
+Delimiter $$
+CREATE PROCEDURE sp_insert_movie(
+    IN p_title VARCHAR(200),
+    IN p_duration INT,
+    IN p_director VARCHAR(150),
+    IN p_genre_id INT,
+    IN p_rating_id INT,
+    IN p_poster_url VARCHAR(500)
+)
+BEGIN
+    INSERT INTO movie (title, duration, director, genre_id, rating_id, poster_url)
+    VALUES (p_title, p_duration, p_director, p_genre_id, p_rating_id, p_poster_url);
+END $$
+
+Delimiter ;
+
+Delimiter $$
+CREATE PROCEDURE sp_get_all_movies()
+BEGIN
+    SELECT 
+        m.movie_id,
+        m.title,
+        m.duration,
+        m.director,
+        g.name AS genre_name,
+        r.name AS rating_name,
+        m.poster_url
+    FROM movie m
+    INNER JOIN genre g ON m.genre_id = g.genre_id
+    INNER JOIN rating r ON m.rating_id = r.rating_id
+    ORDER BY m.title ASC;
+END 
+
+DELIMITER ;
+
+select * from movie;
+
+
+-- ============================================================
+
 -- 10. Procedimientos para Inicio de sesion
 
 -- ============================================================
@@ -356,7 +461,6 @@ END $$
 
 DELIMITER ;
 
-<<<<<<< HEAD:src/org/cineplex/system/config/ddl.sql
 
 INSERT INTO users (full_name, username, password, email, role_id)
 VALUES (
@@ -377,6 +481,4 @@ VALUES (
     2 
 );
 
-=======
 select * from movie;
->>>>>>> 311a243 (fix: Errores de tipos de datos en la DB arreglados):src/org/cineplex/system/config/DataBase.sql

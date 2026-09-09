@@ -30,11 +30,20 @@ public class AdministradorController {
         mostrarMensaje("Cartelera", "Módulo de Cartelera abierto (Gestión completa)");
     }
 
-    @FXML
-    public void abrirUsuarios() {
-        System.out.println("HU3: Administrador accede a Gestión de Usuarios - PERMITIDO");
-        mostrarMensaje("Usuarios", "Módulo de Gestión de Usuarios abierto");
+@FXML
+public void abrirUsuarios() {
+    System.out.println("HU4: Administrador accede a Gestión de Usuarios - PERMITIDO");
+    try {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/UserManagement.fxml"));
+        Parent root = loader.load();
+        Stage stage = (Stage) lblBienvenida.getScene().getWindow();
+        stage.setScene(new Scene(root));
+        stage.setTitle("Gestión de Usuarios - CinePlex");
+    } catch (Exception e) {
+        e.printStackTrace();
+        mostrarMensaje("Error", "No se pudo cargar la pantalla de usuarios.");
     }
+}
 
     @FXML
     public void abrirReportes() {
@@ -54,6 +63,8 @@ public class AdministradorController {
             e.printStackTrace();
         }
     }
+    
+    
 
     private void mostrarMensaje(String titulo, String contenido) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
