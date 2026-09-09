@@ -30,14 +30,14 @@
          <children>
             <Label fx:id="lblTitle" text="Titulo" />
             <Label fx:id="lblGenre" text="Genero" GridPane.rowIndex="1" />
-            <Label fx:id="lblLength" text="Duracion" GridPane.rowIndex="2" />
+            <Label fx:id="lblLength" text="Duracion (min)" GridPane.rowIndex="2" />
             <Label fx:id="lblRating" text="Clasificacion" GridPane.rowIndex="3" />
             <Label fx:id="lblDirector" text="Director" GridPane.rowIndex="4" />
             <Label fx:id="lblPoster" text="Poster" GridPane.rowIndex="5" />
             <TextField fx:id="txtTitle" GridPane.columnIndex="1" />
-            <TextField fx:id="txtGenre" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <TextField fx:id="txtLength" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <TextField fx:id="txtRating" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <TextField fx:id="txtGenre" promptText="Action,Drama,Comedy" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="txtLength" promptText="140,160" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="txtRating" promptText="A,B,C" GridPane.columnIndex="1" GridPane.rowIndex="3" />
             <TextField fx:id="txtDirector" GridPane.columnIndex="1" GridPane.rowIndex="4" />
             <TextField fx:id="txtPoster" GridPane.columnIndex="1" GridPane.rowIndex="5" />
          </children>
