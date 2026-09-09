@@ -356,6 +356,7 @@ END $$
 
 DELIMITER ;
 
+<<<<<<< HEAD:src/org/cineplex/system/config/ddl.sql
 
 INSERT INTO users (full_name, username, password, email, role_id)
 VALUES (
@@ -376,3 +377,6 @@ VALUES (
     2 
 );
 
+=======
+select * from movie;
+>>>>>>> 311a243 (fix: Errores de tipos de datos en la DB arreglados):src/org/cineplex/system/config/DataBase.sql
