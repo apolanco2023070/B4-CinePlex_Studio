@@ -3,27 +3,16 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
+
             <file>file:/C:/Users/Informatica/Desktop/Apolanco-2023070%20MAT/CinePlex/B4-CinePlex_Studio/src/org/cineplex/system/ClasePrincipal.java</file>
-=======
-=======
->>>>>>> ebc7250c0b6ecf05dec7cd1ae24e388332b84b87
             <file>file:/C:/Users/Informatica/Desktop/MAT-2023184/BIM4/scrum/B4-CinePlex_Studio/src/org/cineplex/system/utils/AlertInformation.java</file>
             <file>file:/C:/Users/Informatica/Desktop/MAT-2023184/BIM4/scrum/B4-CinePlex_Studio/src/org/cineplex/system/config/Enviroment.java</file>
             <file>file:/C:/Users/Informatica/Desktop/MAT-2023184/BIM4/scrum/B4-CinePlex_Studio/src/org/cineplex/system/utils/Validations.java</file>
             <file>file:/C:/Users/Informatica/Desktop/MAT-2023184/BIM4/scrum/B4-CinePlex_Studio/src/org/cineplex/system/config/ConexionDB.java</file>
-<<<<<<< HEAD
->>>>>>> ebc7250 (feat: se agrego logica para las validaciones)
-=======
->>>>>>> ebc7250c0b6ecf05dec7cd1ae24e388332b84b87
-=======
             <file>file:/C:/Users/informatica/OneDrive%20-%20Fundación%20Kinal%20-Alumnos-/Escritorio/BIM4%202023230%20MAT/B4-CinePlex_Studio/src/org/cineplex/system/repository/MovieRepository.java</file>
             <file>file:/C:/Users/informatica/OneDrive%20-%20Fundación%20Kinal%20-Alumnos-/Escritorio/BIM4%202023230%20MAT/B4-CinePlex_Studio/src/org/cineplex/system/utils/ViewFactory.java</file>
             <file>file:/C:/Users/informatica/OneDrive%20-%20Fundación%20Kinal%20-Alumnos-/Escritorio/BIM4%202023230%20MAT/B4-CinePlex_Studio/src/org/cineplex/system/MainClass.java</file>
             <file>file:/C:/Users/informatica/OneDrive%20-%20Fundación%20Kinal%20-Alumnos-/Escritorio/BIM4%202023230%20MAT/B4-CinePlex_Studio/src/org/cineplex/system/resources/styles/Movie.css</file>
->>>>>>> bfc7b5f49f5f9cd4109bd3a717bd3e8c5499e5ce
         </group>
     </open-files>
 </project-private>
