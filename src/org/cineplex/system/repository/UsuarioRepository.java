@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package org.cineplex.system.dao;
+package org.cineplex.system.repository;
 
 import org.cineplex.system.config.ConexionDB;
 import org.cineplex.system.model.Rol;
@@ -12,7 +12,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class UsuarioDAO {
+public class UsuarioRepository {
     
     public Usuario buscarPorNombreUsuario(String nombreUsuario) {
         String sql = "{CALL sp_obtener_usuario_por_username(?)}";
