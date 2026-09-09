@@ -4,6 +4,7 @@
  */
 package org.cineplex.system.controller;
 
+import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -29,28 +30,28 @@ public class SeatsController {
 
     @FXML
     private Button btnRegisterRoom;
-    
+
     @FXML
     private Button btnRegisterSeats;
-    
+
     @FXML
     private ComboBox<Auditorium> cmbRooms;
-    
+
     @FXML
     private Label lblCapacity;
-    
+
     @FXML
     private Label lblRooms;
-    
+
     @FXML
     private TextField txtCapacity;
-    
+
     @FXML
     private TableView<Seat> tblSeats;
-    
+
     @FXML
     private TableColumn<Seat, Integer> colNumber;
-    
+
     @FXML
     private TableColumn<Seat, String> colStatus;
 
@@ -79,6 +80,7 @@ public class SeatsController {
     private void configureComboBox() {
         cmbRooms.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
             if (newValue != null) {
+                System.out.println("Sala seleccionada: " + newValue.getName() + " (ID: " + newValue.getAuditoriumId() + ")");
                 loadSeats(newValue.getAuditoriumId());
             }
         });
@@ -147,30 +149,28 @@ public class SeatsController {
     }
 
     private void createSeatsForAuditorium(Integer auditoriumId, int capacity) {
-        int seatsPerRow = 10;
-        int seatNumber = 1;
-        char row = 'A';
+        for (int i = 1; i <= capacity; i++) {
 
-        for (int i = 0; i < capacity; i++) {
-            Seat seat = new Seat(seatNumber, auditoriumId); 
+            Seat seat = new Seat(i, auditoriumId);
+
             seatRepository.saveSeat(seat);
-
-            seatNumber++;
-            if (seatNumber > seatsPerRow) {
-                seatNumber = 1;
-                row++;
-            }
         }
     }
 
     private void loadSeats(Integer auditoriumId) {
         try {
-            ObservableList<Seat> seats = FXCollections.observableArrayList(
-                    seatRepository.findByAuditoriumId(auditoriumId)
-            );
+            tblSeats.getItems().clear();
+
+            List<Seat> seatsFromDB = seatRepository.findByAuditoriumId(auditoriumId);
+            System.out.println("Asientos encontrados en BD: " + seatsFromDB.size());
+
+            ObservableList<Seat> seats = FXCollections.observableArrayList(seatsFromDB);
             tblSeats.setItems(seats);
+            tblSeats.refresh();
+
         } catch (Exception e) {
             AlertInformation.viewAlert("ERROR", "Load Error", "Could not load seats", e.getMessage());
+            e.printStackTrace();
         }
     }
 }

@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml/1" 
-      fx:controller="org.cineplex.system.controller.AdministradorController" style="-fx-background-color: #ecf0f1;">
-    <padding><Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/></padding>
-    <Label text="Panel Administrador" style="-fx-text-fill: #2c3e50;"><font><Font size="28.0" /></font></Label>
-    <Label fx:id="lblBienvenida" text="Bienvenido" style="-fx-text-fill: #34495e;"><font><Font size="16.0" /></font></Label>
-    <VBox spacing="15.0" alignment="CENTER" maxWidth="300">
-        <Button text="Gestionar Cartelera" onAction="#abrirCartelera" style="-fx-background-color: #3498db; -fx-text-fill: white;" prefWidth="300" />
-        <Button text="Gestionar Usuarios" onAction="#abrirUsuarios" style="-fx-background-color: #3498db; -fx-text-fill: white;" prefWidth="300" />
-        <Button text="Reportes" onAction="#abrirReportes" style="-fx-background-color: #3498db; -fx-text-fill: white;" prefWidth="300" />
-        <Button text="Cerrar Sesión" onAction="#cerrarSesion" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" prefWidth="300" />
+<VBox alignment="CENTER" spacing="20.0" style="-fx-background-color: #ecf0f1;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21.0.1" fx:controller="org.cineplex.system.controller.AdministradorController">
+    <padding><Insets bottom="40.0" left="40.0" right="40.0" top="40.0" /></padding>
+    <Label style="-fx-text-fill: #2c3e50;" text="Panel Administrador"><font><Font size="28.0" /></font></Label>
+    <Label fx:id="lblBienvenida" style="-fx-text-fill: #34495e;" text="Bienvenido"><font><Font size="16.0" /></font></Label>
+    <VBox alignment="CENTER" maxWidth="300" spacing="15.0">
+        <Button onAction="#abrirCartelera" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Gestionar Cartelera" />
+        <Button onAction="#abrirUsuarios" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Gestionar Usuarios" />
+      <Button fx:id="btnManageSeatsAndAuditoriums" onAction="#manageSeatsAndAuditoriums" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Gestionar Salas y Asientos" />
+        <Button onAction="#abrirReportes" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Reportes" />
+        <Button onAction="#cerrarSesion" prefWidth="300" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" text="Cerrar Sesión" />
     </VBox>
 </VBox>

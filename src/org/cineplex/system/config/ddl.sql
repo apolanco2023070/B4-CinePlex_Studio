@@ -164,7 +164,6 @@ CREATE TABLE seat (
 
         ON DELETE CASCADE,
 
-    -- A seat number cannot be repeated within the same auditorium
 
     CONSTRAINT uq_seat_auditorium
 
@@ -534,5 +533,6 @@ END $$
 
 DELIMITER ;
 
-
-
+call sp_delete_seats_by_auditorium(1);
+call sp_delete_seats_by_auditorium(2);
+call sp_delete_seats_by_auditorium(3);
