@@ -1,9 +1,9 @@
+
 package org.cineplex.system.utils;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
- 
- 
+
 public class AlertInformation {
  
     public AlertInformation() {
@@ -18,6 +18,7 @@ public class AlertInformation {
      * @param mensaje     Contenido principal del mensaje
      */
     public void viewAlert(String tipoAlerta, String titulo, String encabezado, String mensaje) {
+
         // Variable local de tipo AlertType que almacenará el tipo de alerta a mostrar
         AlertType tipo;
  
@@ -52,4 +53,5 @@ public class AlertInformation {
         // Mostrar la alerta
         alert.showAndWait();
     }
+    
 }
