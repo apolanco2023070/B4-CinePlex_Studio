@@ -39,7 +39,7 @@ public class ConexionDB {
         return instanciaConexionDB;
     }
  
-    public static Connection getConnection() {
+    public Connection getConnection() {
         return connection;
     }
  
