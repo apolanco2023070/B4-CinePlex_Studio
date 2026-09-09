@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package org.cineplex.system.utils;
 
 /*
@@ -18,7 +15,6 @@ public class Validations {
         return textOriginal.equals(textCompare);
     }
 
-
     public boolean emptyText(String text) {
         return text == null || text.isEmpty() || text.isBlank();
     }
@@ -28,7 +24,6 @@ public class Validations {
         return text.length() <= lengthMax;
     }
 
-   
     public boolean isNumeric(String text) {
         if (emptyText(text)) return false;
         try {
@@ -52,7 +47,6 @@ public class Validations {
         return r.equals("A") || r.equals("B") || r.equals("C");
     }
 
- 
     public boolean isValidGenre(String genre) {
         if (emptyText(genre)) return false;
         String g = genre.trim().toLowerCase();
@@ -61,3 +55,4 @@ public class Validations {
                g.equals("comedy") || g.equals("comedia");
     }
 }
+

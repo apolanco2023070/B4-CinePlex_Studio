@@ -28,6 +28,6 @@ public class MainClass extends Application {
         
         SceneManager.getSceneManagerInstance().setPrimaryStage(stageRoot);
         ViewFactory viewFactory = new ViewFactory();
-        viewFactory.viewLogin();
+        viewFactory.viewSeatsAndAuditoriumManagment();
     }
 }

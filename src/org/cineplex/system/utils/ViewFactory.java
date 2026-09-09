@@ -50,6 +50,11 @@ public class ViewFactory {
                     SceneManager.getSceneManagerInstance().getPrimaryStage().setResizable(false);
                     scene = loadFileFXML("Login.fxml", 380, 316);
                 }
+            case "seatManagment" -> {
+                    SceneManager.getSceneManagerInstance().getPrimaryStage().setTitle("Inicio de sesión");
+                    SceneManager.getSceneManagerInstance().getPrimaryStage().setResizable(false);
+                    scene = loadFileFXML("SeatsAndRoomsManagment.fxml", 600, 400);
+                }
                 default ->
 
                     scene = loadFileFXML("MovieRegister.fxml", 300, 400);
@@ -66,5 +71,9 @@ public class ViewFactory {
     
     public void viewLogin(){
         loadScene("login");
+    }
+    
+    public void viewSeatsAndAuditoriumManagment(){
+        loadScene("seatManagment");
     }
 }
