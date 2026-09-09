@@ -44,7 +44,7 @@
       </GridPane>
       <ToolBar prefHeight="40.0" prefWidth="200.0">
         <items>
-          <Button fx:id="btnRegisterMovie" mnemonicParsing="false" onMouseClicked="#registerMovies" text="Registrar" />
+          <Button fx:id="btnRegisterMovie" mnemonicParsing="false" onAction="#registerMovies" text="Registrar" />
         </items>
       </ToolBar>
    </children>
