@@ -2,32 +2,26 @@
 
 -- DATABASE: CINEPLEX
 
--- CinePlex Management System
-
 -- ============================================================
-
--- Drop database if it already exists
-
+ 
+ 
 DROP DATABASE IF EXISTS cineplex_IN4AM;
-
--- Create database
 
 CREATE DATABASE cineplex_IN4AM
 
 CHARACTER SET utf8mb4
 
 COLLATE utf8mb4_unicode_ci;
-
--- Select database
-
+ 
 USE cineplex_IN4AM;
  
 -- ============================================================
 
--- 1. TABLE: ROLE
+-- 2. ESTRUCTURA DE TABLAS (DDL)
 
 -- ============================================================
-
+ 
+ 
 CREATE TABLE role (
 
     role_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -35,18 +29,8 @@ CREATE TABLE role (
     name VARCHAR(50) NOT NULL UNIQUE
 
 );
-
-INSERT INTO role (name) VALUES
-('ADMINISTRATOR'),
-('MANAGER');
-
-
--- ============================================================
-
--- 2. TABLE: USERS
-
--- ============================================================
-
+ 
+ 
 CREATE TABLE users (
 
     user_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -72,13 +56,8 @@ CREATE TABLE users (
         ON DELETE RESTRICT
 
 );
-
--- ============================================================
-
--- 3. TABLE: GENRE
-
--- ============================================================
-
+ 
+ 
 CREATE TABLE genre (
 
     genre_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -86,27 +65,14 @@ CREATE TABLE genre (
     name VARCHAR(50) NOT NULL UNIQUE
 
 );
-
--- ============================================================
-
--- 4. TABLE: RATING
-
--- ============================================================
-
+ 
 CREATE TABLE rating (
 
-    rating_id INT AUTO_INCREMENT PRIMARY KEY,
-
-    name VARCHAR(5) NOT NULL UNIQUE
+    rating_id CHAR(1) PRIMARY KEY
 
 );
-
--- ============================================================
-
--- 5. TABLE: MOVIE
-
--- ============================================================
-
+ 
+ 
 CREATE TABLE movie (
 
     movie_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -119,7 +85,7 @@ CREATE TABLE movie (
 
     genre_id INT NOT NULL,
 
-    rating_id INT NOT NULL,
+    rating_id CHAR(1) NOT NULL,
 
     poster_url VARCHAR(500),
 
@@ -148,12 +114,7 @@ CREATE TABLE movie (
         CHECK (duration > 0)
 
 );
-
--- ============================================================
-
--- 6. TABLE: AUDITORIUM
-
--- ============================================================
+ 
  
 CREATE TABLE auditorium (
 
@@ -168,13 +129,8 @@ CREATE TABLE auditorium (
         CHECK (capacity > 0)
 
 );
-
--- ============================================================
-
--- 7. TABLE: SEAT
-
--- ===== =======================================================
-
+ 
+ 
 CREATE TABLE seat (
 
     seat_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -193,8 +149,6 @@ CREATE TABLE seat (
 
         ON DELETE CASCADE,
 
-    -- A seat number cannot be repeated within the same auditorium
-
     CONSTRAINT uq_seat_auditorium
 
         UNIQUE (seat_number, auditorium_id),
@@ -204,13 +158,7 @@ CREATE TABLE seat (
         CHECK (seat_number > 0)
 
 );
-
--- ============================================================
-
--- 8. TABLE: SCREENING
-
--- ============================================================
-
+ 
 CREATE TABLE screening (
 
     screening_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -248,13 +196,8 @@ CREATE TABLE screening (
         UNIQUE (auditorium_id, show_date, show_time)
 
 );
-
--- ============================================================
-
--- 9. TABLE: RESERVATION
-
--- ============================================================
-
+ 
+ 
 CREATE TABLE reservation (
 
     reservation_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -299,19 +242,11 @@ CREATE TABLE reservation (
 
         ON DELETE RESTRICT,
 
-
     CONSTRAINT uq_reservation_screening_seat
- 
+
         UNIQUE (screening_id, seat_id)
- 
+
 );
- 
- 
--- ============================================================
-
--- 10. TABLE: TICKET
-
--- ============================================================
  
 CREATE TABLE ticket (
 
@@ -332,51 +267,140 @@ CREATE TABLE ticket (
         ON DELETE RESTRICT
 
 );
-
+ 
 -- ============================================================
 
--- 10. Procedimientos para Inicio de sesion
+-- 3. DATOS INICIALES (DML)
 
 -- ============================================================
+ 
+ 
+INSERT INTO role (name) VALUES
+
+('ADMINISTRATOR'),
+
+('MANAGER');
+ 
+ 
+INSERT INTO genre (name) VALUES
+
+('Action'),
+
+('Drama'),
+
+('Comedy');
+ 
+ 
+INSERT INTO rating (rating_id) VALUES
+
+('A'),
+('B'),
+('C');
+ 
+ 
+INSERT INTO users (full_name, username, password, email, role_id) VALUES
+
+('Administrador Principal', 'admin', 'admin123', 'admin@cineplex.com', 1),
+
+('Gerente de Cine', 'gerente', 'gerente123', 'gerente@cineplex.com', 2);
+ 
+-- ============================================================
+
+-- 4. PROCEDIMIENTOS ALMACENADOS (STORED PROCEDURES)
+
+-- ============================================================
+ 
+ 
 DELIMITER $$
 
 CREATE PROCEDURE sp_obtener_usuario_por_username(IN p_username VARCHAR(50))
+
 BEGIN
-    -- Selecciona los datos del usuario y su rol asociado
-    SELECT 
-        u.user_id, 
-        u.username, 
-        u.password, 
-        r.role_id, 
-        r.name 
-    FROM users u 
-    JOIN role r ON u.role_id = r.role_id 
+
+    SELECT
+
+        u.user_id,
+
+        u.username,
+
+        u.password,
+
+        r.role_id,
+
+        r.name
+
+    FROM users u
+
+    JOIN role r ON u.role_id = r.role_id
+
     WHERE u.username = p_username;
+
 END $$
 
 DELIMITER ;
+ 
+ 
+DELIMITER $$
 
-<<<<<<< HEAD:src/org/cineplex/system/config/ddl.sql
+CREATE PROCEDURE sp_insert_movie(
 
-INSERT INTO users (full_name, username, password, email, role_id)
-VALUES (
-    'Administrador Principal',
-    'admin',
-    'admin123',
-    'admin@cineplex.com',
-    1
-);
+    IN p_title VARCHAR(200),
 
+    IN p_duration INT,
 
-INSERT INTO users (full_name, username, password, email, role_id)
-VALUES (
-    'Gerente de Cine',
-    'gerente',
-    'gerente123',
-    'gerente@cineplex.com',
-    2 
-);
+    IN p_director VARCHAR(150),
 
-=======
-select * from movie;
->>>>>>> 311a243 (fix: Errores de tipos de datos en la DB arreglados):src/org/cineplex/system/config/DataBase.sql
+    IN p_genre_id INT,
+
+    IN p_rating_id CHAR(1), 
+
+    IN p_poster_url VARCHAR(500)
+
+)
+
+BEGIN
+
+    INSERT INTO movie (title, duration, director, genre_id, rating_id, poster_url)
+
+    VALUES (p_title, p_duration, p_director, p_genre_id, p_rating_id, p_poster_url);
+
+END $$
+
+DELIMITER ;
+ 
+ 
+DELIMITER $$
+
+CREATE PROCEDURE sp_get_all_movies()
+
+BEGIN
+
+    SELECT
+
+        m.movie_id,
+
+        m.title,
+
+        m.duration,
+
+        m.director,
+
+        g.name AS genre_name,
+
+        r.rating_id AS rating_name, 
+
+        m.poster_url
+
+    FROM movie m
+
+    INNER JOIN genre g ON m.genre_id = g.genre_id
+
+    INNER JOIN rating r ON m.rating_id = r.rating_id
+
+    ORDER BY m.title ASC;
+
+END $$
+
+DELIMITER ;
+ 
+ 

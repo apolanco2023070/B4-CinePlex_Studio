@@ -1,47 +1,73 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+* Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+* Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+*/
 package org.cineplex.system.config;
-
-import org.cineplex.system.config.Enviroment;
+ 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
-/**
- *
- * @author informatica
- */
+ 
 public class DatabaseConnection {
-
+ 
     private static DatabaseConnection databaseInstance;
-
+    private Connection connection;
+ 
+    
     private DatabaseConnection() {
+        conectar();
+    }
+ 
+    
+    private void conectar() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            System.err.println("Error: Driver de MySQL no encontrado. " + e.getMessage());
-            throw new RuntimeException("Driver de MySQL no encontrado", e);
+            this.connection = DriverManager.getConnection(
+                    "jdbc:mysql://" + Enviroment.LOCATION_SERVICE + "/" + Enviroment.DATA_BASE,
+                    Enviroment.USER,
+                    Enviroment.PASSWORD);
+        } catch (ClassNotFoundException classNotFound) {
+            System.err.println("Error de clase no encontrada: " + classNotFound.getMessage());
+        } catch (SQLException sqlException) {
+            System.err.println("Error de conexión SQL: " + sqlException.getMessage());
+        } catch (Exception e) {
+            System.err.println("Error padre: " + e.getMessage());
         }
     }
-
-
+ 
     public static DatabaseConnection getDatabaseInstance() {
         if (databaseInstance == null) {
             databaseInstance = new DatabaseConnection();
         }
         return databaseInstance;
     }
+ 
 
-   
-    public Connection getConnectionDB() throws SQLException {
-        return DriverManager.getConnection(
-            "jdbc:mysql://" + Enviroment.LOCATION_SERVICE + "/" +
-                    Enviroment.DATA_BASE,
-            Enviroment.USER, 
-            Enviroment.PASSWORD
-        );
+    public Connection getConnectionDB() {
+        try {
+            if (this.connection == null || this.connection.isClosed()) {
+                System.out.println(" La conexión estaba cerrada. Reconectando a la base de datos...");
+                conectar();
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al verificar el estado de la conexión: " + e.getMessage());
+        }
+        return this.connection;
     }
-
+ 
+    public void setConnection   (Connection connection) {
+        this.connection = connection;
+    }
+ 
+  
+    public void cerrarConexion() {
+        try {
+            if (this.connection != null && !this.connection.isClosed()) {
+                this.connection.close();
+                System.out.println("Conexión cerrada correctamente al salir de la aplicación.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al cerrar la conexión: " + e.getMessage());
+        }
+    }
 }

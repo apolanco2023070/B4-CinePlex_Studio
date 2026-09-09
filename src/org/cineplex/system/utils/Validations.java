@@ -1,23 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.cineplex.system.utils;
 
-/*
- * Clase de utilidades para validaciones de datos.
- * @author informatica
- */
 public class Validations {
-
-    public Validations() {
-    }
-
-    public boolean equalsText(String textOriginal, String textCompare) {
-        if (textOriginal == null || textCompare == null) return false;
-        return textOriginal.equals(textCompare);
-    }
-
+    public Validations() {}
 
     public boolean emptyText(String text) {
         return text == null || text.isEmpty() || text.isBlank();
@@ -28,7 +12,6 @@ public class Validations {
         return text.length() <= lengthMax;
     }
 
-   
     public boolean isNumeric(String text) {
         if (emptyText(text)) return false;
         try {
@@ -40,9 +23,7 @@ public class Validations {
     }
 
     public boolean isPositiveNumber(String text) {
-        if (!isNumeric(text)) {
-            return false;
-        }
+        if (!isNumeric(text)) return false;
         return Integer.parseInt(text) > 0;
     }
 
@@ -52,7 +33,6 @@ public class Validations {
         return r.equals("A") || r.equals("B") || r.equals("C");
     }
 
- 
     public boolean isValidGenre(String genre) {
         if (emptyText(genre)) return false;
         String g = genre.trim().toLowerCase();

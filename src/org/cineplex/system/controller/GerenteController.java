@@ -24,12 +24,24 @@ public class GerenteController {
         lblBienvenida.setText("Bienvenido, " + usuario.getNombreUsuario());
     }
 
-    @FXML
+        @FXML
     public void verCartelera() {
         System.out.println("HU3: Gerente accede a Cartelera - PERMITIDO (Solo lectura)");
-        mostrarMensaje("Cartelera", "Viendo cartelera (solo lectura)");
-    }
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Cartelera.fxml"));
+            Parent root = loader.load();
 
+            CarteleraController controller = loader.getController();
+            controller.setUsuarioLogueado(usuarioLogueado);
+
+            Stage stage = (Stage) lblBienvenida.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Cartelera - CinePlex");
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarMensaje("Error", "No se pudo cargar la cartelera: " + e.getMessage());
+        }
+    }
     @FXML
     public void verVentas() {
         System.out.println("HU3: Gerente accede a Ventas - PERMITIDO");
