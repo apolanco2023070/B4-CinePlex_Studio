@@ -18,7 +18,7 @@ public class UsuarioDAO {
         String sql = "{CALL sp_obtener_usuario_por_username(?)}";
         
      
-        try (Connection con = ConexionDB.getConexion();
+        try (Connection con = ConexionDB.getInstanciaConexionDB().getConnection();
              CallableStatement cs = con.prepareCall(sql)) {
             
             cs.setString(1, nombreUsuario);
