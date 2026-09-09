@@ -533,6 +533,12 @@ END $$
 
 DELIMITER ;
 
-call sp_delete_seats_by_auditorium(1);
-call sp_delete_seats_by_auditorium(2);
-call sp_delete_seats_by_auditorium(3);
+Delimiter $$
+CREATE PROCEDURE sp_delete_auditorium(
+    IN p_auditorium_id INT
+)
+BEGIN
+    DELETE FROM auditorium WHERE auditorium_id = p_auditorium_id;
+END $$
+
+DELIMITER ;
