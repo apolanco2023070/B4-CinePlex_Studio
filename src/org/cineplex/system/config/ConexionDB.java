@@ -10,27 +10,40 @@ import java.sql.SQLException;
 
 public class ConexionDB {
 
-    private static final String URL = "jdbc:mysql://" + Enviroment.LOCATION_SERVICE
-            + "/" + Enviroment.DATA_BASE + "?useSSL=false&serverTimezone=UTC";
-    private static final String USER = Enviroment.USER;
-    private static final String PASSWORD = Enviroment.PASSWORD;
-
-    static {
+ 
+    private static ConexionDB instanciaConexionDB;
+    private Connection connection;
+ 
+    private ConexionDB() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            System.err.println("Driver de MySQL no encontrado: " + e.getMessage());
+            connection
+                    = DriverManager
+                            .getConnection(
+                                    "jdbc:mysql://" + Enviroment.LOCATION_SERVICE + "/" + Enviroment.DATA_BASE,
+                                    Enviroment.USER,
+                                    Enviroment.PASSWORD);
+        } catch (ClassNotFoundException classNotFound) {
+            System.out.println("Error de clase no encontrada");
+        } catch (SQLException sqlException) {
+            System.out.println("Error de conexion sql");
+        } catch (Exception e) {
+            System.out.println("Error padre: " + e.getMessage());
         }
     }
-
-    public static Connection getConexion() throws SQLException {
-        try {
-            Connection con = DriverManager.getConnection(URL, USER, PASSWORD);
-            System.out.println("Nueva conexión creada exitosamente");
-            return con;
-        } catch (SQLException e) {
-            System.err.println("Error al crear conexión: " + e.getMessage());
-            throw e;
+ 
+    public static ConexionDB getInstanciaConexionDB() {
+        if (instanciaConexionDB == null) {
+            instanciaConexionDB = new ConexionDB();
         }
+        return instanciaConexionDB;
+    }
+ 
+    public Connection getConnection() {
+        return connection;
+    }
+ 
+    public void setConnection(Connection connection) {
+        this.connection = connection;
     }
 }

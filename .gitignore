@@ -7,7 +7,8 @@ dist/*
 
 
 # Compiled class file
-*.class
+*.class 
+src/org/cineplex/system/config/Enviroment.java
 
 # Log file
 *.log
