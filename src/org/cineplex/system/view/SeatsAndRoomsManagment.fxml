@@ -16,7 +16,7 @@
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cineplex.system.controller.SeatsController">
    <children>
-      <Label text="Gestión de asientos y salas">
+      <Label text="Gestión de asientos y salas" underline="true">
          <font>
             <Font size="21.0" />
          </font>
@@ -50,11 +50,14 @@
             <Font size="16.0" />
          </font>
       </Label>
-      <TableView fx:id="tblSeats" prefHeight="200.0" prefWidth="200.0">
+      <TableView fx:id="tblSeats" prefHeight="222.0" prefWidth="590.0">
         <columns>
           <TableColumn fx:id="colNumber" prefWidth="75.0" text="Número" />
             <TableColumn fx:id="colStatus" prefWidth="75.0" text="Estado" />
         </columns>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
       </TableView>
    </children>
    <opaqueInsets>

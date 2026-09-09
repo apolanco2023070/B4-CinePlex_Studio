@@ -26,6 +26,9 @@
          <VBox.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </VBox.margin>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
       </TableView>
       <GridPane>
         <columnConstraints>
@@ -54,6 +57,9 @@
             <TextField fx:id="txtDirector" GridPane.columnIndex="1" GridPane.rowIndex="4" />
             <TextField fx:id="txtPoster" GridPane.columnIndex="1" GridPane.rowIndex="5" />
          </children>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
       </GridPane>
       <ToolBar prefHeight="40.0" prefWidth="200.0">
         <items>
