@@ -24,11 +24,22 @@ public class AdministradorController {
         lblBienvenida.setText("Bienvenido, " + usuario.getNombreUsuario());
     }
 
-    @FXML
-    public void abrirCartelera() {
-        System.out.println("HU3: Administrador accede a Cartelera - PERMITIDO");
-        mostrarMensaje("Cartelera", "Módulo de Cartelera abierto (Gestión completa)");
+@FXML
+public void abrirCartelera() {
+    System.out.println("HU7/HU8/HU9: Administrador accede a Cartelera - PERMITIDO");
+    try {
+        // Cargar la pantalla de registro/edición de películas
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/MovieRegister.fxml"));
+        Parent root = loader.load();
+        
+        Stage stage = (Stage) lblBienvenida.getScene().getWindow();
+        stage.setScene(new Scene(root));
+        stage.setTitle("Gestión de Cartelera - CinePlex");
+    } catch (Exception e) {
+        e.printStackTrace();
+        mostrarMensaje("Error", "No se pudo cargar la pantalla de cartelera: " + e.getMessage());
     }
+}
 
 @FXML
 public void abrirUsuarios() {
@@ -63,6 +74,8 @@ public void abrirUsuarios() {
             e.printStackTrace();
         }
     }
+    
+    
     
     
 
