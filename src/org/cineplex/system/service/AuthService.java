@@ -4,12 +4,13 @@
  */
 package org.cineplex.system.service;
 
-import org.cineplex.system.repository.UsuarioFactory;
+
+import org.cineplex.system.repository.UsuarioRepository;
 import org.cineplex.system.model.TypeRol;
 import org.cineplex.system.model.Usuario;
 
 public class AuthService {
-    private final UsuarioFactory usuarioDAO = new UsuarioFactory();
+    private final UsuarioRepository usuarioDAO = new UsuarioRepository();
     
 
     public static class ResultadoLogin {

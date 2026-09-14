@@ -1,7 +1,17 @@
+
+
 package org.cineplex.system.utils;
 
 public class Validations {
-    public Validations() {}
+
+
+    public Validations() {
+    }
+
+    public boolean equalsText(String textOriginal, String textCompare) {
+        if (textOriginal == null || textCompare == null) return false;
+        return textOriginal.equals(textCompare);
+    }
 
     public boolean emptyText(String text) {
         return text == null || text.isEmpty() || text.isBlank();
@@ -40,4 +50,6 @@ public class Validations {
                g.equals("drama") || 
                g.equals("comedy") || g.equals("comedia");
     }
+
 }
+

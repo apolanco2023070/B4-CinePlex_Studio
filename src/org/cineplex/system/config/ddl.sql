@@ -1,17 +1,22 @@
 -- ============================================================
-
 -- DATABASE: CINEPLEX
+<<<<<<< HEAD
 
 -- ============================================================
  
  
 DROP DATABASE IF EXISTS cineplex_IN4AM;
 
+=======
+-- ============================================================
+
+
+DROP DATABASE IF EXISTS cineplex_IN4AM;
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
 CREATE DATABASE cineplex_IN4AM
-
 CHARACTER SET utf8mb4
-
 COLLATE utf8mb4_unicode_ci;
+<<<<<<< HEAD
  
 USE cineplex_IN4AM;
  
@@ -22,13 +27,21 @@ USE cineplex_IN4AM;
 -- ============================================================
  
  
+=======
+
+USE cineplex_IN4AM;
+
+-- ============================================================
+-- 2. ESTRUCTURA DE TABLAS (DDL)
+-- ============================================================
+
+
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
 CREATE TABLE role (
-
     role_id INT AUTO_INCREMENT PRIMARY KEY,
-
     name VARCHAR(50) NOT NULL UNIQUE
-
 );
+<<<<<<< HEAD
  
  
 CREATE TABLE users (
@@ -59,12 +72,186 @@ CREATE TABLE users (
  
  
 CREATE TABLE genres (
+=======
 
-    genre_id INT AUTO_INCREMENT PRIMARY KEY,
+<<<<<<< HEAD
+-- ============================================================
+=======
 
-    name VARCHAR(50) NOT NULL UNIQUE
-
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(100) NOT NULL,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    role_id INT NOT NULL,
+    CONSTRAINT fk_user_role
+        FOREIGN KEY (role_id)
+        REFERENCES role(role_id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
 );
+
+
+CREATE TABLE genre (
+    genre_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE rating (
+    rating_id CHAR(1) PRIMARY KEY
+);
+
+
+CREATE TABLE movie (
+    movie_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(200) NOT NULL,
+    duration INT NOT NULL,
+    director VARCHAR(150) NOT NULL,
+    genre_id INT NOT NULL,
+    rating_id CHAR(1) NOT NULL,
+    poster_url VARCHAR(500),
+    CONSTRAINT fk_movie_genre
+        FOREIGN KEY (genre_id)
+        REFERENCES genre(genre_id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT fk_movie_rating
+        FOREIGN KEY (rating_id)
+        REFERENCES rating(rating_id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT chk_duration
+        CHECK (duration > 0)
+);
+
+
+CREATE TABLE auditorium (
+    auditorium_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE, 
+    capacity INT NOT NULL,
+    CONSTRAINT chk_capacity
+        CHECK (capacity > 0)
+);
+
+
+CREATE TABLE seat (
+    seat_id INT AUTO_INCREMENT PRIMARY KEY,
+    seat_number INT NOT NULL,
+    auditorium_id INT NOT NULL,
+    CONSTRAINT fk_seat_auditorium
+        FOREIGN KEY (auditorium_id)
+        REFERENCES auditorium(auditorium_id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT uq_seat_auditorium
+        UNIQUE (seat_number, auditorium_id),
+    CONSTRAINT chk_seat_number
+        CHECK (seat_number > 0)
+);
+
+CREATE TABLE screening (
+    screening_id INT AUTO_INCREMENT PRIMARY KEY,
+    movie_id INT NOT NULL,
+    auditorium_id INT NOT NULL,
+    show_date DATE NOT NULL,
+    show_time TIME NOT NULL,
+    CONSTRAINT fk_screening_movie
+        FOREIGN KEY (movie_id)
+        REFERENCES movie(movie_id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT fk_screening_auditorium
+        FOREIGN KEY (auditorium_id)
+        REFERENCES auditorium(auditorium_id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT uq_screening_auditorium_date_time
+        UNIQUE (auditorium_id, show_date, show_time)
+);
+
+
+CREATE TABLE reservation (
+    reservation_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    screening_id INT NOT NULL,
+    seat_id INT NOT NULL,
+    reservation_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('RESERVED', 'CANCELLED') NOT NULL DEFAULT 'RESERVED',
+    CONSTRAINT fk_reservation_user
+        FOREIGN KEY (user_id)
+        REFERENCES users(user_id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT fk_reservation_screening
+        FOREIGN KEY (screening_id)
+        REFERENCES screening(screening_id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT fk_reservation_seat
+        FOREIGN KEY (seat_id)
+        REFERENCES seat(seat_id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT uq_reservation_screening_seat
+        UNIQUE (screening_id, seat_id)
+);
+
+CREATE TABLE ticket (
+    ticket_id INT AUTO_INCREMENT PRIMARY KEY,
+    reservation_id INT NOT NULL UNIQUE,
+    issue_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ticket_reservation
+        FOREIGN KEY (reservation_id)
+        REFERENCES reservation(reservation_id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT
+);
+
+-- ============================================================
+-- 3. DATOS INICIALES (DML)
+-- ============================================================
+
+
+INSERT INTO role (name) VALUES
+('ADMINISTRATOR'),
+('MANAGER');
+
+
+INSERT INTO genre (name) VALUES
+('Action'),
+('Drama'),
+('Comedy');
+>>>>>>> 7ffc786d51781936049eb9859b97363711cf1ac6
+
+
+INSERT INTO rating (rating_id) VALUES
+('A'),
+('B'),
+('C');
+
+
+INSERT INTO users (full_name, username, password, email, role_id) VALUES
+('Administrador Principal', 'admin', 'admin123', 'admin@cineplex.com', 1),
+('Gerente de Cine', 'gerente', 'gerente123', 'gerente@cineplex.com', 2);
+
+-- ============================================================
+-- 4. PROCEDIMIENTOS ALMACENADOS (STORED PROCEDURES)
+-- ============================================================
+
+
+<<<<<<< HEAD
+-- ============================================================
+
+USE cineplex_IN4AM;
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
+
+-- 1. Tabla GENRE (Padre)
+CREATE TABLE IF NOT EXISTS genre (
+    genre_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE
+);
+<<<<<<< HEAD
  
 CREATE TABLE rating (
 
@@ -75,46 +262,68 @@ CREATE TABLE rating (
  
 CREATE TABLE movie (
 
+=======
+
+-- 2. Tabla RATING (Padre) - Usamos CHAR(1) como acordamos
+CREATE TABLE IF NOT EXISTS rating (
+    rating_id CHAR(1) PRIMARY KEY
+);
+
+-- 3. Tabla MOVIE (Hija) - ¡Aquí estaba el error! rating_id ahora es CHAR(1)
+CREATE TABLE IF NOT EXISTS movie (
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
     movie_id INT AUTO_INCREMENT PRIMARY KEY,
-
     title VARCHAR(200) NOT NULL,
-
     duration INT NOT NULL,
-
     director VARCHAR(150) NOT NULL,
-
     genre_id INT NOT NULL,
+<<<<<<< HEAD
 
     rating_id CHAR(1) NOT NULL,
 
+=======
+    rating_id CHAR(1) NOT NULL,       -- <-- CORREGIDO: De INT a CHAR(1)
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
     poster_url VARCHAR(500),
-
+    
     CONSTRAINT fk_movie_genre
-
         FOREIGN KEY (genre_id)
+<<<<<<< HEAD
 
         REFERENCES genres(genre_id)
 
+=======
+        REFERENCES genre(genre_id)
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
         ON UPDATE CASCADE
-
         ON DELETE RESTRICT,
-
+        
     CONSTRAINT fk_movie_rating
-
         FOREIGN KEY (rating_id)
-
         REFERENCES rating(rating_id)
-
         ON UPDATE CASCADE
-
         ON DELETE RESTRICT,
-
+        
     CONSTRAINT chk_duration
-
         CHECK (duration > 0)
-
 );
+<<<<<<< HEAD
  
+=======
+
+-- 4. Insertar datos iniciales (¡Importante hacerlo después de crear las tablas!)
+INSERT INTO genre (name) VALUES ('Action'), ('Drama'), ('Comedy')
+ON DUPLICATE KEY UPDATE name=name;
+
+INSERT INTO rating (rating_id) VALUES ('A'), ('B'), ('C')
+ON DUPLICATE KEY UPDATE rating_id=rating_id;
+
+-- ============================================================
+
+-- 6. TABLE: AUDITORIUM
+
+-- ============================================================
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
  
 CREATE TABLE auditorium (
 
@@ -149,6 +358,10 @@ CREATE TABLE seat (
 
         ON DELETE CASCADE,
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
     CONSTRAINT uq_seat_auditorium
 
         UNIQUE (seat_number, auditorium_id),
@@ -190,6 +403,10 @@ CREATE TABLE screening (
         ON UPDATE CASCADE
 
         ON DELETE RESTRICT,
+
+    -- Prevents registering two exactly identical screenings 
+
+    -- in the same auditorium, date, and time
 
     CONSTRAINT uq_screening_auditorium_date_time
 
@@ -242,6 +459,11 @@ CREATE TABLE reservation (
 
         ON DELETE RESTRICT,
 
+<<<<<<< HEAD
+=======
+    -- A seat can only be reserved once for the same screening
+
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
     CONSTRAINT uq_reservation_screening_seat
 
         UNIQUE (screening_id, seat_id)
@@ -270,6 +492,7 @@ CREATE TABLE ticket (
  
 -- ============================================================
 
+<<<<<<< HEAD
 -- 3. DATOS INICIALES (DML)
 
 -- ============================================================
@@ -363,6 +586,181 @@ BEGIN
     ORDER BY m.title ASC;
 END $$
 DELIMITER ;
+=======
+-- INITIAL DATA
+
+-- ============================================================
+ 
+-- ============================================================
+
+-- ROLES
+
+-- ============================================================
+
+INSERT INTO role (name) VALUES
+
+('ADMINISTRATOR'),
+
+('MANAGER');
+
+-- ============================================================
+
+-- GENRES
+
+-- ============================================================
+ 
+INSERT INTO genre (name) VALUES
+
+('Action'),
+
+('Drama'),
+
+('Comedy');
+ 
+-- ============================================================
+
+-- RATINGS
+
+-- ============================================================
+
+
+-- ============================================================
+
+-- INITIAL ADMINISTRATOR USER
+
+-- ============================================================	
+
+INSERT INTO users (full_name, username, password, email, role_id)
+
+VALUES (
+
+    'CinePlex Administrator',
+
+    'admin',
+
+    'admin123',
+
+    'admin@cineplex.com',
+
+    1
+
+);
+ 
+-- ============================================================
+
+-- VERIFICATION
+
+-- ============================================================
+
+SELECT * FROM role;
+
+SELECT * FROM users;
+
+SELECT * FROM genre;
+
+SELECT * FROM rating;
+
+SELECT * FROM movie;
+
+SELECT * FROM auditorium;
+
+SELECT * FROM seat;
+
+SELECT * FROM screening;
+
+SELECT * FROM reservation;
+
+SELECT * FROM ticket;
+
+ # Stores Procedures
+ USE cineplex_IN4AM;
+
+
+Delimiter $$
+CREATE PROCEDURE sp_insert_movie(
+    IN p_title VARCHAR(200),
+    IN p_duration INT,
+    IN p_director VARCHAR(150),
+    IN p_genre_id INT,
+    IN p_rating_id INT,
+    IN p_poster_url VARCHAR(500)
+)
+BEGIN
+    INSERT INTO movie (title, duration, director, genre_id, rating_id, poster_url)
+    VALUES (p_title, p_duration, p_director, p_genre_id, p_rating_id, p_poster_url);
+END $$
+
+Delimiter ;
+
+Delimiter $$
+CREATE PROCEDURE sp_get_all_movies()
+BEGIN
+    SELECT 
+        m.movie_id,
+        m.title,
+        m.duration,
+        m.director,
+        g.name AS genre_name,
+        r.name AS rating_name,
+        m.poster_url
+    FROM movie m
+    INNER JOIN genre g ON m.genre_id = g.genre_id
+    INNER JOIN rating r ON m.rating_id = r.rating_id
+    ORDER BY m.title ASC;
+END 
+
+DELIMITER ;
+
+
+-- ============================================================
+
+-- 10. Procedimientos para Inicio de sesion
+
+-- ============================================================
+=======
+>>>>>>> 7ffc786d51781936049eb9859b97363711cf1ac6
+DELIMITER $$
+CREATE PROCEDURE sp_obtener_usuario_por_username(IN p_username VARCHAR(50))
+BEGIN
+    SELECT
+        u.user_id,
+        u.username,
+        u.password,
+        r.role_id,
+        r.name
+    FROM users u
+    JOIN role r ON u.role_id = r.role_id
+    WHERE u.username = p_username;
+END $$
+DELIMITER ;
+
+<<<<<<< HEAD
+INSERT INTO users (full_name, username, password, email, role_id)
+VALUES (
+    'Administrador Principal',
+    'admin',
+    'admin123',
+    'admin@cineplex.com',
+    1
+);
+=======
+
+DELIMITER $$
+CREATE PROCEDURE sp_insert_movie(
+    IN p_title VARCHAR(200),
+    IN p_duration INT,
+    IN p_director VARCHAR(150),
+    IN p_genre_id INT,
+    IN p_rating_id CHAR(1), 
+    IN p_poster_url VARCHAR(500)
+)
+BEGIN
+    INSERT INTO movie (title, duration, director, genre_id, rating_id, poster_url)
+    VALUES (p_title, p_duration, p_director, p_genre_id, p_rating_id, p_poster_url);
+END $$
+DELIMITER ;
+>>>>>>> 7ffc786d51781936049eb9859b97363711cf1ac6
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
 
 -- 4. Obtener película por ID (CORREGIDO: movie en singular, rating_id en lugar de rating)
 DELIMITER $$
@@ -376,6 +774,7 @@ BEGIN
 END $$
 DELIMITER ;
 
+<<<<<<< HEAD
 -- 5. Actualizar película (CORREGIDO: movie en singular, rating_id en lugar de rating)
 DELIMITER $$
 CREATE PROCEDURE sp_update_movie(
@@ -420,3 +819,93 @@ END $$
 DELIMITER ;
  
  
+=======
+DELIMITER $$
+CREATE PROCEDURE sp_get_all_movies()
+BEGIN
+    SELECT
+        m.movie_id,
+        m.title,
+        m.duration,
+        m.director,
+        g.name AS genre_name,
+        r.rating_id AS rating_name, 
+        m.poster_url
+    FROM movie m
+    INNER JOIN genre g ON m.genre_id = g.genre_id
+    INNER JOIN rating r ON m.rating_id = r.rating_id
+    ORDER BY m.title ASC;
+END $$
+DELIMITER ;
+
+<<<<<<< HEAD
+
+DELIMITER $$
+
+-- SP para insertar sala
+CREATE PROCEDURE sp_insert_auditorium(
+    IN p_name VARCHAR(100),
+    IN p_capacity INT
+)
+BEGIN
+    INSERT INTO auditorium (name, capacity) VALUES (p_name, p_capacity);
+END $$
+
+-- SP para obtener todas las salas
+CREATE PROCEDURE sp_get_all_auditoriums()
+BEGIN
+    SELECT * FROM auditorium ORDER BY name;
+END $$
+
+-- SP para insertar asiento
+CREATE PROCEDURE sp_insert_seat(
+    IN p_seat_number INT,
+    IN p_auditorium_id INT
+)
+BEGIN
+    INSERT INTO seat (seat_number, auditorium_id) VALUES (p_seat_number, p_auditorium_id);
+END $$
+
+-- SP para obtener asientos por sala
+CREATE PROCEDURE sp_get_seats_by_auditorium(
+    IN p_auditorium_id INT
+)
+BEGIN
+    SELECT * FROM seat WHERE auditorium_id = p_auditorium_id ORDER BY seat_number;
+END $$
+
+CREATE PROCEDURE sp_check_seats_exist(
+    IN p_auditorium_id INT
+)
+BEGIN
+    SELECT CASE 
+        WHEN COUNT(*) > 0 THEN 1 
+        ELSE 0 
+    END AS exists_flag
+    FROM seat 
+    WHERE auditorium_id = p_auditorium_id;
+END $$
+
+CREATE PROCEDURE sp_delete_seats_by_auditorium(
+    IN p_auditorium_id INT
+)
+BEGIN
+    DELETE FROM seat WHERE auditorium_id = p_auditorium_id;
+END $$
+
+DELIMITER ;
+
+Delimiter $$
+CREATE PROCEDURE sp_delete_auditorium(
+    IN p_auditorium_id INT
+)
+BEGIN
+    DELETE FROM auditorium WHERE auditorium_id = p_auditorium_id;
+END $$
+
+DELIMITER ;
+=======
+select * from movie;
+
+>>>>>>> 7ffc786d51781936049eb9859b97363711cf1ac6
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8

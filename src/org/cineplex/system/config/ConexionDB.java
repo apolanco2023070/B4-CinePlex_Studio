@@ -1,23 +1,23 @@
 /*
-* Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-* Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
-*/
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package org.cineplex.system.config;
- 
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
- 
-public class DatabaseConnection {
- 
-    private static DatabaseConnection databaseInstance;
+
+public class ConexionDB {
+
+    private static ConexionDB instanciaConexionDB;
     private Connection connection;
- 
+
     
-    private DatabaseConnection() {
+    private ConexionDB() {
         conectar();
     }
- 
+
     
     private void conectar() {
         try {
@@ -34,16 +34,16 @@ public class DatabaseConnection {
             System.err.println("Error padre: " + e.getMessage());
         }
     }
- 
-    public static DatabaseConnection getDatabaseInstance() {
-        if (databaseInstance == null) {
-            databaseInstance = new DatabaseConnection();
-        }
-        return databaseInstance;
-    }
- 
 
-    public Connection getConnectionDB() {
+    public static ConexionDB getInstanciaConexionDB() {
+        if (instanciaConexionDB == null) {
+            instanciaConexionDB = new ConexionDB();
+        }
+        return instanciaConexionDB;
+    }
+
+ 
+    public Connection getConnection() {
         try {
             if (this.connection == null || this.connection.isClosed()) {
                 System.out.println(" La conexión estaba cerrada. Reconectando a la base de datos...");
@@ -54,11 +54,11 @@ public class DatabaseConnection {
         }
         return this.connection;
     }
- 
-    public void setConnection   (Connection connection) {
+
+    public void setConnection(Connection connection) {
         this.connection = connection;
     }
- 
+
   
     public void cerrarConexion() {
         try {

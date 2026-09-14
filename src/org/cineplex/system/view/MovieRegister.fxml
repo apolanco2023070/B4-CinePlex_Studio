@@ -14,6 +14,7 @@
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cineplex.system.controller.MovieRegisterController">
    <children>
+<<<<<<< HEAD
       <!-- TABLA: Se agregaron los fx:id para conectar con el Controller -->
       <TableView fx:id="tableMovies" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
         <columns>
@@ -23,13 +24,30 @@
             <TableColumn fx:id="colClasificacion" prefWidth="100.0" text="Clasificacion" />
             <TableColumn fx:id="colDirector" prefWidth="100.0" text="Director" />
             <TableColumn fx:id="colUrlPoster" prefWidth="140.0" text="URL Poster" />
+=======
+      <TableView prefHeight="200.0" prefWidth="200.0">
+        <columns>
+          <TableColumn prefWidth="75.0" text="Titulo" />
+          <TableColumn prefWidth="75.0" text="Genero" />
+            <TableColumn prefWidth="75.0" text="Duracion" />
+            <TableColumn prefWidth="75.0" text="Clasificacion" />
+            <TableColumn prefWidth="75.0" text="Director" />
+            <TableColumn prefWidth="75.0" text="URL Poster" />
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
         </columns>
          <VBox.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </VBox.margin>
+<<<<<<< HEAD
       </TableView>
       
       <!-- FORMULARIO -->
+=======
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </TableView>
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
       <GridPane>
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -57,19 +75,29 @@
             <TextField fx:id="txtDirector" GridPane.columnIndex="1" GridPane.rowIndex="4" />
             <TextField fx:id="txtPoster" GridPane.columnIndex="1" GridPane.rowIndex="5" />
          </children>
+<<<<<<< HEAD
          <VBox.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </VBox.margin>
+=======
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
       </GridPane>
       
       <!-- BARRA DE HERRAMIENTAS CON LOS BOTONES -->
       <ToolBar prefHeight="40.0" prefWidth="200.0">
         <items>
+<<<<<<< HEAD
           <!-- Se cambió onMouseClicked por onAction (mejor práctica en JavaFX) -->
           <Button fx:id="btnRegisterMovie" mnemonicParsing="false" onAction="#registerMovies" text="Registrar" />
           
           <!-- SE AGREGÓ onAction="#verPoster" para que el botón funcione -->
           <Button fx:id="btnVerPoster" mnemonicParsing="false" onAction="#verPoster" text=" Ver poster" />
+=======
+          <Button fx:id="btnRegisterMovie" mnemonicParsing="false" onAction="#registerMovies" text="Registrar" />
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
         </items>
       </ToolBar>
    </children>
