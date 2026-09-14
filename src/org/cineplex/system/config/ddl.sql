@@ -20,9 +20,6 @@ CREATE TABLE role (
     name VARCHAR(50) NOT NULL UNIQUE
 );
 
-<<<<<<< HEAD
--- ============================================================
-=======
 
 CREATE TABLE users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -168,8 +165,6 @@ INSERT INTO genre (name) VALUES
 ('Action'),
 ('Drama'),
 ('Comedy');
->>>>>>> 7ffc786d51781936049eb9859b97363711cf1ac6
-
 
 INSERT INTO rating (rating_id) VALUES
 ('A'),
@@ -185,8 +180,6 @@ INSERT INTO users (full_name, username, password, email, role_id) VALUES
 -- 4. PROCEDIMIENTOS ALMACENADOS (STORED PROCEDURES)
 -- ============================================================
 
-
-<<<<<<< HEAD
 -- ============================================================
 
 USE cineplex_IN4AM;
@@ -555,8 +548,7 @@ DELIMITER ;
 -- 10. Procedimientos para Inicio de sesion
 
 -- ============================================================
-=======
->>>>>>> 7ffc786d51781936049eb9859b97363711cf1ac6
+
 DELIMITER $$
 CREATE PROCEDURE sp_obtener_usuario_por_username(IN p_username VARCHAR(50))
 BEGIN
@@ -572,7 +564,6 @@ BEGIN
 END $$
 DELIMITER ;
 
-<<<<<<< HEAD
 INSERT INTO users (full_name, username, password, email, role_id)
 VALUES (
     'Administrador Principal',
@@ -581,7 +572,6 @@ VALUES (
     'admin@cineplex.com',
     1
 );
-=======
 
 DELIMITER $$
 CREATE PROCEDURE sp_insert_movie(
@@ -597,7 +587,7 @@ BEGIN
     VALUES (p_title, p_duration, p_director, p_genre_id, p_rating_id, p_poster_url);
 END $$
 DELIMITER ;
->>>>>>> 7ffc786d51781936049eb9859b97363711cf1ac6
+
 
 
 DELIMITER $$
@@ -618,7 +608,6 @@ BEGIN
 END $$
 DELIMITER ;
 
-<<<<<<< HEAD
 
 DELIMITER $$
 
@@ -684,7 +673,4 @@ BEGIN
 END $$
 
 DELIMITER ;
-=======
-select * from movie;
 
->>>>>>> 7ffc786d51781936049eb9859b97363711cf1ac6
