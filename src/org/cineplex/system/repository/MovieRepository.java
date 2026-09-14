@@ -20,7 +20,7 @@ public class MovieRepository {
             cstmt.setInt(2, movie.getDuration());
             cstmt.setString(3, movie.getDirector());
             cstmt.setInt(4, movie.getGenreId());
-            cstmt.setString(5, movie.getRating()); // CHAR(1) se envía como String
+            cstmt.setString(5, movie.getRating());
             cstmt.setString(6, movie.getPosterUrl());
             
             cstmt.execute();
@@ -44,7 +44,7 @@ public class MovieRepository {
                     rs.getInt("duration"),
                     rs.getString("director"),
                     rs.getInt("genre_id"),
-                    rs.getString("rating_name"), // Obtenemos el nombre desde el JOIN
+                    rs.getString("rating_id"),
                     rs.getString("poster_url")
                 );
                 movies.add(movie);
@@ -53,5 +53,111 @@ public class MovieRepository {
             throw new Exception("Error al obtener películas: " + e.getMessage(), e);
         }
         return movies;
+    }
+    public Movie getMovieById(int movieId) throws Exception {
+        String sql = "CALL sp_get_movie_by_id(?)";
+        try (Connection conn = DatabaseConnection.getDatabaseInstance().getConnectionDB();
+             CallableStatement cstmt = conn.prepareCall(sql)) {
+            
+            cstmt.setInt(1, movieId);
+            try (ResultSet rs = cstmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Movie(
+                        rs.getInt("movie_id"),
+                        rs.getString("title"),
+                        rs.getInt("duration"),
+                        rs.getString("director"),
+                        rs.getInt("genre_id"),
+                        rs.getString("rating_name"), 
+                        rs.getString("poster_url")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Error al obtener la película: " + e.getMessage(), e);
+        }
+        return null;
+    }
+
+    public void updateMovie(Movie movie) throws Exception {
+        String sql = "CALL sp_update_movie(?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = DatabaseConnection.getDatabaseInstance().getConnectionDB();
+             CallableStatement cstmt = conn.prepareCall(sql)) {
+            
+            cstmt.setInt(1, movie.getMovieId()); 
+            cstmt.setString(2, movie.getTitle());
+            cstmt.setInt(3, movie.getDuration());
+            cstmt.setString(4, movie.getDirector());
+            cstmt.setInt(5, movie.getGenreId());
+            cstmt.setString(6, movie.getRating());
+            cstmt.setString(7, movie.getPosterUrl());
+            
+            cstmt.execute();
+        } catch (SQLException e) {
+            throw new Exception("Error de base de datos al actualizar: " + e.getMessage(), e);
+        }
+    }
+
+    public List<Movie> getMoviesByGenreId(int genreId) throws Exception {
+        List<Movie> movies = new ArrayList<>();
+        String sql = "CALL sp_get_movies_by_genre_id(?)";
+        
+        try (Connection conn = DatabaseConnection.getDatabaseInstance().getConnectionDB();
+             CallableStatement cstmt = conn.prepareCall(sql)) {
+            
+            cstmt.setInt(1, genreId);
+            try (ResultSet rs = cstmt.executeQuery()) {
+                while (rs.next()) {
+                    movies.add(new Movie(
+                        rs.getInt("movie_id"),
+                        rs.getString("title"),  
+                        rs.getInt("duration"),
+                        rs.getString("director"),
+                        rs.getInt("genre_id"),
+                        rs.getString("rating_name"),
+                        rs.getString("poster_url")
+                    ));
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Error al obtener películas por género: " + e.getMessage(), e);
+        }
+        return movies;
+    }
+
+    public List<GenreOption> getAllGenres() throws Exception {
+        List<GenreOption> genres = new ArrayList<>();
+        String sql = "CALL sp_get_all_genres()";
+        
+        try (Connection conn = DatabaseConnection.getDatabaseInstance().getConnectionDB();
+             CallableStatement cstmt = conn.prepareCall(sql);
+             ResultSet rs = cstmt.executeQuery()) {
+            
+            while (rs.next()) {
+                genres.add(new GenreOption(rs.getInt("genre_id"), rs.getString("name")));
+            }
+        } catch (SQLException e) {
+            throw new Exception("Error al obtener géneros: " + e.getMessage(), e);
+        }
+        return genres;
+    }
+
+    public static class GenreOption {
+        private final int id;
+        private final String name;
+
+        public GenreOption(int id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        public int getId() { return id; }
+        public String getName() { return name; }
+
+        // JavaFX usa este método para mostrar el texto en el ComboBox
+        @Override
+        public String toString() {
+            return name;
+        }
     }
 }

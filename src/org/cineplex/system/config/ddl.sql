@@ -58,7 +58,7 @@ CREATE TABLE users (
 );
  
  
-CREATE TABLE genre (
+CREATE TABLE genres (
 
     genre_id INT AUTO_INCREMENT PRIMARY KEY,
 
@@ -93,7 +93,7 @@ CREATE TABLE movie (
 
         FOREIGN KEY (genre_id)
 
-        REFERENCES genre(genre_id)
+        REFERENCES genres(genre_id)
 
         ON UPDATE CASCADE
 
@@ -282,7 +282,7 @@ INSERT INTO role (name) VALUES
 ('MANAGER');
  
  
-INSERT INTO genre (name) VALUES
+INSERT INTO genres (name) VALUES
 
 ('Action'),
 
@@ -313,94 +313,110 @@ INSERT INTO users (full_name, username, password, email, role_id) VALUES
  
 DELIMITER $$
 
+-- 1. Obtener usuario por username
+DELIMITER $$
 CREATE PROCEDURE sp_obtener_usuario_por_username(IN p_username VARCHAR(50))
-
 BEGIN
-
     SELECT
-
         u.user_id,
-
         u.username,
-
         u.password,
-
         r.role_id,
-
         r.name
-
     FROM users u
-
     JOIN role r ON u.role_id = r.role_id
-
     WHERE u.username = p_username;
-
 END $$
-
 DELIMITER ;
- 
- 
-DELIMITER $$
 
+-- 2. Insertar película
+DELIMITER $$
 CREATE PROCEDURE sp_insert_movie(
-
     IN p_title VARCHAR(200),
-
     IN p_duration INT,
-
     IN p_director VARCHAR(150),
-
     IN p_genre_id INT,
-
-    IN p_rating_id CHAR(1), 
-
+    IN p_rating_id CHAR(1),
     IN p_poster_url VARCHAR(500)
-
 )
-
 BEGIN
-
     INSERT INTO movie (title, duration, director, genre_id, rating_id, poster_url)
-
     VALUES (p_title, p_duration, p_director, p_genre_id, p_rating_id, p_poster_url);
-
 END $$
-
 DELIMITER ;
- 
- 
+
+-- 3. Obtener todas las películas (CORREGIDO: genres en plural)
 DELIMITER $$
-
 CREATE PROCEDURE sp_get_all_movies()
-
 BEGIN
-
     SELECT
-
         m.movie_id,
-
         m.title,
-
         m.duration,
-
         m.director,
-
         g.name AS genre_name,
-
-        r.rating_id AS rating_name, 
-
+        r.rating_id AS rating_name,
         m.poster_url
-
     FROM movie m
-
-    INNER JOIN genre g ON m.genre_id = g.genre_id
-
+    INNER JOIN genres g ON m.genre_id = g.genre_id
     INNER JOIN rating r ON m.rating_id = r.rating_id
-
     ORDER BY m.title ASC;
-
 END $$
+DELIMITER ;
 
+-- 4. Obtener película por ID (CORREGIDO: movie en singular, rating_id en lugar de rating)
+DELIMITER $$
+CREATE PROCEDURE sp_get_movie_by_id(IN p_movie_id INT)
+BEGIN
+    SELECT m.movie_id, m.title, m.duration, m.director, m.genre_id,
+           g.name AS genre_name, m.rating_id, m.poster_url
+    FROM movie m
+    JOIN genres g ON m.genre_id = g.genre_id
+    WHERE m.movie_id = p_movie_id;
+END $$
+DELIMITER ;
+
+-- 5. Actualizar película (CORREGIDO: movie en singular, rating_id en lugar de rating)
+DELIMITER $$
+CREATE PROCEDURE sp_update_movie(
+    IN p_movie_id INT,
+    IN p_title VARCHAR(200),
+    IN p_duration INT,
+    IN p_director VARCHAR(150),
+    IN p_genre_id INT,
+    IN p_rating_id CHAR(1),
+    IN p_poster_url VARCHAR(500)
+)
+BEGIN
+    UPDATE movie
+    SET title = p_title,
+        duration = p_duration,
+        director = p_director,
+        genre_id = p_genre_id,
+        rating_id = p_rating_id,
+        poster_url = p_poster_url
+    WHERE movie_id = p_movie_id;
+END $$
+DELIMITER ;
+
+-- 3. Get movies by Genre ID (for filtering)
+DELIMITER $$
+CREATE PROCEDURE sp_get_movies_by_genre_id(IN p_genre_id INT)
+BEGIN
+    SELECT m.movie_id, m.title, m.duration, m.director, m.genre_id,
+           g.name AS genre_name, m.rating_id, m.poster_url
+    FROM movie m
+    JOIN genres g ON m.genre_id = g.genre_id
+    WHERE m.genre_id = p_genre_id;
+END $$
+DELIMITER ;
+
+-- 7. Obtener todos los géneros
+DELIMITER $$
+CREATE PROCEDURE sp_get_all_genres()
+BEGIN
+    SELECT genre_id, name FROM genres ORDER BY name;
+END $$
 DELIMITER ;
  
  

@@ -24,7 +24,10 @@ public class MovieRegisterController {
     @FXML private TableColumn<Movie, String> colUrlPoster;
 
     @FXML private Label lblTitle, lblGenre, lblLength, lblRating, lblDirector, lblPoster;
-    @FXML private TextField txtTitle, txtGenre, txtLength, txtRating, txtDirector, txtPoster;
+    @FXML private TextField txtTitle, txtLength, txtRating, txtDirector, txtPoster;
+    
+    @FXML private ComboBox<MovieRepository.GenreOption> cmbGenre; 
+    
     @FXML private Button btnRegisterMovie, btnVerPoster;
 
     private final MovieRepository movieRepository;
@@ -40,6 +43,7 @@ public class MovieRegisterController {
     @FXML
     public void initialize() {
         configurarTabla();
+        cargarGenerosEnComboBox(); 
         cargarPeliculas();
     }
 
@@ -50,6 +54,14 @@ public class MovieRegisterController {
         colClasificacion.setCellValueFactory(data -> data.getValue().ratingProperty());
         colDirector.setCellValueFactory(data -> data.getValue().directorProperty());
         colUrlPoster.setCellValueFactory(data -> data.getValue().posterUrlProperty());
+    }
+
+    private void cargarGenerosEnComboBox() {
+        try {
+            cmbGenre.getItems().addAll(movieRepository.getAllGenres());
+        } catch (Exception e) {
+            alertInfo.viewAlert("ERROR", "Error de carga", "No se pudieron cargar los géneros", e.getMessage());
+        }
     }
 
     private void cargarPeliculas() {
@@ -69,7 +81,6 @@ public class MovieRegisterController {
         String director = txtDirector.getText().trim();
         String rating = txtRating.getText().trim().toUpperCase();
         String posterUrl = txtPoster.getText().trim();
-        String genreText = txtGenre.getText().trim();
 
         StringBuilder errores = new StringBuilder();
         boolean hayErrores = false;
@@ -91,11 +102,11 @@ public class MovieRegisterController {
             hayErrores = true;
         }
         
-        int genreId = obtenerGenreId(genreText);
-        if (genreId == -1) {
-            errores.append("• Género no reconocido (Action, Drama, Comedy).\n");
+        if (cmbGenre.getValue() == null) {
+            errores.append("• Debe seleccionar un género de la lista.\n");
             hayErrores = true;
         }
+        
         if (!validations.emptyText(posterUrl) && !validations.validateLengthText(posterUrl, 500)) {
             errores.append("• La URL del póster no puede exceder 500 caracteres.\n");
             hayErrores = true;
@@ -107,7 +118,9 @@ public class MovieRegisterController {
         }
 
         try {
-            int duration = Integer.parseInt(lengthText); // 100% seguro gracias a isPositiveNumber
+            int duration = Integer.parseInt(lengthText);
+            int genreId = cmbGenre.getValue().getId(); 
+            
             Movie movie = new Movie(0, title, duration, director, genreId, rating, posterUrl);
             movieRepository.saveMovie(movie);
             
@@ -119,60 +132,18 @@ public class MovieRegisterController {
         }
     }
 
-    @FXML
-    private void verPoster() {
-        String url = txtPoster.getText().trim();
-        if (validations.emptyText(url)) {
-            alertInfo.viewAlert("WARNING", "Sin URL", "Campo vacío", "Ingrese una URL de póster antes de visualizarla.");
-            lblPoster.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
-            return;
-        }
-        if (!url.startsWith("http://") && !url.startsWith("https://")) {
-            alertInfo.viewAlert("WARNING", "URL inválida", "Formato incorrecto", "La URL debe comenzar con http:// o https://");
-            return;
-        }
-
-        try {
-            Image image = new Image(url, 400, 600, true, true);
-            if (image.isError()) {
-                alertInfo.viewAlert("ERROR", "Imagen no disponible", "Error de carga", "No se pudo cargar la imagen. Verifique la URL.");
-                return;
-            }
-            ImageView imageView = new ImageView(image);
-            imageView.setPreserveRatio(true);
-            imageView.setFitWidth(400);
-            
-            StackPane root = new StackPane();
-            root.setStyle("-fx-background-color: black; -fx-padding: 20;");
-            root.getChildren().add(imageView);
-            
-            Stage stage = new Stage();
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.setTitle("Vista Previa del Póster");
-            stage.setScene(new javafx.scene.Scene(root));
-            stage.setResizable(true);
-            stage.show();
-        } catch (Exception e) {
-            alertInfo.viewAlert("ERROR", "Error", "Problema al cargar", "Detalle: " + e.getMessage());
-        }
-    }
-
-    private int obtenerGenreId(String genreName) {
-        if (!validations.isValidGenre(genreName)) return -1;
-        String g = genreName.toLowerCase();
-        if (g.equals("action") || g.equals("acción")) return 1;
-        if (g.equals("drama")) return 2;
-        if (g.equals("comedy") || g.equals("comedia")) return 3;
-        return -1;
-    }
-
+    
     private void limpiarFormulario() {
-        txtTitle.clear(); txtGenre.clear(); txtLength.clear();
-        txtRating.clear(); txtDirector.clear(); txtPoster.clear();
+        txtTitle.clear(); 
+        cmbGenre.setValue(null); 
+        txtLength.clear();
+        txtRating.clear(); 
+        txtDirector.clear(); 
+        txtPoster.clear();
         limpiarErroresVisuales();
         txtTitle.requestFocus();
     }
-
+    
     private void limpiarErroresVisuales() {
         lblTitle.setStyle("-fx-text-fill: black; -fx-font-weight: normal;");
         lblLength.setStyle("-fx-text-fill: black; -fx-font-weight: normal;");
