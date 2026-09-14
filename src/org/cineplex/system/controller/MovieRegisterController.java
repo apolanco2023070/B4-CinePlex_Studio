@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.cineplex.system.controller;
 
 import javafx.fxml.FXML;
@@ -9,13 +5,15 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import org.cineplex.system.model.Movie;
 import org.cineplex.system.repository.MovieRepository;
 import org.cineplex.system.utils.AlertInformation;
+import org.cineplex.system.utils.Validations;
+import java.util.List;
 
 /**
- *
- * @author informatica
+ * Controlador para registro y edición de películas
  */
 public class MovieRegisterController {
 
@@ -41,7 +39,7 @@ public class MovieRegisterController {
     private Label lblTitle;
 
     @FXML
-    private ListView<?> list;
+    private ListView<Movie> list;
 
     @FXML
     private TextField txtDirector;
@@ -62,12 +60,51 @@ public class MovieRegisterController {
     private TextField txtTitle;
 
     private final MovieRepository movieRepository;
-    private AlertInformation alertInfo =new AlertInformation();
+    private final AlertInformation alertInfo;
+    private final Validations validaciones;
+    
+    // Variable para almacenar la película seleccionada
+    private Movie movieSeleccionada;
 
     public MovieRegisterController() {
         this.movieRepository = new MovieRepository();
+        this.alertInfo = new AlertInformation();
+        this.validaciones = new Validations();
     }
 
+    /**
+     * Inicializa el controlador y carga las películas
+     */
+    @FXML
+    public void initialize() {
+        cargarPeliculas();
+    }
+
+    /**
+     * Carga todas las películas en el ListView
+     */
+    private void cargarPeliculas() {
+        List<Movie> peliculas = movieRepository.getAllMovies();
+        list.getItems().clear();
+        list.getItems().addAll(peliculas);
+        
+        // Configurar cómo se muestra cada película
+        list.setCellFactory(param -> new javafx.scene.control.ListCell<Movie>() {
+            @Override
+            protected void updateItem(Movie movie, boolean empty) {
+                super.updateItem(movie, empty);
+                if (empty || movie == null) {
+                    setText(null);
+                } else {
+                    setText(movie.getTitle() + " (" + movie.getDuration() + " min)");
+                }
+            }
+        });
+    }
+
+    /**
+     * Registra o actualiza una película
+     */
     @FXML
     private void registerMovies() {
         try {
@@ -78,26 +115,103 @@ public class MovieRegisterController {
             String posterUrl = txtPoster.getText().trim();
             String genreText = txtGenre.getText().trim();
 
+            // Validaciones
+            if (validaciones.emptyText(title) || validaciones.emptyText(lengthText) || 
+                validaciones.emptyText(director) || validaciones.emptyText(rating) || 
+                validaciones.emptyText(genreText)) {
+                alertInfo.viewAlert("ERROR", "Campos vacíos", "Error de validación", 
+                    "Todos los campos son obligatorios.");
+                return;
+            }
+
+            if (!validaciones.isPositiveNumber(lengthText)) {
+                alertInfo.viewAlert("ERROR", "Duración inválida", "Error de validación", 
+                    "La duración debe ser un número positivo.");
+                return;
+            }
+
+            if (!validaciones.isValidRating(rating)) {
+                alertInfo.viewAlert("ERROR", "Clasificación inválida", "Error de validación", 
+                    "La clasificación debe ser A, B o C.");
+                return;
+            }
+
+            if (!validaciones.isValidGenre(genreText)) {
+                alertInfo.viewAlert("ERROR", "Género inválido", "Error de validación", 
+                    "El género debe ser Acción, Drama o Comedia.");
+                return;
+            }
+
             int duration = Integer.parseInt(lengthText);
             int genreId = obtenerGenreId(genreText);
 
             Movie movie = new Movie(title, duration, director, genreId, rating, posterUrl);
 
-            movieRepository.saveMovie(movie);
+            boolean exito;
+            
+            if (movieSeleccionada != null) {
+                // MODO EDICIÓN: Actualizar película existente
+                movie.setMovieId(movieSeleccionada.getMovieId());
+                exito = movieRepository.updateMovie(movie);
+                
+                if (exito) {
+                    alertInfo.viewAlert("INFORMATION", "Éxito", "Actualización completada", 
+                        "La película se actualizó correctamente.");
+                }
+            } else {
+                // MODO CREACIÓN: Registrar nueva película
+                movieRepository.saveMovie(movie);
+                exito = true;
+                
+                if (exito) {
+                    alertInfo.viewAlert("INFORMATION", "Éxito", "Registro completado", 
+                        "La película se guardó correctamente.");
+                }
+            }
 
             limpiarFormulario();
-            alertInfo.viewAlert("INFORMATION", "Éxito", "Registro completado", "La película se guardó correctamente en la base de datos.");
-
-        } catch (NumberFormatException e) {
-            alertInfo.viewAlert("ERROR", "Datos inválidos", "Error de formato", "La duración debe ser un número válido (no puede estar vacía ni tener letras).");
+            cargarPeliculas();
 
         } catch (Exception e) {
-            alertInfo.viewAlert("ERROR", "Error al registrar", "Error de sistema",
-                    "No se pudo registrar la película. Detalle: " + e.getMessage());
+            alertInfo.viewAlert("ERROR", "Error", "Error de sistema",
+                    "No se pudo procesar la película. Detalle: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
+    /**
+     * Selecciona una película del listado para editar
+     */
+    @FXML
+    public void seleccionarPelicula(MouseEvent event) {
+        if (event.getClickCount() == 2) { // Doble click
+            Movie movieSeleccionada = list.getSelectionModel().getSelectedItem();
+            if (movieSeleccionada != null) {
+                cargarDatosPelicula(movieSeleccionada);
+            }
+        }
+    }
+
+    /**
+     * Carga los datos de una película en el formulario
+     */
+    @FXML
+    public void cargarDatosPelicula(Movie movie) {
+        this.movieSeleccionada = movie;
+        
+        txtTitle.setText(movie.getTitle());
+        txtLength.setText(String.valueOf(movie.getDuration()));
+        txtDirector.setText(movie.getDirector());
+        txtGenre.setText(movie.getGenreName());
+        txtRating.setText(movie.getRating());
+        txtPoster.setText(movie.getPosterUrl());
+        
+        btnRegisterMovie.setText("Actualizar");
+    }
+
+    /**
+     * Obtiene el ID del género según el nombre
+     */
     private int obtenerGenreId(String genreName) {
         switch (genreName.toLowerCase()) {
             case "action":
@@ -113,6 +227,9 @@ public class MovieRegisterController {
         }
     }
 
+    /**
+     * Limpia el formulario
+     */
     private void limpiarFormulario() {
         txtTitle.clear();
         txtGenre.clear();
@@ -120,6 +237,8 @@ public class MovieRegisterController {
         txtRating.clear();
         txtDirector.clear();
         txtPoster.clear();
+        movieSeleccionada = null;
+        btnRegisterMovie.setText("Registrar");
         txtTitle.requestFocus();
     }
 }
