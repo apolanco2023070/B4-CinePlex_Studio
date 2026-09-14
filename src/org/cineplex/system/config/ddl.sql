@@ -1,12 +1,33 @@
 -- ============================================================
 -- DATABASE: CINEPLEX
+<<<<<<< HEAD
+
+-- ============================================================
+ 
+ 
+DROP DATABASE IF EXISTS cineplex_IN4AM;
+
+=======
 -- ============================================================
 
 
 DROP DATABASE IF EXISTS cineplex_IN4AM;
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
 CREATE DATABASE cineplex_IN4AM
 CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
+<<<<<<< HEAD
+ 
+USE cineplex_IN4AM;
+ 
+-- ============================================================
+
+-- 2. ESTRUCTURA DE TABLAS (DDL)
+
+-- ============================================================
+ 
+ 
+=======
 
 USE cineplex_IN4AM;
 
@@ -15,10 +36,43 @@ USE cineplex_IN4AM;
 -- ============================================================
 
 
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
 CREATE TABLE role (
     role_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE
 );
+<<<<<<< HEAD
+ 
+ 
+CREATE TABLE users (
+
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    full_name VARCHAR(100) NOT NULL,
+
+    username VARCHAR(50) NOT NULL UNIQUE,
+
+    password VARCHAR(255) NOT NULL,
+
+    email VARCHAR(150) NOT NULL UNIQUE,
+
+    role_id INT NOT NULL,
+
+    CONSTRAINT fk_user_role
+
+        FOREIGN KEY (role_id)
+
+        REFERENCES role(role_id)
+
+        ON UPDATE CASCADE
+
+        ON DELETE RESTRICT
+
+);
+ 
+ 
+CREATE TABLE genres (
+=======
 
 <<<<<<< HEAD
 -- ============================================================
@@ -190,12 +244,25 @@ INSERT INTO users (full_name, username, password, email, role_id) VALUES
 -- ============================================================
 
 USE cineplex_IN4AM;
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
 
 -- 1. Tabla GENRE (Padre)
 CREATE TABLE IF NOT EXISTS genre (
     genre_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE
 );
+<<<<<<< HEAD
+ 
+CREATE TABLE rating (
+
+    rating_id CHAR(1) PRIMARY KEY
+
+);
+ 
+ 
+CREATE TABLE movie (
+
+=======
 
 -- 2. Tabla RATING (Padre) - Usamos CHAR(1) como acordamos
 CREATE TABLE IF NOT EXISTS rating (
@@ -204,17 +271,30 @@ CREATE TABLE IF NOT EXISTS rating (
 
 -- 3. Tabla MOVIE (Hija) - ¡Aquí estaba el error! rating_id ahora es CHAR(1)
 CREATE TABLE IF NOT EXISTS movie (
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
     movie_id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(200) NOT NULL,
     duration INT NOT NULL,
     director VARCHAR(150) NOT NULL,
     genre_id INT NOT NULL,
+<<<<<<< HEAD
+
+    rating_id CHAR(1) NOT NULL,
+
+=======
     rating_id CHAR(1) NOT NULL,       -- <-- CORREGIDO: De INT a CHAR(1)
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
     poster_url VARCHAR(500),
     
     CONSTRAINT fk_movie_genre
         FOREIGN KEY (genre_id)
+<<<<<<< HEAD
+
+        REFERENCES genres(genre_id)
+
+=======
         REFERENCES genre(genre_id)
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
         ON UPDATE CASCADE
         ON DELETE RESTRICT,
         
@@ -227,6 +307,9 @@ CREATE TABLE IF NOT EXISTS movie (
     CONSTRAINT chk_duration
         CHECK (duration > 0)
 );
+<<<<<<< HEAD
+ 
+=======
 
 -- 4. Insertar datos iniciales (¡Importante hacerlo después de crear las tablas!)
 INSERT INTO genre (name) VALUES ('Action'), ('Drama'), ('Comedy')
@@ -240,6 +323,7 @@ ON DUPLICATE KEY UPDATE rating_id=rating_id;
 -- 6. TABLE: AUDITORIUM
 
 -- ============================================================
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
  
 CREATE TABLE auditorium (
 
@@ -254,13 +338,8 @@ CREATE TABLE auditorium (
         CHECK (capacity > 0)
 
 );
-
--- ============================================================
-
--- 7. TABLE: SEAT
-
--- ===== =======================================================
-
+ 
+ 
 CREATE TABLE seat (
 
     seat_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -279,7 +358,10 @@ CREATE TABLE seat (
 
         ON DELETE CASCADE,
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
     CONSTRAINT uq_seat_auditorium
 
         UNIQUE (seat_number, auditorium_id),
@@ -289,13 +371,7 @@ CREATE TABLE seat (
         CHECK (seat_number > 0)
 
 );
-
--- ============================================================
-
--- 8. TABLE: SCREENING
-
--- ============================================================
-
+ 
 CREATE TABLE screening (
 
     screening_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -337,13 +413,8 @@ CREATE TABLE screening (
         UNIQUE (auditorium_id, show_date, show_time)
 
 );
-
--- ============================================================
-
--- 9. TABLE: RESERVATION
-
--- ============================================================
-
+ 
+ 
 CREATE TABLE reservation (
 
     reservation_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -388,20 +459,16 @@ CREATE TABLE reservation (
 
         ON DELETE RESTRICT,
 
+<<<<<<< HEAD
+=======
     -- A seat can only be reserved once for the same screening
 
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
     CONSTRAINT uq_reservation_screening_seat
- 
+
         UNIQUE (screening_id, seat_id)
- 
+
 );
- 
- 
--- ============================================================
-
--- 10. TABLE: TICKET
-
--- ============================================================
  
 CREATE TABLE ticket (
 
@@ -422,9 +489,104 @@ CREATE TABLE ticket (
         ON DELETE RESTRICT
 
 );
-
+ 
 -- ============================================================
 
+<<<<<<< HEAD
+-- 3. DATOS INICIALES (DML)
+
+-- ============================================================
+ 
+ 
+INSERT INTO role (name) VALUES
+
+('ADMINISTRATOR'),
+
+('MANAGER');
+ 
+ 
+INSERT INTO genres (name) VALUES
+
+('Action'),
+
+('Drama'),
+
+('Comedy');
+ 
+ 
+INSERT INTO rating (rating_id) VALUES
+
+('A'),
+('B'),
+('C');
+ 
+ 
+INSERT INTO users (full_name, username, password, email, role_id) VALUES
+
+('Administrador Principal', 'admin', 'admin123', 'admin@cineplex.com', 1),
+
+('Gerente de Cine', 'gerente', 'gerente123', 'gerente@cineplex.com', 2);
+ 
+-- ============================================================
+
+-- 4. PROCEDIMIENTOS ALMACENADOS (STORED PROCEDURES)
+
+-- ============================================================
+ 
+ 
+DELIMITER $$
+
+-- 1. Obtener usuario por username
+DELIMITER $$
+CREATE PROCEDURE sp_obtener_usuario_por_username(IN p_username VARCHAR(50))
+BEGIN
+    SELECT
+        u.user_id,
+        u.username,
+        u.password,
+        r.role_id,
+        r.name
+    FROM users u
+    JOIN role r ON u.role_id = r.role_id
+    WHERE u.username = p_username;
+END $$
+DELIMITER ;
+
+-- 2. Insertar película
+DELIMITER $$
+CREATE PROCEDURE sp_insert_movie(
+    IN p_title VARCHAR(200),
+    IN p_duration INT,
+    IN p_director VARCHAR(150),
+    IN p_genre_id INT,
+    IN p_rating_id CHAR(1),
+    IN p_poster_url VARCHAR(500)
+)
+BEGIN
+    INSERT INTO movie (title, duration, director, genre_id, rating_id, poster_url)
+    VALUES (p_title, p_duration, p_director, p_genre_id, p_rating_id, p_poster_url);
+END $$
+DELIMITER ;
+
+-- 3. Obtener todas las películas (CORREGIDO: genres en plural)
+DELIMITER $$
+CREATE PROCEDURE sp_get_all_movies()
+BEGIN
+    SELECT
+        m.movie_id,
+        m.title,
+        m.duration,
+        m.director,
+        g.name AS genre_name,
+        r.rating_id AS rating_name,
+        m.poster_url
+    FROM movie m
+    INNER JOIN genres g ON m.genre_id = g.genre_id
+    INNER JOIN rating r ON m.rating_id = r.rating_id
+    ORDER BY m.title ASC;
+END $$
+DELIMITER ;
+=======
 -- INITIAL DATA
 
 -- ============================================================
@@ -598,8 +760,66 @@ BEGIN
 END $$
 DELIMITER ;
 >>>>>>> 7ffc786d51781936049eb9859b97363711cf1ac6
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
 
+-- 4. Obtener película por ID (CORREGIDO: movie en singular, rating_id en lugar de rating)
+DELIMITER $$
+CREATE PROCEDURE sp_get_movie_by_id(IN p_movie_id INT)
+BEGIN
+    SELECT m.movie_id, m.title, m.duration, m.director, m.genre_id,
+           g.name AS genre_name, m.rating_id, m.poster_url
+    FROM movie m
+    JOIN genres g ON m.genre_id = g.genre_id
+    WHERE m.movie_id = p_movie_id;
+END $$
+DELIMITER ;
 
+<<<<<<< HEAD
+-- 5. Actualizar película (CORREGIDO: movie en singular, rating_id en lugar de rating)
+DELIMITER $$
+CREATE PROCEDURE sp_update_movie(
+    IN p_movie_id INT,
+    IN p_title VARCHAR(200),
+    IN p_duration INT,
+    IN p_director VARCHAR(150),
+    IN p_genre_id INT,
+    IN p_rating_id CHAR(1),
+    IN p_poster_url VARCHAR(500)
+)
+BEGIN
+    UPDATE movie
+    SET title = p_title,
+        duration = p_duration,
+        director = p_director,
+        genre_id = p_genre_id,
+        rating_id = p_rating_id,
+        poster_url = p_poster_url
+    WHERE movie_id = p_movie_id;
+END $$
+DELIMITER ;
+
+-- 3. Get movies by Genre ID (for filtering)
+DELIMITER $$
+CREATE PROCEDURE sp_get_movies_by_genre_id(IN p_genre_id INT)
+BEGIN
+    SELECT m.movie_id, m.title, m.duration, m.director, m.genre_id,
+           g.name AS genre_name, m.rating_id, m.poster_url
+    FROM movie m
+    JOIN genres g ON m.genre_id = g.genre_id
+    WHERE m.genre_id = p_genre_id;
+END $$
+DELIMITER ;
+
+-- 7. Obtener todos los géneros
+DELIMITER $$
+CREATE PROCEDURE sp_get_all_genres()
+BEGIN
+    SELECT genre_id, name FROM genres ORDER BY name;
+END $$
+DELIMITER ;
+ 
+ 
+=======
 DELIMITER $$
 CREATE PROCEDURE sp_get_all_movies()
 BEGIN
@@ -688,3 +908,4 @@ DELIMITER ;
 select * from movie;
 
 >>>>>>> 7ffc786d51781936049eb9859b97363711cf1ac6
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
