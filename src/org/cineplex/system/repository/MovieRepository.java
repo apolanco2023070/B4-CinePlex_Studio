@@ -1,14 +1,13 @@
 package org.cineplex.system.repository;
 
 import java.sql.Connection;
-import java.sql.CallableStatement;
-import org.cineplex.system.config.DatabaseConnection;
-import org.cineplex.system.model.Movie;
-import java.sql.SQLException;
-import java.sql.ResultSet;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import org.cineplex.system.config.DatabaseConnection;
+import org.cineplex.system.model.Movie;
 
 /**
  * Repository para manejo de películas

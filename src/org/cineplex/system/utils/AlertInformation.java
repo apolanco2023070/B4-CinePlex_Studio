@@ -17,7 +17,7 @@ public class AlertInformation {
      * @param encabezado  Texto del encabezado (puede ser null)
      * @param mensaje     Contenido principal del mensaje
      */
-    public void viewAlert(String tipoAlerta, String titulo, String encabezado, String mensaje) {
+    public static void viewAlert(String tipoAlerta, String titulo, String encabezado, String mensaje) {
 
         // Variable local de tipo AlertType que almacenará el tipo de alerta a mostrar
         AlertType tipo;
