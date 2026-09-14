@@ -8,7 +8,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import org.cineplex.system.config.DatabaseConnection;
+import org.cineplex.system.config.ConexionDB;
 import org.cineplex.system.model.Auditorium;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ public class AuditoriumRepository {
         String sql = "{call sp_insert_auditorium(?,?)}";
 
         // Try-with-resources: Connection y CallableStatement se cierran solos al terminar
-        try (Connection conn = DatabaseConnection.getDatabaseInstance().getConnectionDB();
+        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
      CallableStatement callSP = conn.prepareCall(sql)) {
 
             callSP.setString(1, auditorium.getName());
@@ -42,7 +42,7 @@ public class AuditoriumRepository {
         List<Auditorium> auditoriums = new ArrayList<>();
         String sql = "{call sp_get_all_auditoriums()}";
         
-        try (Connection conn = DatabaseConnection.getDatabaseInstance().getConnectionDB();
+        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
              CallableStatement callSP = conn.prepareCall(sql);
              ResultSet rs = callSP.executeQuery()) {
             

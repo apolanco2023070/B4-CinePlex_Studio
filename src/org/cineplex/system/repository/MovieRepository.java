@@ -6,7 +6,7 @@ package org.cineplex.system.repository;
 
 import java.sql.Connection;
 import java.sql.CallableStatement;
-import org.cineplex.system.config.DatabaseConnection;
+import org.cineplex.system.config.ConexionDB;
 import org.cineplex.system.model.Movie;
 import java.sql.SQLException;
 import java.sql.ResultSet;
@@ -29,7 +29,7 @@ public class MovieRepository {
         String sql = "{call sp_insert_movie(?,?,?,?,?,?)}";
 
         // Try-with-resources: Connection y CallableStatement se cierran solos al terminar
-        try (Connection conn = DatabaseConnection.getDatabaseInstance().getConnectionDB();
+        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
      CallableStatement callSP = conn.prepareCall(sql)) {
 
             callSP.setString(1, movie.getTitle());
@@ -55,7 +55,7 @@ public class MovieRepository {
         String sql = "{call sp_get_all_movies()}";
 
         // Try-with-resources: Connection, CallableStatement y ResultSet se cierran solos
-        try (Connection conn = DatabaseConnection.getDatabaseInstance().getConnectionDB();
+        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
                 CallableStatement callSP = conn.prepareCall(sql); ResultSet rs = callSP.executeQuery()) {
 
             while (rs.next()) {

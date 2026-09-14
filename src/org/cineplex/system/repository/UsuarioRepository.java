@@ -10,7 +10,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.cineplex.system.config.DatabaseConnection;
+import org.cineplex.system.config.ConexionDB;
 
 public class UsuarioRepository {
     
@@ -18,7 +18,7 @@ public class UsuarioRepository {
         String sql = "{CALL sp_obtener_usuario_por_username(?)}";
         
      
-        try (Connection con = DatabaseConnection.getDatabaseInstance().getConnectionDB();
+        try (Connection con = ConexionDB.getInstanciaConexionDB().getConnection();
              CallableStatement cs = con.prepareCall(sql)) {
             
             cs.setString(1, nombreUsuario);

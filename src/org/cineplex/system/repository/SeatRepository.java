@@ -10,7 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import org.cineplex.system.config.DatabaseConnection;
+import org.cineplex.system.config.ConexionDB;
 import org.cineplex.system.model.Seat;
 
 public class SeatRepository {
@@ -18,7 +18,7 @@ public class SeatRepository {
     public void saveSeat(Seat seat) {
         String sql = "{call sp_insert_seat(?, ?)}";
         
-        try (Connection conn = DatabaseConnection.getDatabaseInstance().getConnectionDB();
+        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
              CallableStatement cstmt = conn.prepareCall(sql)) {
             
             cstmt.setInt(1, seat.getSeatNumber());
@@ -35,7 +35,7 @@ public class SeatRepository {
         List<Seat> seats = new ArrayList<>();
         String sql = "{call sp_get_seats_by_auditorium(?)}";
         
-        try (Connection conn = DatabaseConnection.getDatabaseInstance().getConnectionDB();
+        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
              CallableStatement cstmt = conn.prepareCall(sql)) {
             
             cstmt.setInt(1, auditoriumId);
@@ -60,7 +60,7 @@ public class SeatRepository {
     public boolean existsByAuditoriumId(Integer auditoriumId) {
         String sql = "{call sp_check_seats_exist(?)}";
         
-        try (Connection conn = DatabaseConnection.getDatabaseInstance().getConnectionDB();
+        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
              CallableStatement cstmt = conn.prepareCall(sql)) {
             
             cstmt.setInt(1, auditoriumId);
@@ -81,7 +81,7 @@ public class SeatRepository {
     public void deleteByAuditoriumId(Integer auditoriumId) {
         String sql = "{call sp_delete_seats_by_auditorium(?)}";
         
-        try (Connection conn = DatabaseConnection.getDatabaseInstance().getConnectionDB();
+        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
              CallableStatement cstmt = conn.prepareCall(sql)) {
             
             cstmt.setInt(1, auditoriumId);
