@@ -3,9 +3,14 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+<<<<<<< HEAD
             <file>file:/C:/Users/Informatica/Desktop/Apolanco-2023070%20MAT/CinePlex/B4-CinePlex_Studio/src/org/cineplex/system/controller/AdministradorController.java</file>
             <file>file:/C:/Users/Informatica/Desktop/Apolanco-2023070%20MAT/CinePlex/B4-CinePlex_Studio/src/org/cineplex/system/controller/MovieRegisterController.java</file>
             <file>file:/C:/Users/Informatica/Desktop/Apolanco-2023070%20MAT/CinePlex/B4-CinePlex_Studio/src/org/cineplex/system/repository/UsuarioRepository.java</file>
+=======
+            <file>file:/C:/Users/informatica/OneDrive%20-%20Fundación%20Kinal%20-Alumnos-/Escritorio/BIM4%202023230%20MAT/B4-CinePlex_Studio/src/org/cineplex/system/MainClass.java</file>
+            <file>file:/C:/Users/informatica/OneDrive%20-%20Fundación%20Kinal%20-Alumnos-/Escritorio/BIM4%202023230%20MAT/B4-CinePlex_Studio/src/org/cineplex/system/controller/AdministradorController.java</file>
+>>>>>>> 696e6f2f5d71ef14e6edf60fec96ed5a53c07be8
         </group>
     </open-files>
 </project-private>
