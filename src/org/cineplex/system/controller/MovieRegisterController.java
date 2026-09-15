@@ -5,10 +5,14 @@
 package org.cineplex.system.controller;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 import org.cineplex.system.model.Movie;
 import org.cineplex.system.repository.MovieRepository;
 import org.cineplex.system.utils.AlertInformation;
@@ -62,7 +66,7 @@ public class MovieRegisterController {
     private TextField txtTitle;
 
     private final MovieRepository movieRepository;
-    private AlertInformation alertInfo =new AlertInformation();
+    private AlertInformation alertInfo = new AlertInformation();
 
     public MovieRegisterController() {
         this.movieRepository = new MovieRepository();
@@ -95,6 +99,27 @@ public class MovieRegisterController {
             alertInfo.viewAlert("ERROR", "Error al registrar", "Error de sistema",
                     "No se pudo registrar la película. Detalle: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void regresarMenu() {
+        try {
+            Stage stageActual = (Stage) btnRegisterMovie.getScene().getWindow();
+
+           
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Administrador.fxml"));
+            Parent root = loader.load();
+
+            Scene escenaNueva = new Scene(root);
+
+            stageActual.setScene(escenaNueva);
+            stageActual.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            alertInfo.viewAlert("ERROR", "Error de navegación", "No se pudo cargar la vista",
+                    "Detalle: " + e.getMessage() + "\nVerifica la ruta del archivo Administrador.fxml");
         }
     }
 
