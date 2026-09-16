@@ -4,6 +4,7 @@
  */
 package org.cineplex.system.repository;
 
+
 import org.cineplex.system.model.Rol;
 import org.cineplex.system.model.Usuario;
 import java.sql.CallableStatement;
@@ -11,6 +12,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.cineplex.system.config.ConexionDB;
+
 
 public class UsuarioRepository {
     
