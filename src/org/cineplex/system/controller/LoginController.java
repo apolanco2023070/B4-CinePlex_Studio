@@ -5,17 +5,27 @@
 package org.cineplex.system.controller;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import model.Usuario;
-import service.AuthService;
+import javafx.stage.Stage;
+import org.cineplex.system.model.TypeRol; 
+import org.cineplex.system.model.Usuario;
+import org.cineplex.system.service.AuthService;
 
 public class LoginController {
 
-    @FXML private TextField campoUsuario;
-    @FXML private PasswordField campoPassword;
-    @FXML private Label mensajeError;
+    @FXML
+    private TextField campoUsuario;
+
+    @FXML
+    private PasswordField campoPassword;
+
+    @FXML
+    private Label mensajeError;
 
     private final AuthService authService = new AuthService();
 
@@ -24,18 +34,58 @@ public class LoginController {
         String usuario = campoUsuario.getText();
         String password = campoPassword.getText();
 
-        AuthService.ResultadoLogin resultado = authService.login(usuario, password, "Administrador");
+    
+        AuthService.ResultadoLogin resultado = authService.login(usuario, password, TypeRol.ADMINISTRATOR);
 
         if (resultado.exito) {
             mensajeError.setText("");
-            abrirModuloCartelera(resultado.usuario);
+            abrirModuloAdministrador(resultado.usuario);
         } else {
-            mensajeError.setText(resultado.mensaje);
+           
+            resultado = authService.login(usuario, password, TypeRol.MANAGER);
+
+            if (resultado.exito) {
+                mensajeError.setText("");
+                abrirModuloGerente(resultado.usuario);
+            } else {
+                mensajeError.setText(resultado.mensaje);
+            }
         }
     }
 
-    private void abrirModuloCartelera(Usuario usuarioLogueado) {
-        System.out.println("Acceso concedido a: " + usuarioLogueado);
-        // TODO: cargar Cartelera.fxml (se implementa junto con HU7/HU8)
+    private void abrirModuloAdministrador(Usuario usuarioLogueado) {
+        try {
+            System.out.println("HU1: Acceso concedido a ADMINISTRATOR: " + usuarioLogueado);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Administrador.fxml"));
+            Parent root = loader.load();
+
+            AdministradorController controller = loader.getController();
+            controller.setUsuarioLogueado(usuarioLogueado);
+
+            Stage stage = (Stage) campoUsuario.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Panel Administrador - CinePlex");
+        } catch (Exception e) {
+            mensajeError.setText("Error al cargar el módulo: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void abrirModuloGerente(Usuario usuarioLogueado) {
+        try {
+            System.out.println("HU2: Acceso concedido a MANAGER: " + usuarioLogueado);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Gerente.fxml"));
+            Parent root = loader.load();
+
+            GerenteController controller = loader.getController();
+            controller.setUsuarioLogueado(usuarioLogueado);
+
+            Stage stage = (Stage) campoUsuario.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Panel Gerente - CinePlex");
+        } catch (Exception e) {
+            mensajeError.setText("Error al cargar el módulo: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
