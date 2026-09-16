@@ -8,6 +8,9 @@ import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -15,6 +18,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 import org.cineplex.system.model.Auditorium;
 import org.cineplex.system.model.Seat;
 import org.cineplex.system.repository.AuditoriumRepository;
@@ -30,6 +34,9 @@ public class SeatsController {
 
     @FXML
     private Button btnRegisterRoom;
+
+    @FXML
+    private Button btnRegresar;
 
     @FXML
     private Button btnRegisterSeats;
@@ -171,6 +178,28 @@ public class SeatsController {
         } catch (Exception e) {
             AlertInformation.viewAlert("ERROR", "Load Error", "Could not load seats", e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void regresarMenu() {
+        try {
+
+            Stage stageActual = (Stage) btnRegresar.getScene().getWindow();
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Administrador.fxml"));
+
+            Parent root = loader.load();
+
+            Scene escenaNueva = new Scene(root);
+
+            stageActual.setScene(escenaNueva);
+            stageActual.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertInformation.viewAlert("ERROR", "Error de navegación", "No se pudo cargar la vista",
+                    "Detalle: " + e.getMessage() + "\nVerifica la ruta del archivo Administrador.fxml en el código Java.");
         }
     }
 }

@@ -33,7 +33,6 @@ public class AdministradorController {
 
             java.net.URL fxmlLocation = getClass().getResource(fxmlPath);
 
-        
             FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent root = loader.load();
 

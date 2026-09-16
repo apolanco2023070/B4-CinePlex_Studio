@@ -27,7 +27,7 @@ public class UsuarioRepository {
             
             try (ResultSet rs = cs.executeQuery()) {
                 if (rs.next()) {
-                    Rol rol = new Rol(rs.getInt("role_id"), rs.getString("name"));
+                    Rol rol = new Rol(rs.getInt("role_id"), rs.getString("role_name"));
                     return new Usuario(
                         rs.getInt("user_id"),
                         rs.getString("username"),
