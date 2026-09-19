@@ -20,17 +20,16 @@ import java.util.List;
 public class MovieRepository {
 
     /**
-     * 
-     * @param saveMovie 
-     * 
+     *
+     * @param saveMovie
+     *
      * Procedimiento que llama al SP en la database para guardar peliculas
      */
     public void saveMovie(Movie movie) {
         String sql = "{call sp_insert_movie(?,?,?,?,?,?)}";
 
         // Try-with-resources: Connection y CallableStatement se cierran solos al terminar
-        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
-     CallableStatement callSP = conn.prepareCall(sql)) {
+        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection(); CallableStatement callSP = conn.prepareCall(sql)) {
 
             callSP.setString(1, movie.getTitle());
             callSP.setInt(2, movie.getDuration());
@@ -54,13 +53,10 @@ public class MovieRepository {
         List<Movie> moviesList = new ArrayList<>();
         String sql = "{call sp_get_all_movies()}";
 
-        // Try-with-resources: Connection, CallableStatement y ResultSet se cierran solos
-        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
-                CallableStatement callSP = conn.prepareCall(sql); ResultSet rs = callSP.executeQuery()) {
+        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection(); CallableStatement callSP = conn.prepareCall(sql); ResultSet rs = callSP.executeQuery()) {
 
             while (rs.next()) {
                 Movie movie = new Movie();
-
                 movie.setMovieId(rs.getInt("movie_id"));
                 movie.setTitle(rs.getString("title"));
                 movie.setDuration(rs.getInt("duration"));
@@ -68,12 +64,13 @@ public class MovieRepository {
                 movie.setGenreName(rs.getString("genre_name"));
                 movie.setRating(rs.getString("rating_id"));
                 movie.setPosterUrl(rs.getString("poster_url"));
-
                 moviesList.add(movie);
             }
 
         } catch (SQLException e) {
-            
+            // ✅ AGREGA ESTO PARA VER EL ERROR REAL
+            System.err.println("❌ ERROR SQL en getAllMovies: " + e.getMessage());
+            e.printStackTrace();
         }
 
         return moviesList;
