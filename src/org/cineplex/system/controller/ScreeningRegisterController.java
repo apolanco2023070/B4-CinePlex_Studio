@@ -12,6 +12,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 import org.cineplex.system.model.Auditorium;
 import org.cineplex.system.model.Movie;
 import org.cineplex.system.model.Screening;
@@ -29,23 +30,23 @@ public class ScreeningRegisterController {
 
     @FXML
     private ComboBox<Movie> cmbMovies;
-    
     @FXML
     private ComboBox<Auditorium> cmbAuditoriums;
-    
     @FXML
     private DatePicker dpDate;
-    
     @FXML
     private TextField txtTime;
-    
     @FXML
-    private Button btnSaveScreening;
+    private Button btnSave;
+    @FXML
+    private Button btnCancel;
 
     private final ScreeningRepository screeningRepository;
     private final MovieRepository movieRepository;
     private final AuditoriumRepository auditoriumRepository;
     private final Validations validations;
+
+    private Runnable onScreeningSaved;
 
     public ScreeningRegisterController() {
         this.screeningRepository = new ScreeningRepository();
@@ -59,6 +60,10 @@ public class ScreeningRegisterController {
         configureComboBoxes();
         loadMovies();
         loadAuditoriums();
+    }
+
+    public void setOnScreeningSaved(Runnable callback) {
+        this.onScreeningSaved = callback;
     }
 
     private void configureComboBoxes() {
@@ -97,12 +102,12 @@ public class ScreeningRegisterController {
         LocalDate date = dpDate.getValue();
         String timeText = txtTime.getText().trim();
 
+        // Validaciones
         if (selectedMovie == null || selectedAuditorium == null || date == null || validations.emptyText(timeText)) {
             AlertInformation.viewAlert("ERROR", "Campos incompletos", "Validación", "Todos los campos son obligatorios.");
             return;
         }
 
-        // Validar formato de hora simple (HH:mm)
         if (!timeText.matches("^([01]?[0-9]|2[0-3]):[0-5][0-9]$")) {
             AlertInformation.viewAlert("ERROR", "Formato de hora inválido", "Validación", "Use el formato HH:mm (ej: 14:30)");
             return;
@@ -115,17 +120,20 @@ public class ScreeningRegisterController {
             screeningRepository.saveScreening(screening);
 
             AlertInformation.viewAlert("INFORMATION", "Éxito", "Función Registrada", "La función se programó correctamente.");
-            clearForm();
+
+            if (onScreeningSaved != null) {
+                onScreeningSaved.run();
+            }
+
+            ((Stage) btnSave.getScene().getWindow()).close();
+
         } catch (Exception e) {
             AlertInformation.viewAlert("ERROR", "Error", "No se pudo guardar", e.getMessage());
         }
     }
 
-    private void clearForm() {
-        cmbMovies.getSelectionModel().clearSelection();
-        cmbAuditoriums.getSelectionModel().clearSelection();
-        dpDate.setValue(null);
-        txtTime.clear();
+    @FXML
+    private void cancel() {
+        ((Stage) btnCancel.getScene().getWindow()).close();
     }
 }
-

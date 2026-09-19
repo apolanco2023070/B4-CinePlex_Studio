@@ -404,3 +404,222 @@ END $$
 
 DELIMITER ;
 
+DELIMITER $$
+
+-- ============================================================
+-- 1. SP para insertar una función
+-- ============================================================
+CREATE PROCEDURE sp_insert_screening(
+    IN p_movie_id INT,
+    IN p_auditorium_id INT,
+    IN p_show_date DATE,
+    IN p_show_time TIME
+)
+BEGIN
+    INSERT INTO screening (movie_id, auditorium_id, show_date, show_time)
+    VALUES (p_movie_id, p_auditorium_id, p_show_date, p_show_time);
+END $$
+
+-- ============================================================
+-- 2. SP para obtener todas las funciones
+-- ============================================================
+CREATE PROCEDURE sp_get_all_screenings()
+BEGIN
+    SELECT 
+        s.screening_id,
+        m.title AS movie_title,
+        a.name AS auditorium_name,
+        s.show_date,
+        s.show_time
+    FROM screening s
+    INNER JOIN movie m ON s.movie_id = m.movie_id
+    INNER JOIN auditorium a ON s.auditorium_id = a.auditorium_id
+    ORDER BY s.show_date DESC, s.show_time ASC;
+END $$
+
+-- ============================================================
+-- 3. SP para obtener una función por ID
+-- ============================================================
+CREATE PROCEDURE sp_get_screening_by_id(
+    IN p_screening_id INT
+)
+BEGIN
+    SELECT 
+        s.screening_id,
+        m.title AS movie_title,
+        a.name AS auditorium_name,
+        s.show_date,
+        s.show_time
+    FROM screening s
+    INNER JOIN movie m ON s.movie_id = m.movie_id
+    INNER JOIN auditorium a ON s.auditorium_id = a.auditorium_id
+    WHERE s.screening_id = p_screening_id;
+END $$
+
+-- ============================================================
+-- 4. SP para obtener asientos de una función con su estado
+-- ============================================================
+CREATE PROCEDURE sp_get_seats_for_screening(
+    IN p_screening_id INT
+)
+BEGIN
+    SELECT 
+        s.seat_id,
+        s.seat_number,
+        s.status AS seat_status,
+        CASE 
+            WHEN r.reservation_id IS NOT NULL AND r.status = 'RESERVED' THEN 'RESERVED'
+            ELSE 'AVAILABLE'
+        END AS reservation_status,
+        r.reservation_id
+    FROM seat s
+    INNER JOIN screening scr ON s.auditorium_id = scr.auditorium_id
+    LEFT JOIN reservation r ON s.seat_id = r.seat_id AND r.screening_id = p_screening_id
+    WHERE scr.screening_id = p_screening_id
+    ORDER BY s.seat_number ASC;
+END $$
+
+-- ============================================================
+-- 5. SP para insertar una reserva
+-- ============================================================
+CREATE PROCEDURE sp_insert_reservation(
+    IN p_user_id INT,
+    IN p_screening_id INT,
+    IN p_seat_id INT,
+    IN p_status VARCHAR(20)
+)
+BEGIN
+    DECLARE v_count INT;
+    
+    -- Verificar si el asiento ya está reservado para esta función
+    SELECT COUNT(*) INTO v_count 
+    FROM reservation 
+    WHERE screening_id = p_screening_id 
+    AND seat_id = p_seat_id 
+    AND status = 'RESERVED';
+    
+    IF v_count > 0 THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'El asiento ya está reservado para esta función';
+    ELSE
+        INSERT INTO reservation (user_id, screening_id, seat_id, status, reservation_date)
+        VALUES (p_user_id, p_screening_id, p_seat_id, p_status, NOW());
+    END IF;
+END $$
+
+-- ============================================================
+-- 6. SP para actualizar el estado de una reserva
+-- ============================================================
+CREATE PROCEDURE sp_update_reservation_status(
+    IN p_reservation_id INT,
+    IN p_new_status VARCHAR(20)
+)
+BEGIN
+    UPDATE reservation 
+    SET status = p_new_status 
+    WHERE reservation_id = p_reservation_id;
+END $$
+
+-- ============================================================
+-- 7. SP para cancelar una reserva específica
+-- ============================================================
+CREATE PROCEDURE sp_cancel_reservation(
+    IN p_reservation_id INT
+)
+BEGIN
+    UPDATE reservation 
+    SET status = 'CANCELLED' 
+    WHERE reservation_id = p_reservation_id;
+END $$
+
+-- ============================================================
+-- 8. SP para eliminar una función (y sus reservas)
+-- ============================================================
+CREATE PROCEDURE sp_delete_screening(
+    IN p_screening_id INT
+)
+BEGIN
+    -- Primero eliminar las reservas asociadas
+    DELETE FROM reservation WHERE screening_id = p_screening_id;
+    -- Luego eliminar la función
+    DELETE FROM screening WHERE screening_id = p_screening_id;
+END $$
+
+-- ============================================================
+-- 9. SP para verificar si una función existe
+-- ============================================================
+CREATE PROCEDURE sp_check_screening_exists(
+    IN p_movie_id INT,
+    IN p_auditorium_id INT,
+    IN p_show_date DATE,
+    IN p_show_time TIME,
+    OUT p_exists INT
+)
+BEGIN
+    SELECT COUNT(*) INTO p_exists 
+    FROM screening 
+    WHERE movie_id = p_movie_id 
+    AND auditorium_id = p_auditorium_id 
+    AND show_date = p_show_date 
+    AND show_time = p_show_time;
+END $$
+
+-- ============================================================
+-- 10. SP para obtener funciones por fecha
+-- ============================================================
+CREATE PROCEDURE sp_get_screenings_by_date(
+    IN p_show_date DATE
+)
+BEGIN
+    SELECT 
+        s.screening_id,
+        m.title AS movie_title,
+        a.name AS auditorium_name,
+        s.show_date,
+        s.show_time
+    FROM screening s
+    INNER JOIN movie m ON s.movie_id = m.movie_id
+    INNER JOIN auditorium a ON s.auditorium_id = a.auditorium_id
+    WHERE s.show_date = p_show_date
+    ORDER BY s.show_time ASC;
+END $$
+
+-- ============================================================
+-- 11. SP para obtener funciones por sala
+-- ============================================================
+CREATE PROCEDURE sp_get_screenings_by_auditorium(
+    IN p_auditorium_id INT
+)
+BEGIN
+    SELECT 
+        s.screening_id,
+        m.title AS movie_title,
+        a.name AS auditorium_name,
+        s.show_date,
+        s.show_time
+    FROM screening s
+    INNER JOIN movie m ON s.movie_id = m.movie_id
+    INNER JOIN auditorium a ON s.auditorium_id = a.auditorium_id
+    WHERE s.auditorium_id = p_auditorium_id
+    ORDER BY s.show_date DESC, s.show_time ASC;
+END $$
+
+DELIMITER ;
+USE cineplex_IN4AM;
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_insert_movie(
+    IN p_title VARCHAR(200),
+    IN p_duration INT,
+    IN p_director VARCHAR(150),
+    IN p_genre_id INT,
+    IN p_rating_id CHAR(1),  -- ✅ CAMBIADO: De INT a CHAR(1)
+    IN p_poster_url VARCHAR(500)
+)
+BEGIN
+    INSERT INTO movie (title, duration, director, genre_id, rating_id, poster_url)
+    VALUES (p_title, p_duration, p_director, p_genre_id, p_rating_id, p_poster_url);
+END $$
+
+DELIMITER ;

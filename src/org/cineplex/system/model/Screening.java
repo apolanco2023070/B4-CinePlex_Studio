@@ -87,4 +87,8 @@ public class Screening {
         this.showTime = showTime;
     }
 
+    // Getter auxiliar para mostrar la hora como String en la tabla
+    public String getShowTimeString() {
+        return showTime != null ? showTime.toString() : "";
+    }
 }

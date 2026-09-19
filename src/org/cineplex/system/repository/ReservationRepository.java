@@ -4,9 +4,6 @@
  */
 package org.cineplex.system.repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import org.cineplex.system.config.ConexionDB;
 import java.sql.Connection;
 import org.cineplex.system.config.ConexionDB;
 import java.sql.CallableStatement;
@@ -30,8 +27,6 @@ public class ReservationRepository {
             cstmt.setInt(1, screeningId);
             try (ResultSet rs = cstmt.executeQuery()) {
                 while (rs.next()) {
-                    // Nota: Para obtener el reservation_id necesitaríamos ajustar el SP, 
-                    // pero por ahora con saber el status es suficiente para la vista.
                     seats.add(new SeatStatus(
                         rs.getInt("seat_id"),
                         rs.getInt("seat_number"),
@@ -50,7 +45,7 @@ public class ReservationRepository {
         try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
              CallableStatement cstmt = conn.prepareCall(sql)) {
             
-            cstmt.setInt(1, userId); // Por ahora hardcodeamos 1 (Admin) o el usuario logueado
+            cstmt.setInt(1, userId); 
             cstmt.setInt(2, screeningId);
             cstmt.setInt(3, seatId);
             cstmt.setString(4, status);

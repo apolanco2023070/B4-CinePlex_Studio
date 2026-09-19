@@ -28,7 +28,7 @@ public class AdministradorController {
     public void abrirCartelera() {
         System.out.println("HU3: Administrador accede a Cartelera - PERMITIDO");
         try {
-            
+
             String fxmlPath = "/org/cineplex/system/view/MovieRegister.fxml";
 
             java.net.URL fxmlLocation = getClass().getResource(fxmlPath);
@@ -36,14 +36,13 @@ public class AdministradorController {
             FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent root = loader.load();
 
-         
             Stage stage = (Stage) lblBienvenida.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("CinePlex - Gestión de Cartelera");
 
         } catch (Exception e) {
             System.err.println("Error inesperado al cargar la vista:");
-            e.printStackTrace(); 
+            e.printStackTrace();
             mostrarMensaje("Error de Navegación", "No se pudo cargar la vista:\n" + e.getMessage());
         }
     }
@@ -73,6 +72,29 @@ public class AdministradorController {
             Stage stage = (Stage) lblBienvenida.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("CinePlex - Gestión de Salas y Asientos");
+
+        } catch (Exception e) {
+            System.err.println("Error inesperado al cargar la vista:");
+            e.printStackTrace();
+            mostrarMensaje("Error de Navegación", "No se pudo cargar la vista:\n" + e.getMessage());
+        }
+    }
+
+    @FXML
+    public void manageScreening() {
+        
+        try {
+
+            String fxmlPath = "/org/cineplex/system/view/ScreeningView.fxml";
+
+            java.net.URL fxmlLocation = getClass().getResource(fxmlPath);
+
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            Parent root = loader.load();
+
+            Stage stage = (Stage) lblBienvenida.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("CinePlex - Gestión de Cartelera");
 
         } catch (Exception e) {
             System.err.println("Error inesperado al cargar la vista:");

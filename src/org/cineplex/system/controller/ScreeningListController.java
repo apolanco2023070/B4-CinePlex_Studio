@@ -5,11 +5,13 @@
 package org.cineplex.system.controller;
 
 import java.time.LocalDate;
+import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -61,21 +63,31 @@ public class ScreeningListController {
         colMovie.setCellValueFactory(new PropertyValueFactory<>("movieTitle"));
         colAuditorium.setCellValueFactory(new PropertyValueFactory<>("auditoriumName"));
         colDate.setCellValueFactory(new PropertyValueFactory<>("showDate"));
-        colTime.setCellValueFactory(cellData
-                -> new javafx.beans.property.SimpleStringProperty(
-                        cellData.getValue().getShowTime().toString()
-                )
-        );
+
+        colTime.setCellValueFactory(new PropertyValueFactory<>("showTimeString"));
     }
 
     private void loadAllScreenings() {
         try {
-            allScreenings = FXCollections.observableArrayList(
-                    screeningRepository.getAllScreening()
-            );
+            System.out.println("Intentando cargar funciones...");
+
+            List<Screening> screenings = screeningRepository.getAllScreening();
+            System.out.println("Funciones encontradas: " + screenings.size());
+
+            allScreenings = FXCollections.observableArrayList(screenings);
             tblScreenings.setItems(allScreenings);
+
+            System.out.println("Tabla actualizada correctamente");
+
         } catch (Exception e) {
-            AlertInformation.viewAlert("ERROR", "Error", "No se pudieron cargar las funciones", e.getMessage());
+            e.printStackTrace();
+
+            AlertInformation.viewAlert(
+                    "ERROR",
+                    "Error al cargar funciones",
+                    "Detalle: " + e.getClass().getSimpleName(),
+                    e.getMessage()
+            );
         }
     }
 
@@ -101,25 +113,21 @@ public class ScreeningListController {
     @FXML
     private void addScreening() {
         try {
-            // Cargar el FXML de registro
+            
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/ScreeningRegisterView.fxml"));
             Parent root = loader.load();
 
-            // Obtener el controller del formulario de registro
             ScreeningRegisterController registerController = loader.getController();
 
-            // Configurar callback para recargar la tabla cuando se guarde
             registerController.setOnScreeningSaved(() -> {
-                loadAllScreenings(); // Recargar la tabla de funciones
+                loadAllScreenings(); 
             });
 
-            // Crear y mostrar la ventana
             Stage stage = new Stage();
             stage.setTitle("Agregar Nueva Función");
             stage.setScene(new Scene(root, 500, 400));
             stage.setResizable(false);
-            stage.initModality(Modality.APPLICATION_MODAL); // Bloquea la ventana padre hasta cerrar
-            stage.showAndWait(); // Espera a que se cierre para continuar
+            stage.showAndWait();
 
         } catch (Exception e) {
             AlertInformation.viewAlert("ERROR", "Error", "No se pudo abrir el formulario", e.getMessage());
