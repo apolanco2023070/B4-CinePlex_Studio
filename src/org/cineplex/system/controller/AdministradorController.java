@@ -103,6 +103,30 @@ public class AdministradorController {
         }
     }
 
+    
+    @FXML
+    public void seatReservation() {
+        
+        try {
+
+            String fxmlPath = "/org/cineplex/system/view/SeatReservation.fxml";
+
+            java.net.URL fxmlLocation = getClass().getResource(fxmlPath);
+
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            Parent root = loader.load();
+
+            Stage stage = (Stage) lblBienvenida.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("CinePlex - Gestión de Cartelera");
+
+        } catch (Exception e) {
+            System.err.println("Error inesperado al cargar la vista:");
+            e.printStackTrace();
+            mostrarMensaje("Error de Navegación", "No se pudo cargar la vista:\n" + e.getMessage());
+        }
+    }
+    
     @FXML
     public void cerrarSesion() {
         try {

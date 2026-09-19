@@ -16,7 +16,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.cineplex.system.model.Screening;
 import org.cineplex.system.repository.ScreeningRepository;
@@ -89,25 +88,6 @@ public class ScreeningListController {
                     e.getMessage()
             );
         }
-    }
-
-    @FXML
-    private void viewSeats() {
-        Screening selected = tblScreenings.getSelectionModel().getSelectedItem();
-
-        if (selected == null) {
-            AlertInformation.viewAlert("WARNING", "Sin selección",
-                    "Selecciona una función primero", "");
-            return;
-        }
-
-        AlertInformation.viewAlert("INFORMATION", "Ver Asientos",
-                "Función seleccionada",
-                "Película: " + selected.getMovieTitle() + "\n"
-                + "Sala: " + selected.getAuditoriumName() + "\n"
-                + "Fecha: " + selected.getShowDate() + "\n"
-                + "Hora: " + selected.getShowTime());
-
     }
 
     @FXML

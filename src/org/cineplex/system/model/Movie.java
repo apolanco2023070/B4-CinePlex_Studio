@@ -108,4 +108,9 @@ public class Movie {
     public void setGenreName(String genreName) {
         this.genreName = genreName;
     }
+    
+    @Override
+    public String toString() {
+        return this.title; 
+    }
 }

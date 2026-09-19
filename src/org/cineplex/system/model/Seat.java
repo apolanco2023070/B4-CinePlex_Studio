@@ -50,4 +50,9 @@ public class Seat {
     public String getStatus() {
         return "Disponible";
     }
+
+    @Override
+    public String toString() {
+        return "Asiento " + seatNumber;
+    }
 }

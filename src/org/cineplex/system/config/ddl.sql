@@ -321,24 +321,23 @@ END $$
 
 Delimiter ;
 
--- 3. Obtener todas las películas (CORREGIDO: r.rating_id en lugar de r.name)
-Delimiter $$
+DELIMITER $$
+
 CREATE PROCEDURE sp_get_all_movies()
 BEGIN
-    SELECT
+    SELECT 
         m.movie_id,
         m.title,
         m.duration,
         m.director,
         g.name AS genre_name,
-        r.rating_id AS rating_name, 
+        r.rating_id AS rating_id,   -- ✅ AQUÍ ESTABA EL ERROR: Ahora el alias coincide con Java
         m.poster_url
     FROM movie m
     INNER JOIN genre g ON m.genre_id = g.genre_id
     INNER JOIN rating r ON m.rating_id = r.rating_id
     ORDER BY m.title ASC;
 END $$
-
 
 -- SP para insertar sala
 
@@ -423,10 +422,15 @@ END $$
 -- ============================================================
 -- 2. SP para obtener todas las funciones
 -- ============================================================
+
+DELIMITER $$
+
 CREATE PROCEDURE sp_get_all_screenings()
 BEGIN
     SELECT 
         s.screening_id,
+        s.movie_id,          -- ✅ AGREGADO: Java lo necesita
+        s.auditorium_id,     -- ✅ AGREGADO: Java lo necesita
         m.title AS movie_title,
         a.name AS auditorium_name,
         s.show_date,
@@ -436,6 +440,7 @@ BEGIN
     INNER JOIN auditorium a ON s.auditorium_id = a.auditorium_id
     ORDER BY s.show_date DESC, s.show_time ASC;
 END $$
+
 
 -- ============================================================
 -- 3. SP para obtener una función por ID
@@ -605,21 +610,22 @@ BEGIN
 END $$
 
 DELIMITER ;
-USE cineplex_IN4AM;
+
 
 DELIMITER $$
 
-CREATE PROCEDURE sp_insert_movie(
-    IN p_title VARCHAR(200),
-    IN p_duration INT,
-    IN p_director VARCHAR(150),
-    IN p_genre_id INT,
-    IN p_rating_id CHAR(1),  -- ✅ CAMBIADO: De INT a CHAR(1)
-    IN p_poster_url VARCHAR(500)
+CREATE PROCEDURE sp_get_available_seats_for_screening(
+    IN p_screening_id INT
 )
 BEGIN
-    INSERT INTO movie (title, duration, director, genre_id, rating_id, poster_url)
-    VALUES (p_title, p_duration, p_director, p_genre_id, p_rating_id, p_poster_url);
+    -- Obtener todos los asientos de la sala que NO están reservados para esta función
+    SELECT s.seat_id, s.seat_number, s.auditorium_id
+    FROM seat s
+    INNER JOIN screening scr ON s.auditorium_id = scr.auditorium_id
+    LEFT JOIN reservation r ON s.seat_id = r.seat_id 
+        AND r.screening_id = p_screening_id 
+        AND r.status = 'RESERVED'
+    WHERE scr.screening_id = p_screening_id
+    AND r.reservation_id IS NULL  -- Solo los que no tienen reserva
+    ORDER BY s.seat_number ASC;
 END $$
-
-DELIMITER ;
