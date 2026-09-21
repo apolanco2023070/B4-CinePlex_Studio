@@ -6,21 +6,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import org.cineplex.system.config.DatabaseConnection;
+import org.cineplex.system.config.ConexionDB;
 import org.cineplex.system.model.Movie;
 
-/**
- * Repository para manejo de películas
- */
 public class MovieRepository {
 
-    /**
-     * Guarda una película en la base de datos
-     */
     public void saveMovie(Movie movie) {
         String sql = "INSERT INTO movie (title, duration, director, genre_id, rating_id, poster_url) VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = DatabaseConnection.getDatabaseInstance().getConnectionDB();
+        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, movie.getTitle());
@@ -38,14 +32,11 @@ public class MovieRepository {
         }
     }
 
-    /**
-     * Actualiza una película existente
-     */
     public boolean updateMovie(Movie movie) {
         String sql = "UPDATE movie SET title = ?, duration = ?, director = ?, " +
                      "genre_id = ?, rating_id = ?, poster_url = ? WHERE movie_id = ?";
         
-        try (Connection conn = DatabaseConnection.getDatabaseInstance().getConnectionDB();
+        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setString(1, movie.getTitle());
@@ -66,9 +57,6 @@ public class MovieRepository {
         }
     }
 
-    /**
-     * Obtiene todas las películas
-     */
     public List<Movie> getAllMovies() {
         List<Movie> moviesList = new ArrayList<>();
         String sql = "SELECT m.movie_id, m.title, m.duration, m.director, " +
@@ -77,7 +65,7 @@ public class MovieRepository {
                      "INNER JOIN genre g ON m.genre_id = g.genre_id " +
                      "ORDER BY m.title ASC";
 
-        try (Connection conn = DatabaseConnection.getDatabaseInstance().getConnectionDB();
+        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
 
