@@ -3,10 +3,14 @@ package org.cineplex.system.controller;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.stage.Stage;
 import org.cineplex.system.model.Auditorium;
 import org.cineplex.system.model.Movie;
 import org.cineplex.system.model.Screening;
@@ -16,6 +20,7 @@ import org.cineplex.system.repository.MovieRepository;
 import org.cineplex.system.repository.ReservationRepository;
 import org.cineplex.system.repository.ScreeningRepository;
 import org.cineplex.system.repository.SeatRepository;
+import org.cineplex.system.utils.AlertInformation;
 
 public class SeatReservationController {
 
@@ -30,6 +35,9 @@ public class SeatReservationController {
 
     @FXML
     private ComboBox<Screening> cmbScreening;
+
+    @FXML
+    private Button btnRegresar;
 
     private final AuditoriumRepository auditoriumRepository;
     private final MovieRepository movieRepository;
@@ -154,6 +162,26 @@ public class SeatReservationController {
 
         } catch (Exception e) {
             showAlert("Error", "No se pudo realizar la reserva: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void regresarMenu() {
+        try {
+            Stage stageActual = (Stage) btnRegresar.getScene().getWindow();
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Administrador.fxml"));
+            Parent root = loader.load();
+
+            Scene escenaNueva = new Scene(root);
+
+            stageActual.setScene(escenaNueva);
+            stageActual.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertInformation.viewAlert("ERROR", "Error de navegación", "No se pudo cargar la vista",
+                    "Detalle: " + e.getMessage() + "\nVerifica la ruta del archivo Administrador.fxml");
         }
     }
 }
