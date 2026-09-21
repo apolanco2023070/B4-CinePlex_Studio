@@ -20,7 +20,6 @@ CREATE TABLE role (
 );
 
 -- 2. Tabla USERS (Hija de ROLE)
-
 CREATE TABLE users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,
@@ -53,7 +52,7 @@ CREATE TABLE movie (
     duration INT NOT NULL,
     director VARCHAR(150) NOT NULL,
     genre_id INT NOT NULL,
-    rating_id CHAR(1) NOT NULL,       -- CORREGIDO: Debe ser CHAR(1) para coincidir con rating
+    rating_id CHAR(1) NOT NULL,
     poster_url VARCHAR(500),
     CONSTRAINT fk_movie_genre
         FOREIGN KEY (genre_id)
@@ -154,7 +153,6 @@ CREATE TABLE ticket (
         ON DELETE RESTRICT
 );
 
-
 -- ============================================================
 -- 2. DATOS INICIALES (DML)
 -- ============================================================
@@ -178,106 +176,26 @@ INSERT INTO users (full_name, username, password, email, role_id) VALUES
 ('Gerente de Cine', 'gerente', 'gerente123', 'gerente@cineplex.com', 2);
 
 -- ============================================================
--- 4. PROCEDIMIENTOS ALMACENADOS (STORED PROCEDURES)
+-- 3. PROCEDIMIENTOS ALMACENADOS (STORED PROCEDURES)
 -- ============================================================
 
--- ============================================================
-
-USE cineplex_IN4AM;
-
--- 1. Tabla GENRE (Padre)
-CREATE TABLE IF NOT EXISTS genre (
-    genre_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL UNIQUE
-);
-
--- 2. Tabla RATING (Padre) - Usamos CHAR(1) como acordamos
-CREATE TABLE IF NOT EXISTS rating (
-    rating_id CHAR(1) PRIMARY KEY
-);
-
--- 3. Tabla MOVIE (Hija) - ¡Aquí estaba el error! rating_id ahora es CHAR(1)
-CREATE TABLE IF NOT EXISTS movie (
-    movie_id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(200) NOT NULL,
-    duration INT NOT NULL,
-    director VARCHAR(150) NOT NULL,
-    genre_id INT NOT NULL,
-    rating_id CHAR(1) NOT NULL,       -- <-- CORREGIDO: De INT a CHAR(1)
-    poster_url VARCHAR(500),
-    
-    CONSTRAINT fk_movie_genre
-        FOREIGN KEY (genre_id)
-        REFERENCES genre(genre_id)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT,
-        
-    CONSTRAINT fk_movie_rating
-        FOREIGN KEY (rating_id)
-        REFERENCES rating(rating_id)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT,
-        
-    CONSTRAINT chk_duration
-        CHECK (duration > 0)
-);
-
--- 4. Insertar datos iniciales (¡Importante hacerlo después de crear las tablas!)
-INSERT INTO genre (name) VALUES ('Action'), ('Drama'), ('Comedy')
-ON DUPLICATE KEY UPDATE name=name;
-
-INSERT INTO rating (rating_id) VALUES ('A'), ('B'), ('C')
-ON DUPLICATE KEY UPDATE rating_id=rating_id;
-
-
- 
--- ============================================================
-
--- VERIFICATION
+DELIMITER $$
 
 -- ============================================================
-
-SELECT * FROM role;
-
-SELECT * FROM users;
-
-SELECT * FROM genre;
-
-SELECT * FROM rating;
-
-SELECT * FROM movie;
-
-SELECT * FROM auditorium;
-
-SELECT * FROM seat;
-
-SELECT * FROM screening;
-
-SELECT * FROM reservation;
-
-SELECT * FROM ticket;
-
- # Stores Procedures
- USE cineplex_IN4AM;
-
-
-Delimiter $$
-CREATE PROCEDURE sp_insert_movie(
-    IN p_title VARCHAR(200),
-    IN p_duration INT,
-    IN p_director VARCHAR(150),
-    IN p_genre_id INT,
-    IN p_rating_id INT,
-    IN p_poster_url VARCHAR(500)
-)
+-- PROCEDIMIENTO: sp_get_all_genres 
+-- ============================================================
+CREATE PROCEDURE sp_get_all_genres()
 BEGIN
-    INSERT INTO movie (title, duration, director, genre_id, rating_id, poster_url)
-    VALUES (p_title, p_duration, p_director, p_genre_id, p_rating_id, p_poster_url);
+    SELECT 
+        genre_id,
+        name
+    FROM genre
+    ORDER BY name ASC;
 END $$
 
-Delimiter ;
-
-Delimiter $$
+-- ============================================================
+-- PROCEDIMIENTO: sp_get_all_movies 
+-- ============================================================
 CREATE PROCEDURE sp_get_all_movies()
 BEGIN
     SELECT 
@@ -285,27 +203,36 @@ BEGIN
         m.title,
         m.duration,
         m.director,
+        m.genre_id,              -- <-- AGREGADO: Columna que tu Java necesita
         g.name AS genre_name,
-        r.name AS rating_name,
+        m.rating_id,             -- <-- AGREGADO: ID del rating
+        r.rating_id AS rating_name, 
         m.poster_url
     FROM movie m
     INNER JOIN genre g ON m.genre_id = g.genre_id
     INNER JOIN rating r ON m.rating_id = r.rating_id
     ORDER BY m.title ASC;
-END 
-
-DELIMITER ;
-
+END $$
 
 -- ============================================================
-
--- 10. Procedimientos para Inicio de sesion
+-- PROCEDIMIENTO: sp_insert_movie 
+-- ============================================================
+CREATE PROCEDURE sp_insert_movie(
+    IN p_title VARCHAR(200),
+    IN p_duration INT,
+    IN p_director VARCHAR(150),
+    IN p_genre_id INT,
+    IN p_rating_id CHAR(1),      -- <-- CORREGIDO: De INT a CHAR(1)
+    IN p_poster_url VARCHAR(500)
+)
+BEGIN
+    INSERT INTO movie (title, duration, director, genre_id, rating_id, poster_url)
+    VALUES (p_title, p_duration, p_director, p_genre_id, p_rating_id, p_poster_url);
+END $$
 
 -- ============================================================
-
-DELIMITER $$
-
--- 1. Obtener usuario por username (Login)
+-- PROCEDIMIENTO: sp_obtener_usuario_por_username (LOGIN)
+-- ============================================================
 CREATE PROCEDURE sp_obtener_usuario_por_username(IN p_username VARCHAR(50))
 BEGIN
     SELECT
@@ -319,29 +246,9 @@ BEGIN
     WHERE u.username = p_username;
 END $$
 
-Delimiter ;
-
--- 3. Obtener todas las películas (CORREGIDO: r.rating_id en lugar de r.name)
-Delimiter $$
-CREATE PROCEDURE sp_get_all_movies()
-BEGIN
-    SELECT
-        m.movie_id,
-        m.title,
-        m.duration,
-        m.director,
-        g.name AS genre_name,
-        r.rating_id AS rating_name, 
-        m.poster_url
-    FROM movie m
-    INNER JOIN genre g ON m.genre_id = g.genre_id
-    INNER JOIN rating r ON m.rating_id = r.rating_id
-    ORDER BY m.title ASC;
-END $$
-
-
--- SP para insertar sala
-
+-- ============================================================
+-- PROCEDIMIENTO: sp_insert_auditorium
+-- ============================================================
 CREATE PROCEDURE sp_insert_auditorium(
     IN p_name VARCHAR(100),
     IN p_capacity INT
@@ -350,13 +257,17 @@ BEGIN
     INSERT INTO auditorium (name, capacity) VALUES (p_name, p_capacity);
 END $$
 
--- 5. Obtener todas las salas
+-- ============================================================
+-- PROCEDIMIENTO: sp_get_all_auditoriums
+-- ============================================================
 CREATE PROCEDURE sp_get_all_auditoriums()
 BEGIN
     SELECT * FROM auditorium ORDER BY name;
 END $$
 
--- 6. Insertar asiento
+-- ============================================================
+-- PROCEDIMIENTO: sp_insert_seat
+-- ============================================================
 CREATE PROCEDURE sp_insert_seat(
     IN p_seat_number INT,
     IN p_auditorium_id INT
@@ -365,7 +276,9 @@ BEGIN
     INSERT INTO seat (seat_number, auditorium_id) VALUES (p_seat_number, p_auditorium_id);
 END $$
 
--- 7. Obtener asientos por sala
+-- ============================================================
+-- PROCEDIMIENTO: sp_get_seats_by_auditorium
+-- ============================================================
 CREATE PROCEDURE sp_get_seats_by_auditorium(
     IN p_auditorium_id INT
 )
@@ -373,7 +286,9 @@ BEGIN
     SELECT * FROM seat WHERE auditorium_id = p_auditorium_id ORDER BY seat_number;
 END $$
 
--- 8. Verificar si existen asientos en una sala
+-- ============================================================
+-- PROCEDIMIENTO: sp_check_seats_exist
+-- ============================================================
 CREATE PROCEDURE sp_check_seats_exist(
     IN p_auditorium_id INT
 )
@@ -386,7 +301,9 @@ BEGIN
     WHERE auditorium_id = p_auditorium_id;
 END $$
 
--- 9. Eliminar asientos por sala (Útil antes de borrar una sala)
+-- ============================================================
+-- PROCEDIMIENTO: sp_delete_seats_by_auditorium
+-- ============================================================
 CREATE PROCEDURE sp_delete_seats_by_auditorium(
     IN p_auditorium_id INT
 )
@@ -394,7 +311,9 @@ BEGIN
     DELETE FROM seat WHERE auditorium_id = p_auditorium_id;
 END $$
 
--- 10. Eliminar sala
+-- ============================================================
+-- PROCEDIMIENTO: sp_delete_auditorium
+-- ============================================================
 CREATE PROCEDURE sp_delete_auditorium(
     IN p_auditorium_id INT
 )
