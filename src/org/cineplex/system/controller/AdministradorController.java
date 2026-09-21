@@ -24,6 +24,7 @@ public class AdministradorController {
     public void abrirCartelera() {
         System.out.println("HU7/HU8/HU9: Administrador accede a Cartelera - PERMITIDO");
         try {
+            // Se dejó la versión corta para mantener consistencia con el resto del archivo
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/MovieRegister.fxml"));
             Parent root = loader.load();
             

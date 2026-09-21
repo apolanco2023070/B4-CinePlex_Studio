@@ -4,6 +4,7 @@
  */
 package org.cineplex.system.repository;
 
+
 import org.cineplex.system.model.Rol;
 import org.cineplex.system.model.Usuario;
 import java.sql.CallableStatement;
@@ -11,6 +12,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.cineplex.system.config.ConexionDB;
+
 
 public class UsuarioRepository {
     
@@ -25,7 +27,7 @@ public class UsuarioRepository {
             
             try (ResultSet rs = cs.executeQuery()) {
                 if (rs.next()) {
-                    Rol rol = new Rol(rs.getInt("role_id"), rs.getString("name"));
+                    Rol rol = new Rol(rs.getInt("role_id"), rs.getString("role_name"));
                     return new Usuario(
                         rs.getInt("user_id"),
                         rs.getString("username"),
