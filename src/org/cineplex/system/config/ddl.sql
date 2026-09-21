@@ -20,6 +20,7 @@ CREATE TABLE role (
 );
 
 -- 2. Tabla USERS (Hija de ROLE)
+
 CREATE TABLE users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,
@@ -176,9 +177,130 @@ INSERT INTO users (full_name, username, password, email, role_id) VALUES
 ('Administrador Principal', 'admin', 'admin123', 'admin@cineplex.com', 1),
 ('Gerente de Cine', 'gerente', 'gerente123', 'gerente@cineplex.com', 2);
 
+-- ============================================================
+-- 4. PROCEDIMIENTOS ALMACENADOS (STORED PROCEDURES)
+-- ============================================================
 
 -- ============================================================
--- 3. PROCEDIMIENTOS ALMACENADOS (STORED PROCEDURES)
+
+USE cineplex_IN4AM;
+
+-- 1. Tabla GENRE (Padre)
+CREATE TABLE IF NOT EXISTS genre (
+    genre_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE
+);
+
+-- 2. Tabla RATING (Padre) - Usamos CHAR(1) como acordamos
+CREATE TABLE IF NOT EXISTS rating (
+    rating_id CHAR(1) PRIMARY KEY
+);
+
+-- 3. Tabla MOVIE (Hija) - ¡Aquí estaba el error! rating_id ahora es CHAR(1)
+CREATE TABLE IF NOT EXISTS movie (
+    movie_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(200) NOT NULL,
+    duration INT NOT NULL,
+    director VARCHAR(150) NOT NULL,
+    genre_id INT NOT NULL,
+    rating_id CHAR(1) NOT NULL,       -- <-- CORREGIDO: De INT a CHAR(1)
+    poster_url VARCHAR(500),
+    
+    CONSTRAINT fk_movie_genre
+        FOREIGN KEY (genre_id)
+        REFERENCES genre(genre_id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+        
+    CONSTRAINT fk_movie_rating
+        FOREIGN KEY (rating_id)
+        REFERENCES rating(rating_id)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+        
+    CONSTRAINT chk_duration
+        CHECK (duration > 0)
+);
+
+-- 4. Insertar datos iniciales (¡Importante hacerlo después de crear las tablas!)
+INSERT INTO genre (name) VALUES ('Action'), ('Drama'), ('Comedy')
+ON DUPLICATE KEY UPDATE name=name;
+
+INSERT INTO rating (rating_id) VALUES ('A'), ('B'), ('C')
+ON DUPLICATE KEY UPDATE rating_id=rating_id;
+
+
+ 
+-- ============================================================
+
+-- VERIFICATION
+
+-- ============================================================
+
+SELECT * FROM role;
+
+SELECT * FROM users;
+
+SELECT * FROM genre;
+
+SELECT * FROM rating;
+
+SELECT * FROM movie;
+
+SELECT * FROM auditorium;
+
+SELECT * FROM seat;
+
+SELECT * FROM screening;
+
+SELECT * FROM reservation;
+
+SELECT * FROM ticket;
+
+ # Stores Procedures
+ USE cineplex_IN4AM;
+
+
+Delimiter $$
+CREATE PROCEDURE sp_insert_movie(
+    IN p_title VARCHAR(200),
+    IN p_duration INT,
+    IN p_director VARCHAR(150),
+    IN p_genre_id INT,
+    IN p_rating_id INT,
+    IN p_poster_url VARCHAR(500)
+)
+BEGIN
+    INSERT INTO movie (title, duration, director, genre_id, rating_id, poster_url)
+    VALUES (p_title, p_duration, p_director, p_genre_id, p_rating_id, p_poster_url);
+END $$
+
+Delimiter ;
+
+Delimiter $$
+CREATE PROCEDURE sp_get_all_movies()
+BEGIN
+    SELECT 
+        m.movie_id,
+        m.title,
+        m.duration,
+        m.director,
+        g.name AS genre_name,
+        r.name AS rating_name,
+        m.poster_url
+    FROM movie m
+    INNER JOIN genre g ON m.genre_id = g.genre_id
+    INNER JOIN rating r ON m.rating_id = r.rating_id
+    ORDER BY m.title ASC;
+END 
+
+DELIMITER ;
+
+
+-- ============================================================
+
+-- 10. Procedimientos para Inicio de sesion
+
 -- ============================================================
 
 DELIMITER $$
@@ -197,21 +319,10 @@ BEGIN
     WHERE u.username = p_username;
 END $$
 
--- 2. Insertar película (CORREGIDO: p_rating_id como CHAR(1))
-CREATE PROCEDURE sp_insert_movie(
-    IN p_title VARCHAR(200),
-    IN p_duration INT,
-    IN p_director VARCHAR(150),
-    IN p_genre_id INT,
-    IN p_rating_id CHAR(1), 
-    IN p_poster_url VARCHAR(500)
-)
-BEGIN
-    INSERT INTO movie (title, duration, director, genre_id, rating_id, poster_url)
-    VALUES (p_title, p_duration, p_director, p_genre_id, p_rating_id, p_poster_url);
-END $$
+Delimiter ;
 
 -- 3. Obtener todas las películas (CORREGIDO: r.rating_id en lugar de r.name)
+Delimiter $$
 CREATE PROCEDURE sp_get_all_movies()
 BEGIN
     SELECT
@@ -228,7 +339,9 @@ BEGIN
     ORDER BY m.title ASC;
 END $$
 
--- 4. Insertar sala
+
+-- SP para insertar sala
+
 CREATE PROCEDURE sp_insert_auditorium(
     IN p_name VARCHAR(100),
     IN p_capacity INT
