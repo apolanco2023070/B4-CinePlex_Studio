@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.cineplex.system.config;
 
 import java.sql.Connection;
@@ -13,12 +9,10 @@ public class ConexionDB {
     private static ConexionDB instanciaConexionDB;
     private Connection connection;
 
-    
     private ConexionDB() {
         conectar();
     }
 
-    
     private void conectar() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -42,7 +36,6 @@ public class ConexionDB {
         return instanciaConexionDB;
     }
 
- 
     public Connection getConnection() {
         try {
             if (this.connection == null || this.connection.isClosed()) {
@@ -59,7 +52,6 @@ public class ConexionDB {
         this.connection = connection;
     }
 
-  
     public void cerrarConexion() {
         try {
             if (this.connection != null && !this.connection.isClosed()) {

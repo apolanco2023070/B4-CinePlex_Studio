@@ -2,6 +2,7 @@ package org.cineplex.system.repository;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -28,7 +29,6 @@ public class MovieRepository {
             cstmt.setString(6, movie.getPosterUrl());
 
             cstmt.executeUpdate();
-
         } catch (SQLException e) {
             throw new Exception("Error de base de datos al guardar la película: " + e.getMessage(), e);
         }
@@ -36,6 +36,7 @@ public class MovieRepository {
 
     /**
      * Obtiene todas las películas llamando al Stored Procedure.
+     * (Este SP fue corregido anteriormente para incluir genre_id y rating_id)
      */
     public List<Movie> getAllMovies() throws Exception {
         List<Movie> movies = new ArrayList<>();
@@ -51,7 +52,7 @@ public class MovieRepository {
                     rs.getString("title"),
                     rs.getInt("duration"),
                     rs.getString("director"),
-                    rs.getInt("genre_id"),
+                    rs.getInt("genre_id"),      // <-- Coincide con la corrección de la DB
                     rs.getString("rating_id"), 
                     rs.getString("poster_url")
                 );
@@ -64,15 +65,18 @@ public class MovieRepository {
     }
 
     /**
-     * Obtiene una película específica por su ID (para el formulario de edición).
+     * Obtiene una película específica por su ID.
+     * NOTA: Se usa SQL directo para evitar errores si el SP 'sp_get_movie_by_id' no existe aún en tu DB.
      */
     public Movie getMovieById(int movieId) throws Exception {
-        String sql = "{CALL sp_get_movie_by_id(?)}";
+        String sql = "SELECT movie_id, title, duration, director, genre_id, rating_id, poster_url " +
+                     "FROM movie WHERE movie_id = ?";
+        
         try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
-             CallableStatement cstmt = conn.prepareCall(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            cstmt.setInt(1, movieId);
-            try (ResultSet rs = cstmt.executeQuery()) {
+            pstmt.setInt(1, movieId);
+            try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     return new Movie(
                         rs.getInt("movie_id"),
@@ -92,24 +96,29 @@ public class MovieRepository {
     }
 
     /**
-     * Actualiza una película existente llamando al Stored Procedure.
+     * Actualiza una película existente.
+     * NOTA: Se usa SQL directo para evitar errores si el SP 'sp_update_movie' no existe aún en tu DB.
      */
-    public void updateMovie(Movie movie) throws Exception {
-        String sql = "{CALL sp_update_movie(?, ?, ?, ?, ?, ?, ?)}";
+    public boolean updateMovie(Movie movie) throws Exception {
+        String sql = "UPDATE movie SET title = ?, duration = ?, director = ?, " +
+                     "genre_id = ?, rating_id = ?, poster_url = ? WHERE movie_id = ?";
+        
         try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
-             CallableStatement cstmt = conn.prepareCall(sql)) {
-
-            cstmt.setInt(1, movie.getMovieId());
-            cstmt.setString(2, movie.getTitle());
-            cstmt.setInt(3, movie.getDuration());
-            cstmt.setString(4, movie.getDirector());
-            cstmt.setInt(5, movie.getGenreId());
-            cstmt.setString(6, movie.getRating());
-            cstmt.setString(7, movie.getPosterUrl());
-
-            cstmt.executeUpdate();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, movie.getTitle());
+            pstmt.setInt(2, movie.getDuration());
+            pstmt.setString(3, movie.getDirector());
+            pstmt.setInt(4, movie.getGenreId());
+            pstmt.setString(5, movie.getRating());
+            pstmt.setString(6, movie.getPosterUrl());
+            pstmt.setInt(7, movie.getMovieId());
+            
+            int filasAfectadas = pstmt.executeUpdate();
+            return filasAfectadas > 0;
+            
         } catch (SQLException e) {
-            throw new Exception("Error de base de datos al actualizar la película: " + e.getMessage(), e);
+            throw new Exception("Error al actualizar película: " + e.getMessage(), e);
         }
     }
 
@@ -118,13 +127,15 @@ public class MovieRepository {
      */
     public List<Movie> getMoviesByGenreId(int genreId) throws Exception {
         List<Movie> movies = new ArrayList<>();
-        String sql = "{CALL sp_get_movies_by_genre_id(?)}";
+        // Si tienes el SP, usa "{CALL sp_get_movies_by_genre_id(?)}", si no, usa este SQL directo:
+        String sql = "SELECT movie_id, title, duration, director, genre_id, rating_id, poster_url " +
+                     "FROM movie WHERE genre_id = ?";
 
         try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
-             CallableStatement cstmt = conn.prepareCall(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            cstmt.setInt(1, genreId);
-            try (ResultSet rs = cstmt.executeQuery()) {
+            pstmt.setInt(1, genreId);
+            try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     movies.add(new Movie(
                         rs.getInt("movie_id"),
