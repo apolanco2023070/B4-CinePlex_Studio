@@ -1,56 +1,43 @@
 package org.cineplex.system.controller;
 
 import javafx.fxml.FXML;
-
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import org.cineplex.system.model.Movie;
 import org.cineplex.system.repository.MovieRepository;
 import org.cineplex.system.utils.AlertInformation;
 import org.cineplex.system.utils.Validations;
-import java.util.List;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 
+import java.util.List;
+
+/**
+ * Controlador para registro y edición de películas
+ */
 public class MovieRegisterController {
 
-    @FXML
-    private TableView<Movie> tableMovies;
-    @FXML
-    private TableColumn<Movie, String> colTitulo;
-    @FXML
-    private TableColumn<Movie, String> colGenero;
-    @FXML
-    private TableColumn<Movie, Integer> colDuracion;
-    @FXML
-    private TableColumn<Movie, String> colClasificacion;
-    @FXML
-    private TableColumn<Movie, String> colDirector;
-    @FXML
-    private TableColumn<Movie, String> colUrlPoster;
+    @FXML private TableView<Movie> tableMovies;
+    @FXML private TableColumn<Movie, String> colTitulo;
+    @FXML private TableColumn<Movie, String> colGenero;
+    @FXML private TableColumn<Movie, Integer> colDuracion;
+    @FXML private TableColumn<Movie, String> colClasificacion;
+    @FXML private TableColumn<Movie, String> colDirector;
+    @FXML private TableColumn<Movie, String> colUrlPoster;
 
-    @FXML
-    private Label lblTitle, lblGenre, lblLength, lblRating, lblDirector, lblPoster;
-    @FXML
-    private TextField txtTitle, txtLength, txtRating, txtDirector, txtPoster;
-
-    @FXML
-    private ComboBox<MovieRepository.GenreOption> cmbGenre;
-
-    @FXML
-    private Button btnRegisterMovie, btnVerPoster;
+    @FXML private Label lblTitle, lblGenre, lblLength, lblRating, lblDirector, lblPoster;
+    @FXML private TextField txtTitle, txtLength, txtRating, txtDirector, txtPoster;
+    @FXML private ComboBox<MovieRepository.GenreOption> cmbGenre;
+    @FXML private Button btnRegisterMovie, btnVerPoster;
 
     private final MovieRepository movieRepository;
-
     private final AlertInformation alertInfo;
     private final Validations validations;
+    
+    // Variable para almacenar la película seleccionada para editar
+    private Movie movieSeleccionada;
 
     public MovieRegisterController() {
         this.movieRepository = new MovieRepository();
@@ -119,12 +106,10 @@ public class MovieRegisterController {
             errores.append("• Clasificación debe ser A, B o C.\n");
             hayErrores = true;
         }
-
         if (cmbGenre.getValue() == null) {
             errores.append("• Debe seleccionar un género de la lista.\n");
             hayErrores = true;
         }
-
         if (!validations.emptyText(posterUrl) && !validations.validateLengthText(posterUrl, 500)) {
             errores.append("• La URL del póster no puede exceder 500 caracteres.\n");
             hayErrores = true;
@@ -138,20 +123,47 @@ public class MovieRegisterController {
         try {
             int duration = Integer.parseInt(lengthText);
             int genreId = cmbGenre.getValue().getId();
-
+            
             Movie movie = new Movie(0, title, duration, director, genreId, rating, posterUrl);
             movieRepository.saveMovie(movie);
 
             limpiarFormulario();
             cargarPeliculas();
             alertInfo.viewAlert("INFORMATION", "Éxito", "Registro completado", "La película se guardó correctamente.");
+            
         } catch (Exception e) {
-          
-            alertInfo.viewAlert("ERROR", "Error al registrar", "Error de sistema", "Detalle: " + e.getMessage());
-             
-             alertInfo.viewAlert("ERROR", "Error al registrar", "Error de sistema",
-                            "No se pudo registrar la película. Detalle: " + e.getMessage());
+            alertInfo.viewAlert("ERROR", "Error al registrar", "Error de sistema", "No se pudo registrar la película. Detalle: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * NUEVO MÉTODO: Abre la URL del póster en el navegador del sistema
+     */
+    @FXML
+    private void verPoster() {
+        String url = txtPoster.getText().trim();
+        
+        // Si el campo está vacío, intenta obtener la URL de la película seleccionada en la tabla
+        if (url.isEmpty()) {
+            Movie seleccionada = tableMovies.getSelectionModel().getSelectedItem();
+            if (seleccionada != null) {
+                url = seleccionada.getPosterUrl();
+            }
+        }
+
+        if (url == null || url.isEmpty()) {
+            alertInfo.viewAlert("ADVERTENCIA", "Sin URL", "No se puede ver el póster", 
+                "No hay una URL de póster ingresada o la película seleccionada no tiene una.");
+            return;
+        }
+
+        try {
+            // Abre la URL en el navegador predeterminado (Chrome, Edge, etc.)
+            java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+        } catch (Exception e) {
+            alertInfo.viewAlert("ERROR", "Error al abrir", "No se pudo abrir el póster", 
+                "Verifica que la URL sea válida (debe empezar con http:// o https://). Detalle: " + e.getMessage());
         }
     }
 
@@ -159,15 +171,10 @@ public class MovieRegisterController {
     private void regresarMenu() {
         try {
             Stage stageActual = (Stage) btnRegisterMovie.getScene().getWindow();
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Administrador.fxml"));
             Parent root = loader.load();
-
-            Scene escenaNueva = new Scene(root);
-
-            stageActual.setScene(escenaNueva);
+            stageActual.setScene(new Scene(root));
             stageActual.show();
-
         } catch (Exception e) {
             e.printStackTrace();
             alertInfo.viewAlert("ERROR", "Error de navegación", "No se pudo cargar la vista",
@@ -175,29 +182,46 @@ public class MovieRegisterController {
         }
     }
 
-    private int obtenerGenreId(String genreName) {
-        switch (genreName.toLowerCase()) {
-            case "action":
-            case "acción":
-                return 1;
-            case "drama":
-                return 2;
-            case "comedy":
-            case "comedia":
-                return 3;
-            default:
-                return 1;
-                
+    @FXML
+    public void seleccionarPelicula(MouseEvent event) {
+        if (event.getClickCount() == 2) { // Doble click
+            Movie seleccionada = tableMovies.getSelectionModel().getSelectedItem();
+            if (seleccionada != null) {
+                cargarDatosPelicula(seleccionada);
+            }
         }
+    }
+
+    public void cargarDatosPelicula(Movie movie) {
+        this.movieSeleccionada = movie;
+        
+        txtTitle.setText(movie.getTitle());
+        txtLength.setText(String.valueOf(movie.getDuration()));
+        txtDirector.setText(movie.getDirector());
+        txtRating.setText(movie.getRating());
+        txtPoster.setText(movie.getPosterUrl());
+        
+        // Seleccionar el género correcto en el ComboBox
+        for (MovieRepository.GenreOption genre : cmbGenre.getItems()) {
+            if (genre.getId() == movie.getGenreId()) {
+                cmbGenre.setValue(genre);
+                break;
+            }
+        }
+        
+        btnRegisterMovie.setText("Actualizar");
     }
 
     private void limpiarFormulario() {
         txtTitle.clear();
-        cmbGenre.setValue(null);
         txtLength.clear();
         txtRating.clear();
         txtDirector.clear();
         txtPoster.clear();
+        cmbGenre.setValue(null);
+        
+        movieSeleccionada = null;
+        btnRegisterMovie.setText("Registrar");
         limpiarErroresVisuales();
         txtTitle.requestFocus();
     }
