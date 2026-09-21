@@ -1,116 +1,150 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.cineplex.system.model;
 
-/**
- *
- * @author informatica
- */
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 public class Movie {
 
-    private Integer movieId;
-    private String title;
-    private Integer duration;
-    private String director;
-    private Integer genreId;
-    private String rating;
-    private String posterUrl;
-
-    private String genreName;
+    private final IntegerProperty movieId;
+    private final StringProperty title;
+    private final IntegerProperty duration;
+    private final StringProperty director;
+    private final IntegerProperty genreId;
+    private final StringProperty genreName;
+    private final StringProperty rating;
+    private final StringProperty posterUrl;
 
     public Movie() {
+        this.movieId = new SimpleIntegerProperty();
+        this.title = new SimpleStringProperty();
+        this.duration = new SimpleIntegerProperty();
+        this.director = new SimpleStringProperty();
+        this.genreId = new SimpleIntegerProperty();
+        this.genreName = new SimpleStringProperty();
+        this.rating = new SimpleStringProperty();
+        this.posterUrl = new SimpleStringProperty();
     }
 
-    public Movie(String title, Integer duration, String director,
-            Integer genreId, String rating, String posterUrl) {
-        this.title = title;
-        this.duration = duration;
-        this.director = director;
-        this.genreId = genreId;
-        this.rating = rating;
-        this.posterUrl = posterUrl;
+    public Movie(int movieId, String title, int duration, String director, int genreId, String rating, String posterUrl) {
+        this();
+        this.movieId.set(movieId);
+        this.title.set(title);
+        this.duration.set(duration);
+        this.director.set(director);
+        this.genreId.set(genreId);
+        this.rating.set(rating);
+        this.posterUrl.set(posterUrl);
     }
 
-    public Movie(Integer movieId, String title, Integer duration, String director,
-            String genreName, String rating, String posterUrl) {
-        this.movieId = movieId;
-        this.title = title;
-        this.duration = duration;
-        this.director = director;
-        this.genreName = genreName;
-        this.rating = rating;
-        this.posterUrl = posterUrl;
+    // --- movieId ---
+    public int getMovieId() {
+        return movieId.get();
     }
 
-    // Getters y Setters
-    public Integer getMovieId() {
+    public void setMovieId(int value) {
+        movieId.set(value);
+    }
+
+    public IntegerProperty movieIdProperty() {
         return movieId;
     }
 
-    public void setMovieId(Integer movieId) {
-        this.movieId = movieId;
+    // --- title ---
+    public String getTitle() {
+        return title.get();
     }
 
-    public String getTitle() {
+    public void setTitle(String value) {
+        title.set(value);
+    }
+
+    public StringProperty titleProperty() {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    // --- duration ---
+    public int getDuration() {
+        return duration.get();
     }
 
-    public Integer getDuration() {
+    public void setDuration(int value) {
+        duration.set(value);
+    }
+
+    public IntegerProperty durationProperty() {
         return duration;
     }
 
-    public void setDuration(Integer duration) {
-        this.duration = duration;
+    // --- director ---
+    public String getDirector() {
+        return director.get();
     }
 
-    public String getDirector() {
+    public void setDirector(String value) {
+        director.set(value);
+    }
+
+    public StringProperty directorProperty() {
         return director;
     }
 
-    public void setDirector(String director) {
-        this.director = director;
+    // --- genreId ---
+    public int getGenreId() {
+        return genreId.get();
     }
 
-    public Integer getGenreId() {
+    public void setGenreId(int value) {
+        genreId.set(value);
+    }
+
+    public IntegerProperty genreIdProperty() {
         return genreId;
     }
 
-    public void setGenreId(Integer genreId) {
-        this.genreId = genreId;
-    }
-
-    public String getRating() {
-        return rating;
-    }
-
-    public void setRating(String rating) {
-        this.rating = rating;
-    }
-
-    public String getPosterUrl() {
-        return posterUrl;
-    }
-
-    public void setPosterUrl(String posterUrl) {
-        this.posterUrl = posterUrl;
-    }
-
+    // --- genreName ---
     public String getGenreName() {
+        return genreName.get();
+    }
+
+    public void setGenreName(String value) {
+        genreName.set(value);
+    }
+
+    public StringProperty genreNameProperty() {
         return genreName;
     }
 
-    public void setGenreName(String genreName) {
-        this.genreName = genreName;
+    // --- rating ---
+    public String getRating() {
+        return rating.get();
     }
-    
+
+    public void setRating(String value) {
+        rating.set(value);
+    }
+
+    public StringProperty ratingProperty() {
+        return rating;
+    }
+
+    // --- posterUrl ---
+    public String getPosterUrl() {
+        return posterUrl.get();
+    }
+
+    public void setPosterUrl(String value) {
+        posterUrl.set(value);
+    }
+
+    public StringProperty posterUrlProperty() {
+        return posterUrl;
+    }
+
+    // ✅ CORREGIDO: Ahora devuelve el String real, no el objeto Property
     @Override
     public String toString() {
-        return this.title; 
+        return getTitle();
     }
 }

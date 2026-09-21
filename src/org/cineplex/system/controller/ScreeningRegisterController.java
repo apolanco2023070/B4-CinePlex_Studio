@@ -33,25 +33,25 @@ public class ScreeningRegisterController {
 
     @FXML
     private ComboBox<Movie> cmbMovies;
-    
+
     @FXML
     private ComboBox<Auditorium> cmbAuditoriums;
-    
+
     @FXML
     private DatePicker dpDate;
-    
+
     @FXML
     private TextField txtTime;
-    
+
     @FXML
     private Button btnSave;
-    
+
     @FXML
     private Button btnCancel;
 
     @FXML
     private Button btnRegresar;
-    
+
     private final ScreeningRepository screeningRepository;
     private final MovieRepository movieRepository;
     private final AuditoriumRepository auditoriumRepository;
@@ -99,7 +99,12 @@ public class ScreeningRegisterController {
     }
 
     private void loadMovies() {
-        cmbMovies.setItems(FXCollections.observableArrayList(movieRepository.getAllMovies()));
+        try {
+            cmbMovies.setItems(FXCollections.observableArrayList(movieRepository.getAllMovies()));
+        } catch (Exception e) {
+            System.err.println("Error al cargar películas: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private void loadAuditoriums() {
@@ -147,7 +152,7 @@ public class ScreeningRegisterController {
     private void cancel() {
         ((Stage) btnCancel.getScene().getWindow()).close();
     }
-    
+
     @FXML
     private void regresarMenu() {
         try {

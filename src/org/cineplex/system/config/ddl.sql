@@ -53,7 +53,7 @@ CREATE TABLE movie (
     duration INT NOT NULL,
     director VARCHAR(150) NOT NULL,
     genre_id INT NOT NULL,
-    rating_id CHAR(1) NOT NULL,       -- CORREGIDO: Debe ser CHAR(1) para coincidir con rating
+    rating_id CHAR(1) NOT NULL,  
     poster_url VARCHAR(500),
     CONSTRAINT fk_movie_genre
         FOREIGN KEY (genre_id)
@@ -203,7 +203,7 @@ CREATE TABLE IF NOT EXISTS movie (
     duration INT NOT NULL,
     director VARCHAR(150) NOT NULL,
     genre_id INT NOT NULL,
-    rating_id CHAR(1) NOT NULL,       -- <-- CORREGIDO: De INT a CHAR(1)
+    rating_id CHAR(1) NOT NULL,
     poster_url VARCHAR(500),
     
     CONSTRAINT fk_movie_genre
@@ -321,8 +321,8 @@ END $$
 
 Delimiter ;
 
-DELIMITER $$
-
+-- 3. Obtener todas las películas (CORREGIDO: r.rating_id en lugar de r.name)
+Delimiter $$
 CREATE PROCEDURE sp_get_all_movies()
 BEGIN
     SELECT 
@@ -331,7 +331,7 @@ BEGIN
         m.duration,
         m.director,
         g.name AS genre_name,
-        r.rating_id AS rating_id,   -- ✅ AQUÍ ESTABA EL ERROR: Ahora el alias coincide con Java
+        r.rating_id AS rating_id,
         m.poster_url
     FROM movie m
     INNER JOIN genre g ON m.genre_id = g.genre_id
@@ -429,8 +429,8 @@ CREATE PROCEDURE sp_get_all_screenings()
 BEGIN
     SELECT 
         s.screening_id,
-        s.movie_id,          -- ✅ AGREGADO: Java lo necesita
-        s.auditorium_id,     -- ✅ AGREGADO: Java lo necesita
+        s.movie_id,        
+        s.auditorium_id,     
         m.title AS movie_title,
         a.name AS auditorium_name,
         s.show_date,
