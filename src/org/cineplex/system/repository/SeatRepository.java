@@ -35,7 +35,7 @@ public class SeatRepository {
         List<Seat> seats = new ArrayList<>();
         String sql = "{call sp_get_seats_by_auditorium(?)}";
         
-        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
+        try (Connection conn =  ConexionDB.getInstanciaConexionDB().getConnection();
              CallableStatement cstmt = conn.prepareCall(sql)) {
             
             cstmt.setInt(1, auditoriumId);
@@ -81,7 +81,7 @@ public class SeatRepository {
     public void deleteByAuditoriumId(Integer auditoriumId) {
         String sql = "{call sp_delete_seats_by_auditorium(?)}";
         
-        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
+        try (Connection conn =  ConexionDB.getInstanciaConexionDB().getConnection();
              CallableStatement cstmt = conn.prepareCall(sql)) {
             
             cstmt.setInt(1, auditoriumId);
