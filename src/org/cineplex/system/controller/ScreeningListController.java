@@ -66,7 +66,7 @@ public class ScreeningListController {
         colAuditorium.setCellValueFactory(new PropertyValueFactory<>("auditoriumName"));
         colDate.setCellValueFactory(new PropertyValueFactory<>("showDate"));
 
-        colTime.setCellValueFactory(new PropertyValueFactory<>("showTimeString"));
+        colTime.setCellValueFactory(new PropertyValueFactory<>("showTime"));
     }
 
     private void loadAllScreenings() {
