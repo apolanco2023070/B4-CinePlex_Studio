@@ -92,4 +92,7 @@ public class Screening {
         return showDate + " " + showTime;
     }
 
+    public String getShowTimeString() {
+        return showTime != null ? showTime.toString() : "";
+    }
 }

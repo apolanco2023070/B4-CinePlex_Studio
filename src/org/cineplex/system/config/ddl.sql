@@ -197,21 +197,28 @@ END $$
 -- ============================================================
 -- PROCEDIMIENTO: sp_get_all_movies 
 -- ============================================================
+
+
+DELIMITER $$
+
 CREATE PROCEDURE sp_get_all_movies()
 BEGIN
-		SELECT 
-		m.movie_id,
-		m.title,
-		m.duration,
-		m.director,
-		g.name AS genre_name,
-		r.rating_id AS rating_id,
-		m.poster_url
-	FROM movie m
-	INNER JOIN genre g ON m.genre_id = g.genre_id
-	INNER JOIN rating r ON m.rating_id = r.rating_id
-	ORDER BY m.title ASC;
+    SELECT 
+        m.movie_id,
+        m.title,
+        m.duration,
+        m.director,
+        m.genre_id, 
+        g.name AS genre_name,
+        r.rating_id,
+        m.poster_url
+    FROM movie m
+    INNER JOIN genre g ON m.genre_id = g.genre_id
+    INNER JOIN rating r ON m.rating_id = r.rating_id
+    ORDER BY m.title ASC;
 END $$
+
+DELIMITER ;
 
 -- ============================================================
 -- PROCEDIMIENTO: sp_insert_movie 
@@ -565,54 +572,5 @@ END $$
 
 DELIMITER ;
 
--- Insertar salas (si no existen)
-INSERT INTO auditorium (name, capacity) VALUES
-('Sala 1 (Estándar)', 50),
-('Sala 2 (Premium)', 30),
-('Sala 3 (IMAX)', 100)
-ON DUPLICATE KEY UPDATE name=name;
 
--- Insertar películas de prueba
-INSERT INTO movie (title, duration, director, genre_id, rating_id, poster_url) VALUES
-('The Dark Knight', 152, 'Christopher Nolan', 1, 'B', 'https://example.com/dark_knight.jpg'),
-('The Shawshank Redemption', 142, 'Frank Darabont', 2, 'B', 'https://example.com/shawshank.jpg'),
-('Inception', 148, 'Christopher Nolan', 1, 'B', 'https://example.com/inception.jpg')
-ON DUPLICATE KEY UPDATE title=title;
-
--- Insertar asientos para la Sala 1 (auditorium_id = 1)
-INSERT INTO seat (seat_number, auditorium_id) VALUES
-(1, 1), (2, 1), (3, 1), (4, 1), (5, 1),
-(6, 1), (7, 1), (8, 1), (9, 1), (10, 1)
-ON DUPLICATE KEY UPDATE seat_number=seat_number;
-
--- ============================================================
--- 3. INSERTAR FUNCIONES (SCREENINGS) DE PRUEBA
--- ============================================================
-
--- Insertar funciones para el 20 de septiembre de 2026
-INSERT INTO screening (movie_id, auditorium_id, show_date, show_time) VALUES
-(1, 1, '2026-09-20', '15:00:00'),  -- The Dark Knight en Sala 1 a las 15:00
-(1, 1, '2026-09-20', '18:00:00'),  -- The Dark Knight en Sala 1 a las 18:00
-(2, 2, '2026-09-20', '16:30:00'),  -- Shawshank en Sala 2 a las 16:30
-(3, 3, '2026-09-20', '20:00:00')   -- Inception en Sala 3 a las 20:00
-ON DUPLICATE KEY UPDATE show_date=show_date;
-
--- ============================================================
--- 4. PROBAR LOS STORED PROCEDURES
--- ============================================================
-
--- ✅ CALL 1: Obtener todas las películas (para el ComboBox)
-CALL sp_get_all_movies();
-
--- ✅ CALL 2: Obtener todas las salas (para el ComboBox)
-CALL sp_get_all_auditoriums();
-
--- ✅ CALL 3: Obtener todos los géneros (para el ComboBox)
-CALL sp_get_all_genres();
-
--- ✅ CALL 4: Obtener todas las funciones (para filtrar por película y sala)
-CALL sp_get_all_screenings();
-
--- ✅ CALL 5: Obtener asientos disponibles para una función específica
--- (Reemplaza 1 con el screening_id que obtuviste en el CALL 4)
-CALL sp_get_available_seats_for_screening(1);
+DELIMITER $$
