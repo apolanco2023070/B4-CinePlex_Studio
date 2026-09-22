@@ -8,21 +8,19 @@ package org.cineplex.system.model;
  *
  * @author informatica
  */
-public class Seat {
+public class SeatStatus {
 
     private Integer seatId;
     private Integer seatNumber;
-    private Integer auditoriumId;
+    private String status;
+    private Integer reservationId;
 
-    public Seat() {
-    }
-
-    public Seat(Integer seatNumber, Integer auditoriumId) {
+    public SeatStatus(Integer seatId, Integer seatNumber, String status) {
+        this.seatId = seatId;
         this.seatNumber = seatNumber;
-        this.auditoriumId = auditoriumId;
+        this.status = status;
     }
 
-    // Getters y Setters
     public Integer getSeatId() {
         return seatId;
     }
@@ -39,20 +37,19 @@ public class Seat {
         this.seatNumber = seatNumber;
     }
 
-    public Integer getAuditoriumId() {
-        return auditoriumId;
-    }
-
-    public void setAuditoriumId(Integer auditoriumId) {
-        this.auditoriumId = auditoriumId;
-    }
-
     public String getStatus() {
-        return "Disponible";
+        return status;
     }
 
-    @Override
-    public String toString() {
-        return "Asiento " + seatNumber;
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Integer getReservationId() {
+        return reservationId;
+    }
+
+    public void setReservationId(Integer reservationId) {
+        this.reservationId = reservationId;
     }
 }
