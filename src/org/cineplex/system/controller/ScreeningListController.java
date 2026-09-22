@@ -28,6 +28,9 @@ import org.cineplex.system.utils.AlertInformation;
 public class ScreeningListController {
 
     @FXML
+    private Button btnRegresar;
+
+    @FXML
     private TableView<Screening> tblScreenings;
 
     @FXML
@@ -93,14 +96,14 @@ public class ScreeningListController {
     @FXML
     private void addScreening() {
         try {
-            
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/ScreeningRegisterView.fxml"));
             Parent root = loader.load();
 
             ScreeningRegisterController registerController = loader.getController();
 
             registerController.setOnScreeningSaved(() -> {
-                loadAllScreenings(); 
+                loadAllScreenings();
             });
 
             Stage stage = new Stage();
@@ -114,5 +117,27 @@ public class ScreeningListController {
             e.printStackTrace();
         }
     }
-    
+
+    @FXML
+    private void regresarMenu() {
+        try {
+
+            Stage stageActual = (Stage) btnRegresar.getScene().getWindow();
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Administrador.fxml"));
+
+            Parent root = loader.load();
+
+            Scene escenaNueva = new Scene(root);
+
+            stageActual.setScene(escenaNueva);
+            stageActual.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertInformation.viewAlert("ERROR", "Error de navegación", "No se pudo cargar la vista",
+                    "Detalle: " + e.getMessage() + "\nVerifica la ruta del archivo Administrador.fxml en el código Java.");
+        }
+    }
+
 }
