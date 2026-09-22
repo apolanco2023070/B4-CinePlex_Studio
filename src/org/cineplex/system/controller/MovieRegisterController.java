@@ -51,7 +51,6 @@ public class MovieRegisterController {
     private final AlertInformation alertInfo;
     private final Validations validations;
 
-    // Variable para almacenar la película seleccionada para editar
     private Movie movieSeleccionada;
 
     public MovieRegisterController() {
@@ -93,6 +92,11 @@ public class MovieRegisterController {
         }
     }
 
+    /**
+     * @param registerMovies
+     * El metodo registra las peliculas 
+     */
+    
     @FXML
     private void registerMovies() {
         limpiarErroresVisuales();

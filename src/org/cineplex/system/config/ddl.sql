@@ -52,11 +52,7 @@ CREATE TABLE movie (
     duration INT NOT NULL,
     director VARCHAR(150) NOT NULL,
     genre_id INT NOT NULL,
-<<<<<<< HEAD
-    rating_id CHAR(1) NOT NULL,  
-=======
     rating_id CHAR(1) NOT NULL,
->>>>>>> a8ebccb87244076cf7403913e8913f4d4469de47
     poster_url VARCHAR(500),
     CONSTRAINT fk_movie_genre
         FOREIGN KEY (genre_id)
@@ -183,63 +179,8 @@ INSERT INTO users (full_name, username, password, email, role_id) VALUES
 -- 3. PROCEDIMIENTOS ALMACENADOS (STORED PROCEDURES)
 -- ============================================================
 
-<<<<<<< HEAD
--- ============================================================
 
-USE cineplex_IN4AM;
-
--- 1. Tabla GENRE (Padre)
-CREATE TABLE IF NOT EXISTS genre (
-    genre_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL UNIQUE
-);
-
--- 2. Tabla RATING (Padre) - Usamos CHAR(1) como acordamos
-CREATE TABLE IF NOT EXISTS rating (
-    rating_id CHAR(1) PRIMARY KEY
-);
-
--- 3. Tabla MOVIE (Hija) - ¡Aquí estaba el error! rating_id ahora es CHAR(1)
-CREATE TABLE IF NOT EXISTS movie (
-    movie_id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(200) NOT NULL,
-    duration INT NOT NULL,
-    director VARCHAR(150) NOT NULL,
-    genre_id INT NOT NULL,
-    rating_id CHAR(1) NOT NULL,
-    poster_url VARCHAR(500),
-    
-    CONSTRAINT fk_movie_genre
-        FOREIGN KEY (genre_id)
-        REFERENCES genre(genre_id)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT,
-        
-    CONSTRAINT fk_movie_rating
-        FOREIGN KEY (rating_id)
-        REFERENCES rating(rating_id)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT,
-        
-    CONSTRAINT chk_duration
-        CHECK (duration > 0)
-);
-
--- 4. Insertar datos iniciales (¡Importante hacerlo después de crear las tablas!)
-INSERT INTO genre (name) VALUES ('Action'), ('Drama'), ('Comedy')
-ON DUPLICATE KEY UPDATE name=name;
-
-INSERT INTO rating (rating_id) VALUES ('A'), ('B'), ('C')
-ON DUPLICATE KEY UPDATE rating_id=rating_id;
-
-
- 
--- ============================================================
-
--- VERIFICATION
-=======
 DELIMITER $$
->>>>>>> a8ebccb87244076cf7403913e8913f4d4469de47
 
 -- ============================================================
 -- PROCEDIMIENTO: sp_get_all_genres 
@@ -258,20 +199,18 @@ END $$
 -- ============================================================
 CREATE PROCEDURE sp_get_all_movies()
 BEGIN
-    SELECT 
-        m.movie_id,
-        m.title,
-        m.duration,
-        m.director,
-        m.genre_id,              -- <-- AGREGADO: Columna que tu Java necesita
-        g.name AS genre_name,
-        m.rating_id,             -- <-- AGREGADO: ID del rating
-        r.rating_id AS rating_name, 
-        m.poster_url
-    FROM movie m
-    INNER JOIN genre g ON m.genre_id = g.genre_id
-    INNER JOIN rating r ON m.rating_id = r.rating_id
-    ORDER BY m.title ASC;
+		SELECT 
+		m.movie_id,
+		m.title,
+		m.duration,
+		m.director,
+		g.name AS genre_name,
+		r.rating_id AS rating_id,
+		m.poster_url
+	FROM movie m
+	INNER JOIN genre g ON m.genre_id = g.genre_id
+	INNER JOIN rating r ON m.rating_id = r.rating_id
+	ORDER BY m.title ASC;
 END $$
 
 -- ============================================================
@@ -282,7 +221,7 @@ CREATE PROCEDURE sp_insert_movie(
     IN p_duration INT,
     IN p_director VARCHAR(150),
     IN p_genre_id INT,
-    IN p_rating_id CHAR(1),      -- <-- CORREGIDO: De INT a CHAR(1)
+    IN p_rating_id CHAR(1),
     IN p_poster_url VARCHAR(500)
 )
 BEGIN
@@ -306,34 +245,9 @@ BEGIN
     WHERE u.username = p_username;
 END $$
 
-<<<<<<< HEAD
-Delimiter ;
-
--- 3. Obtener todas las películas (CORREGIDO: r.rating_id en lugar de r.name)
-Delimiter $$
-CREATE PROCEDURE sp_get_all_movies()
-BEGIN
-    SELECT 
-        m.movie_id,
-        m.title,
-        m.duration,
-        m.director,
-        g.name AS genre_name,
-        r.rating_id AS rating_id,
-        m.poster_url
-    FROM movie m
-    INNER JOIN genre g ON m.genre_id = g.genre_id
-    INNER JOIN rating r ON m.rating_id = r.rating_id
-    ORDER BY m.title ASC;
-END $$
-
--- SP para insertar sala
-
-=======
 -- ============================================================
 -- PROCEDIMIENTO: sp_insert_auditorium
 -- ============================================================
->>>>>>> a8ebccb87244076cf7403913e8913f4d4469de47
 CREATE PROCEDURE sp_insert_auditorium(
     IN p_name VARCHAR(100),
     IN p_capacity INT
@@ -500,8 +414,6 @@ CREATE PROCEDURE sp_insert_reservation(
 )
 BEGIN
     DECLARE v_count INT;
-    
-    -- Verificar si el asiento ya está reservado para esta función
     SELECT COUNT(*) INTO v_count 
     FROM reservation 
     WHERE screening_id = p_screening_id 
@@ -631,6 +543,76 @@ BEGIN
         AND r.screening_id = p_screening_id 
         AND r.status = 'RESERVED'
     WHERE scr.screening_id = p_screening_id
-    AND r.reservation_id IS NULL  -- Solo los que no tienen reserva
+    AND r.reservation_id IS NULL 
     ORDER BY s.seat_number ASC;
 END $$
+
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_get_last_reservation_id(
+    IN p_screening_id INT,
+    IN p_seat_id INT
+)
+BEGIN
+    SELECT reservation_id 
+    FROM reservation 
+    WHERE screening_id = p_screening_id 
+      AND seat_id = p_seat_id 
+    ORDER BY reservation_date DESC 
+    LIMIT 1;
+END $$
+
+DELIMITER ;
+
+-- Insertar salas (si no existen)
+INSERT INTO auditorium (name, capacity) VALUES
+('Sala 1 (Estándar)', 50),
+('Sala 2 (Premium)', 30),
+('Sala 3 (IMAX)', 100)
+ON DUPLICATE KEY UPDATE name=name;
+
+-- Insertar películas de prueba
+INSERT INTO movie (title, duration, director, genre_id, rating_id, poster_url) VALUES
+('The Dark Knight', 152, 'Christopher Nolan', 1, 'B', 'https://example.com/dark_knight.jpg'),
+('The Shawshank Redemption', 142, 'Frank Darabont', 2, 'B', 'https://example.com/shawshank.jpg'),
+('Inception', 148, 'Christopher Nolan', 1, 'B', 'https://example.com/inception.jpg')
+ON DUPLICATE KEY UPDATE title=title;
+
+-- Insertar asientos para la Sala 1 (auditorium_id = 1)
+INSERT INTO seat (seat_number, auditorium_id) VALUES
+(1, 1), (2, 1), (3, 1), (4, 1), (5, 1),
+(6, 1), (7, 1), (8, 1), (9, 1), (10, 1)
+ON DUPLICATE KEY UPDATE seat_number=seat_number;
+
+-- ============================================================
+-- 3. INSERTAR FUNCIONES (SCREENINGS) DE PRUEBA
+-- ============================================================
+
+-- Insertar funciones para el 20 de septiembre de 2026
+INSERT INTO screening (movie_id, auditorium_id, show_date, show_time) VALUES
+(1, 1, '2026-09-20', '15:00:00'),  -- The Dark Knight en Sala 1 a las 15:00
+(1, 1, '2026-09-20', '18:00:00'),  -- The Dark Knight en Sala 1 a las 18:00
+(2, 2, '2026-09-20', '16:30:00'),  -- Shawshank en Sala 2 a las 16:30
+(3, 3, '2026-09-20', '20:00:00')   -- Inception en Sala 3 a las 20:00
+ON DUPLICATE KEY UPDATE show_date=show_date;
+
+-- ============================================================
+-- 4. PROBAR LOS STORED PROCEDURES
+-- ============================================================
+
+-- ✅ CALL 1: Obtener todas las películas (para el ComboBox)
+CALL sp_get_all_movies();
+
+-- ✅ CALL 2: Obtener todas las salas (para el ComboBox)
+CALL sp_get_all_auditoriums();
+
+-- ✅ CALL 3: Obtener todos los géneros (para el ComboBox)
+CALL sp_get_all_genres();
+
+-- ✅ CALL 4: Obtener todas las funciones (para filtrar por película y sala)
+CALL sp_get_all_screenings();
+
+-- ✅ CALL 5: Obtener asientos disponibles para una función específica
+-- (Reemplaza 1 con el screening_id que obtuviste en el CALL 4)
+CALL sp_get_available_seats_for_screening(1);

@@ -44,13 +44,11 @@ public class AlertInformation {
                 break;
         }
  
-        // Creación y configuración de la alerta
         Alert alert = new Alert(tipo);
         alert.setTitle(titulo);
         alert.setHeaderText(encabezado);
         alert.setContentText(mensaje);
  
-        // Mostrar la alerta
         alert.showAndWait();
     }
     

@@ -7,17 +7,17 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
-import org.cineplex.system.model.Usuario;
+import org.cineplex.system.model.User;
 
 public class AdministradorController {
 
     @FXML
-    private Label lblBienvenida;
-    private Usuario usuarioLogueado;
+    private Label lblWelcome;
+    private User usuarioLogueado;
 
-    public void setUsuarioLogueado(Usuario usuario) {
-        this.usuarioLogueado = usuario;
-        lblBienvenida.setText("Bienvenido, " + usuario.getNombreUsuario());
+    public void setUsuarioLogueado(User user) {
+        this.usuarioLogueado = user;
+        lblWelcome.setText("Bienvenido, " + user.getUserName());
     }
 
     @FXML
@@ -32,7 +32,7 @@ public class AdministradorController {
             FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent root = loader.load();
 
-            Stage stage = (Stage) lblBienvenida.getScene().getWindow();
+            Stage stage = (Stage) lblWelcome.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("Gestión de Cartelera - CinePlex");
         } catch (Exception e) {
@@ -50,7 +50,7 @@ public class AdministradorController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/UserManagement.fxml"));
             Parent root = loader.load();
-            Stage stage = (Stage) lblBienvenida.getScene().getWindow();
+            Stage stage = (Stage) lblWelcome.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("Gestión de Usuarios - CinePlex");
         } catch (Exception e) {
@@ -73,7 +73,7 @@ public class AdministradorController {
             FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent root = loader.load();
 
-            Stage stage = (Stage) lblBienvenida.getScene().getWindow();
+            Stage stage = (Stage) lblWelcome.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("CinePlex - Gestión de Salas y Asientos");
         } catch (Exception e) {
@@ -95,7 +95,7 @@ public class AdministradorController {
             FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent root = loader.load();
 
-            Stage stage = (Stage) lblBienvenida.getScene().getWindow();
+            Stage stage = (Stage) lblWelcome.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("CinePlex - Gestión de Cartelera");
 
@@ -118,7 +118,7 @@ public class AdministradorController {
             FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent root = loader.load();
 
-            Stage stage = (Stage) lblBienvenida.getScene().getWindow();
+            Stage stage = (Stage) lblWelcome.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("CinePlex - Gestión de Cartelera");
 
@@ -134,7 +134,7 @@ public class AdministradorController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Login.fxml"));
             Parent root = loader.load();
-            Stage stage = (Stage) lblBienvenida.getScene().getWindow();
+            Stage stage = (Stage) lblWelcome.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("CinePlex - Iniciar Sesión");
         } catch (Exception e) {

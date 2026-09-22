@@ -1,8 +1,8 @@
 package org.cineplex.system.repository;
 
 import org.cineplex.system.config.ConexionDB;
-import org.cineplex.system.model.Rol;
-import org.cineplex.system.model.Usuario;
+import org.cineplex.system.model.Role;
+import org.cineplex.system.model.User;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,7 +10,7 @@ import java.sql.SQLException;
 
 public class UsuarioFactory {
     
-    public Usuario buscarPorNombreUsuario(String nombreUsuario) {
+    public User buscarPorNombreUsuario(String nombreUsuario) {
         String sql = "SELECT u.user_id, u.username, u.password, r.role_id, r.name " +
                      "FROM users u " +
                      "INNER JOIN role r ON u.role_id = r.role_id " +
@@ -23,8 +23,8 @@ public class UsuarioFactory {
             
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    Rol rol = new Rol(rs.getInt("role_id"), rs.getString("name"));
-                    return new Usuario(
+                    Role rol = new Role(rs.getInt("role_id"), rs.getString("name"));
+                    return new User(
                         rs.getInt("user_id"),
                         rs.getString("username"),
                         rs.getString("password"),

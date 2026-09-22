@@ -43,7 +43,7 @@ public class ScreeningListController {
     private TableColumn<Screening, String> colTime;
 
     @FXML
-    private Button btnViewSeats;
+    private Button btnRegresar;
 
     private final ScreeningRepository screeningRepository;
     private ObservableList<Screening> allScreenings;
@@ -68,15 +68,11 @@ public class ScreeningListController {
 
     private void loadAllScreenings() {
         try {
-            System.out.println("Intentando cargar funciones...");
 
             List<Screening> screenings = screeningRepository.getAllScreening();
-            System.out.println("Funciones encontradas: " + screenings.size());
 
             allScreenings = FXCollections.observableArrayList(screenings);
             tblScreenings.setItems(allScreenings);
-
-            System.out.println("Tabla actualizada correctamente");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -93,14 +89,16 @@ public class ScreeningListController {
     @FXML
     private void addScreening() {
         try {
-            
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/ScreeningRegisterView.fxml"));
+
+            FXMLLoader loader = new FXMLLoader(getClass()
+                    .getResource("/org/cineplex/system/view/ScreeningRegisterView.fxml"));
+
             Parent root = loader.load();
 
             ScreeningRegisterController registerController = loader.getController();
 
             registerController.setOnScreeningSaved(() -> {
-                loadAllScreenings(); 
+                loadAllScreenings();
             });
 
             Stage stage = new Stage();
@@ -114,5 +112,25 @@ public class ScreeningListController {
             e.printStackTrace();
         }
     }
-    
+
+    @FXML
+    private void regresarMenu() {
+        try {
+            Stage stageActual = (Stage) btnRegresar.getScene().getWindow();
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Administrador.fxml"));
+            Parent root = loader.load();
+
+            Scene escenaNueva = new Scene(root);
+
+            stageActual.setScene(escenaNueva);
+            stageActual.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertInformation.viewAlert("ERROR", "Error de navegación", "No se pudo cargar la vista",
+                    "Detalle: " + e.getMessage() + "\nVerifica la ruta del archivo Administrador.fxml");
+        }
+    }
+
 }
