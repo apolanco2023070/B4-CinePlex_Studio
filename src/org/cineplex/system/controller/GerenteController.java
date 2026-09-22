@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.cineplex.system.controller;
 
 import javafx.fxml.FXML;
@@ -24,38 +20,42 @@ public class GerenteController {
         lblBienvenida.setText("Bienvenido, " + usuario.getNombreUsuario());
     }
 
-        @FXML
-    public void verCartelera() {
-        System.out.println("HU3: Gerente accede a Cartelera - PERMITIDO (Solo lectura)");
+    @FXML
+    public void abrirCartelera() {
+        System.out.println("HU7/HU8/HU9: Gerente accede a Cartelera - PERMITIDO");
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Cartelera.fxml"));
+            String fxmlPath = "/org/cineplex/system/view/MovieRegister.fxml";
+            java.net.URL fxmlLocation = getClass().getResource(fxmlPath);
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent root = loader.load();
-
-            CarteleraController controller = loader.getController();
-            controller.setUsuarioLogueado(usuarioLogueado);
 
             Stage stage = (Stage) lblBienvenida.getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.setTitle("Cartelera - CinePlex");
+            stage.setTitle("Gestión de Cartelera - CinePlex");
         } catch (Exception e) {
+            System.err.println("Error inesperado al cargar la vista:");
             e.printStackTrace();
-            mostrarMensaje("Error", "No se pudo cargar la cartelera: " + e.getMessage());
+            mostrarMensaje("Error de Navegación", "No se pudo cargar la vista:\n" + e.getMessage());
         }
-    }
-    @FXML
-    public void verVentas() {
-        System.out.println("HU3: Gerente accede a Ventas - PERMITIDO");
-        mostrarMensaje("Ventas", "Viendo ventas del día");
     }
 
     @FXML
-    public void intentarAccederGestionUsuarios() {
-        System.out.println("HU3: Gerente intenta acceder a Gestión de Usuarios - DENEGADO");
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Acceso Denegado");
-        alert.setHeaderText("Permisos Insuficientes");
-        alert.setContentText("Solo el Administrador puede gestionar usuarios.");
-        alert.showAndWait();
+    public void consultarReservas() {
+        System.out.println("HU35: Gerente accede a Consultar Reservas - PERMITIDO");
+        try {
+            String fxmlPath = "/org/cineplex/system/view/ReservationConsultation.fxml";
+            java.net.URL fxmlLocation = getClass().getResource(fxmlPath);
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            Parent root = loader.load();
+
+            Stage stage = (Stage) lblBienvenida.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("CinePlex - Consultar Reservas");
+        } catch (Exception e) {
+            System.err.println("Error inesperado al cargar la vista:");
+            e.printStackTrace();
+            mostrarMensaje("Error de Navegación", "No se pudo cargar la vista:\n" + e.getMessage());
+        }
     }
 
     @FXML

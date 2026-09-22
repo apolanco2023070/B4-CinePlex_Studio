@@ -24,16 +24,18 @@ public class AdministradorController {
     public void abrirCartelera() {
         System.out.println("HU7/HU8/HU9: Administrador accede a Cartelera - PERMITIDO");
         try {
-            // Se dejó la versión corta para mantener consistencia con el resto del archivo
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/MovieRegister.fxml"));
+            String fxmlPath = "/org/cineplex/system/view/MovieRegister.fxml";
+            java.net.URL fxmlLocation = getClass().getResource(fxmlPath);
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent root = loader.load();
 
             Stage stage = (Stage) lblBienvenida.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("Gestión de Cartelera - CinePlex");
         } catch (Exception e) {
+            System.err.println("Error inesperado al cargar la vista:");
             e.printStackTrace();
-            mostrarMensaje("Error", "No se pudo cargar la pantalla de cartelera: " + e.getMessage());
+            mostrarMensaje("Error de Navegación", "No se pudo cargar la vista:\n" + e.getMessage());
         }
     }
 
@@ -69,6 +71,42 @@ public class AdministradorController {
             Stage stage = (Stage) lblBienvenida.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("CinePlex - Gestión de Salas y Asientos");
+        } catch (Exception e) {
+            System.err.println("Error inesperado al cargar la vista:");
+            e.printStackTrace();
+            mostrarMensaje("Error de Navegación", "No se pudo cargar la vista:\n" + e.getMessage());
+        }
+    }
+
+    @FXML
+    public void manageScreening() {
+        try {
+            String fxmlPath = "/org/cineplex/system/view/ScreeningView.fxml";
+            java.net.URL fxmlLocation = getClass().getResource(fxmlPath);
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            Parent root = loader.load();
+
+            Stage stage = (Stage) lblBienvenida.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("CinePlex - Gestión de Cartelera");
+        } catch (Exception e) {
+            System.err.println("Error inesperado al cargar la vista:");
+            e.printStackTrace();
+            mostrarMensaje("Error de Navegación", "No se pudo cargar la vista:\n" + e.getMessage());
+        }
+    }
+
+    @FXML
+    public void seatReservation() {
+        try {
+            String fxmlPath = "/org/cineplex/system/view/SeatReservation.fxml";
+            java.net.URL fxmlLocation = getClass().getResource(fxmlPath);
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            Parent root = loader.load();
+
+            Stage stage = (Stage) lblBienvenida.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("CinePlex - Gestión de Cartelera");
         } catch (Exception e) {
             System.err.println("Error inesperado al cargar la vista:");
             e.printStackTrace();

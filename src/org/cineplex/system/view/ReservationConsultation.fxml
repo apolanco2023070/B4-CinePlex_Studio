@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx/21" 
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.cineplex.system.controller.ReservationConsultationController">
+
+    <top>
+        <HBox alignment="CENTER" spacing="10" style="-fx-background-color: #16a085; -fx-padding: 15;">
+            <Label text="🎫 Consultar Reservas" 
+                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+        </HBox>
+    </top>
+
+    <center>
+        <VBox spacing="15" style="-fx-background-color: #ecf0f1;">
+            <padding>
+                <Insets bottom="20" left="20" right="20" top="20"/>
+            </padding>
+
+            <!-- Filtros -->
+            <HBox spacing="10" alignment="CENTER_LEFT" 
+                  style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 8;">
+                <Label text="🎬 Película:" style="-fx-font-weight: bold;"/>
+                <ComboBox fx:id="comboBoxMovies" promptText="Todas" 
+                          HBox.hgrow="ALWAYS" style="-fx-pref-width: 250px;"/>
+                
+                <Label text="📅 Fecha:" style="-fx-font-weight: bold; -fx-margin-left: 20;"/>
+                <DatePicker fx:id="datePickerFecha" promptText="Todas"
+                          style="-fx-pref-width: 150px;"/>
+                
+                <Button fx:id="btnFilter" text=" Filtrar" 
+                        onAction="#filtrarReservas"
+                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                
+                <Button fx:id="btnClear" text="🔄 Limpiar" 
+                        onAction="#limpiarFiltros"
+                        style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 5; -fx-cursor: hand;"/>
+            </HBox>
+
+            <!-- Tabla de Reservas -->
+            <TableView fx:id="tableViewReservations" VBox.vgrow="ALWAYS" 
+                       style="-fx-background-color: white; -fx-background-radius: 8;">
+                <columns>
+                    <TableColumn fx:id="colUsuario" text="Usuario" prefWidth="150"/>
+                    <TableColumn fx:id="colPelicula" text="Película" prefWidth="200"/>
+                    <TableColumn fx:id="colSala" text="Sala" prefWidth="100"/>
+                    <TableColumn fx:id="colAsiento" text="Asiento" prefWidth="80"/>
+                    <TableColumn fx:id="colFecha" text="Fecha Función" prefWidth="100"/>
+                    <TableColumn fx:id="colHora" text="Hora" prefWidth="80"/>
+                    <TableColumn fx:id="colEstado" text="Estado" prefWidth="100"/>
+                </columns>
+            </TableView>
+
+            <HBox spacing="10" alignment="CENTER">
+                <Button fx:id="btnRefresh" text="🔄 Actualizar" 
+                        onAction="#cargarReservas"
+                        style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 5; -fx-cursor: hand;"/>
+            </HBox>
+        </VBox>
+    </center>
+
+    <bottom>
+        <HBox spacing="10" alignment="CENTER_RIGHT" 
+              style="-fx-background-color: #ecf0f1; -fx-padding: 15;">
+            <Button fx:id="btnBack" text=" Volver al Panel" 
+                    onAction="#volverAlPanel"
+                    style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 5; -fx-cursor: hand;"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>

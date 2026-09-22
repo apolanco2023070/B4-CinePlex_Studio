@@ -55,6 +55,17 @@ public class ViewFactory {
                     SceneManager.getSceneManagerInstance().getPrimaryStage().setResizable(false);
                     scene = loadFileFXML("SeatsAndRoomsManagment.fxml", 600, 400);
                 }
+            
+            case "screeningView" -> {
+                    SceneManager.getSceneManagerInstance().getPrimaryStage().setTitle("Inicio de sesión");
+                    SceneManager.getSceneManagerInstance().getPrimaryStage().setResizable(false);
+                    scene = loadFileFXML("ScreeningView.fxml", 600, 400);
+                }
+            case "seatReservation" -> {
+                    SceneManager.getSceneManagerInstance().getPrimaryStage().setTitle("Inicio de sesión");
+                    SceneManager.getSceneManagerInstance().getPrimaryStage().setResizable(false);
+                    scene = loadFileFXML("ScreeningView.fxml", 600, 400);
+                }
                 default ->
 
                     scene = loadFileFXML("MovieRegister.fxml", 300, 400);
@@ -75,5 +86,13 @@ public class ViewFactory {
     
     public void viewSeatsAndAuditoriumManagment(){
         loadScene("seatManagment");
+    }
+    
+     public void viewScreeningView(){
+        loadScene("screeningView");
+    }
+     
+     public void viewSeatReservation(){
+        loadScene("seatReservation");
     }
 }

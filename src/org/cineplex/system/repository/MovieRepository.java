@@ -18,8 +18,7 @@ public class MovieRepository {
     public void saveMovie(Movie movie) throws Exception {
         String sql = "{CALL sp_insert_movie(?, ?, ?, ?, ?, ?)}";
 
-        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
-             CallableStatement cstmt = conn.prepareCall(sql)) {
+        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection(); CallableStatement cstmt = conn.prepareCall(sql)) {
 
             cstmt.setString(1, movie.getTitle());
             cstmt.setInt(2, movie.getDuration());
@@ -35,26 +34,24 @@ public class MovieRepository {
     }
 
     /**
-     * Obtiene todas las películas llamando al Stored Procedure.
-     * (Este SP fue corregido anteriormente para incluir genre_id y rating_id)
+     * Obtiene todas las películas llamando al Stored Procedure. (Este SP fue
+     * corregido anteriormente para incluir genre_id y rating_id)
      */
     public List<Movie> getAllMovies() throws Exception {
         List<Movie> movies = new ArrayList<>();
         String sql = "{CALL sp_get_all_movies()}";
 
-        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
-             CallableStatement cstmt = conn.prepareCall(sql);
-             ResultSet rs = cstmt.executeQuery()) {
+        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection(); CallableStatement cstmt = conn.prepareCall(sql); ResultSet rs = cstmt.executeQuery()) {
 
             while (rs.next()) {
                 Movie movie = new Movie(
-                    rs.getInt("movie_id"),
-                    rs.getString("title"),
-                    rs.getInt("duration"),
-                    rs.getString("director"),
-                    rs.getInt("genre_id"),      // <-- Coincide con la corrección de la DB
-                    rs.getString("rating_id"), 
-                    rs.getString("poster_url")
+                        rs.getInt("movie_id"),
+                        rs.getString("title"),
+                        rs.getInt("duration"),
+                        rs.getString("director"),
+                        rs.getInt("genre_id"),
+                        rs.getString("rating_id"),
+                        rs.getString("poster_url")
                 );
                 movies.add(movie);
             }
@@ -65,27 +62,24 @@ public class MovieRepository {
     }
 
     /**
-     * Obtiene una película específica por su ID.
-     * NOTA: Se usa SQL directo para evitar errores si el SP 'sp_get_movie_by_id' no existe aún en tu DB.
+     * Obtiene una película específica por su ID (para el
+     * formulario de edición).
      */
     public Movie getMovieById(int movieId) throws Exception {
-        String sql = "SELECT movie_id, title, duration, director, genre_id, rating_id, poster_url " +
-                     "FROM movie WHERE movie_id = ?";
-        
-        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
+        String sql = "{CALL sp_get_movie_by_id(?)}";
+        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
             pstmt.setInt(1, movieId);
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     return new Movie(
-                        rs.getInt("movie_id"),
-                        rs.getString("title"),
-                        rs.getInt("duration"),
-                        rs.getString("director"),
-                        rs.getInt("genre_id"),
-                        rs.getString("rating_id"), 
-                        rs.getString("poster_url")
+                            rs.getInt("movie_id"),
+                            rs.getString("title"),
+                            rs.getInt("duration"),
+                            rs.getString("director"),
+                            rs.getInt("genre_id"),
+                            rs.getString("rating_id"),
+                            rs.getString("poster_url")
                     );
                 }
             }
@@ -96,16 +90,16 @@ public class MovieRepository {
     }
 
     /**
-     * Actualiza una película existente.
-     * NOTA: Se usa SQL directo para evitar errores si el SP 'sp_update_movie' no existe aún en tu DB.
+     * Actualiza una película existente. NOTA: Se usa SQL directo para evitar
+     * errores si el SP 'sp_update_movie' no existe aún en tu DB.
      */
+
     public boolean updateMovie(Movie movie) throws Exception {
-        String sql = "UPDATE movie SET title = ?, duration = ?, director = ?, " +
-                     "genre_id = ?, rating_id = ?, poster_url = ? WHERE movie_id = ?";
-        
-        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+        String sql = "UPDATE movie SET title = ?, duration = ?, director = ?, "
+                + "genre_id = ?, rating_id = ?, poster_url = ? WHERE movie_id = ?";
+
+        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
             pstmt.setString(1, movie.getTitle());
             pstmt.setInt(2, movie.getDuration());
             pstmt.setString(3, movie.getDirector());
@@ -113,10 +107,9 @@ public class MovieRepository {
             pstmt.setString(5, movie.getRating());
             pstmt.setString(6, movie.getPosterUrl());
             pstmt.setInt(7, movie.getMovieId());
-            
+
             int filasAfectadas = pstmt.executeUpdate();
             return filasAfectadas > 0;
-            
         } catch (SQLException e) {
             throw new Exception("Error al actualizar película: " + e.getMessage(), e);
         }
@@ -128,42 +121,38 @@ public class MovieRepository {
     public List<Movie> getMoviesByGenreId(int genreId) throws Exception {
         List<Movie> movies = new ArrayList<>();
         // Si tienes el SP, usa "{CALL sp_get_movies_by_genre_id(?)}", si no, usa este SQL directo:
-        String sql = "SELECT movie_id, title, duration, director, genre_id, rating_id, poster_url " +
-                     "FROM movie WHERE genre_id = ?";
+        String sql = "SELECT movie_id, title, duration, director, genre_id, rating_id, poster_url "
+                + "FROM movie WHERE genre_id = ?";
+            try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                
 
-        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setInt(1, genreId);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                while (rs.next()) {
-                    movies.add(new Movie(
-                        rs.getInt("movie_id"),
-                        rs.getString("title"),
-                        rs.getInt("duration"),
-                        rs.getString("director"),
-                        rs.getInt("genre_id"),
-                        rs.getString("rating_id"),
-                        rs.getString("poster_url")
-                    ));
+                pstmt.setInt(1, genreId);
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    while (rs.next()) {
+                        movies.add(new Movie(
+                                rs.getInt("movie_id"),
+                                rs.getString("title"),
+                                rs.getInt("duration"),
+                                rs.getString("director"),
+                                rs.getInt("genre_id"),
+                                rs.getString("rating_id"),
+                                rs.getString("poster_url")
+                        ));
+                    }
                 }
+            } catch (SQLException e) {
+                throw new Exception("Error al obtener películas por género: " + e.getMessage(), e);
             }
-        } catch (SQLException e) {
-            throw new Exception("Error al obtener películas por género: " + e.getMessage(), e);
+            return movies;
         }
-        return movies;
-    }
-
-    /**
-     * Obtiene todos los géneros disponibles para llenar el ComboBox.
-     */
+        /**
+         * Obtiene todos los géneros disponibles para llenar el ComboBox.
+         */
     public List<GenreOption> getAllGenres() throws Exception {
         List<GenreOption> genres = new ArrayList<>();
         String sql = "{CALL sp_get_all_genres()}";
 
-        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
-             CallableStatement cstmt = conn.prepareCall(sql);
-             ResultSet rs = cstmt.executeQuery()) {
+        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection(); CallableStatement cstmt = conn.prepareCall(sql); ResultSet rs = cstmt.executeQuery()) {
 
             while (rs.next()) {
                 genres.add(new GenreOption(rs.getInt("genre_id"), rs.getString("name")));
@@ -178,6 +167,7 @@ public class MovieRepository {
      * Clase auxiliar interna para manejar las opciones del ComboBox de géneros.
      */
     public static class GenreOption {
+
         private final int id;
         private final String name;
 
