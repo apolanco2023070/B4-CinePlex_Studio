@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -25,6 +26,9 @@ public class CarteleraController {
     @FXML
     private ComboBox<MovieRepository.GenreOption> cmbGenreFilter;
 
+    @FXML
+    private Button btnBackToMenu;
+    
     private final MovieRepository movieRepository = new MovieRepository();
     private final AlertInformation alertInfo = new AlertInformation();
     private User loggedUser;
@@ -120,27 +124,21 @@ public class CarteleraController {
         Label lblTitle = new Label(movie.getTitle());
         lblTitle.setWrapText(true);
         lblTitle.setMaxWidth(150);
-        lblTitle.setStyle("-fx-font-weight: bold; -fx-text-alignment: center; -fx-alignment: center;");
-
         Label lblGenre = new Label(movie.getGenreName() != null ? movie.getGenreName() : "Sin género");
-        lblGenre.setStyle("-fx-text-fill: #7f8c8d; -fx-font-size: 11px;");
 
         VBox card = new VBox(6, imageView, lblTitle, lblGenre);
         card.setAlignment(Pos.TOP_CENTER);
         card.setPrefWidth(170);
-        card.setStyle("-fx-background-color: white; -fx-padding: 10; -fx-background-radius: 8; "
-                + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 6, 0, 0, 2);");
-
         return card;
     }
 
     @FXML
-    public void goBack() {
+    public void goBackToMenu() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Gerente.fxml"));
             Parent root = loader.load();
 
-            CarteleraController controller = loader.getController();
+            ManagerController controller = loader.getController();
             controller.setLoggedUser(loggedUser);
 
             Stage stage = (Stage) posterFlowPane.getScene().getWindow();

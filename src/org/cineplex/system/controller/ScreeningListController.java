@@ -28,6 +28,9 @@ import org.cineplex.system.utils.AlertInformation;
 public class ScreeningListController {
 
     @FXML
+    private Button btnRegresar;
+
+    @FXML
     private TableView<Screening> tblScreenings;
 
     @FXML
@@ -41,9 +44,6 @@ public class ScreeningListController {
 
     @FXML
     private TableColumn<Screening, String> colTime;
-
-    @FXML
-    private Button btnRegresar;
 
     private final ScreeningRepository screeningRepository;
     private ObservableList<Screening> allScreenings;
@@ -90,9 +90,7 @@ public class ScreeningListController {
     private void addScreening() {
         try {
 
-            FXMLLoader loader = new FXMLLoader(getClass()
-                    .getResource("/org/cineplex/system/view/ScreeningRegisterView.fxml"));
-
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/ScreeningRegisterView.fxml"));
             Parent root = loader.load();
 
             ScreeningRegisterController registerController = loader.getController();
@@ -116,9 +114,11 @@ public class ScreeningListController {
     @FXML
     private void regresarMenu() {
         try {
+
             Stage stageActual = (Stage) btnRegresar.getScene().getWindow();
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Administrador.fxml"));
+
             Parent root = loader.load();
 
             Scene escenaNueva = new Scene(root);

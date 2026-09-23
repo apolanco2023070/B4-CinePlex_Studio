@@ -40,10 +40,7 @@ public class SeatReservationController {
 
     @FXML
     private Button btnRegresar;
-
-    @FXML
-    private Button btnCreateTicket;
-
+    
     @FXML
     private TextField txtReservationName;
 

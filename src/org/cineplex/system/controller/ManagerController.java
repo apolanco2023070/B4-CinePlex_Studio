@@ -23,7 +23,6 @@ public class ManagerController {
 
     @FXML
     public void viewBoxOffice() {
-        System.out.println("HU3: Manager accesses Box Office - ALLOWED (Read-only)");
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Cartelera.fxml")); // O BoxOffice.fxml si también renombraste el archivo
             Parent root = loader.load();
@@ -42,13 +41,11 @@ public class ManagerController {
 
     @FXML
     public void viewSales() {
-        System.out.println("HU3: Manager accesses Sales - ALLOWED");
         showMessage("Sales", "Viewing daily sales");
     }
 
     @FXML
     public void attemptAccessUserManagement() {
-        System.out.println("HU3: Manager attempts to access User Management - DENIED");
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Access Denied");
         alert.setHeaderText("Insufficient Permissions");

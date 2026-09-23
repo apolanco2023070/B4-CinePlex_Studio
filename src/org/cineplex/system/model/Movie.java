@@ -38,7 +38,6 @@ public class Movie {
         this.posterUrl.set(posterUrl);
     }
 
-    // --- movieId ---
     public int getMovieId() {
         return movieId.get();
     }
@@ -51,7 +50,6 @@ public class Movie {
         return movieId;
     }
 
-    // --- title ---
     public String getTitle() {
         return title.get();
     }
@@ -64,7 +62,6 @@ public class Movie {
         return title;
     }
 
-    // --- duration ---
     public int getDuration() {
         return duration.get();
     }
@@ -77,7 +74,6 @@ public class Movie {
         return duration;
     }
 
-    // --- director ---
     public String getDirector() {
         return director.get();
     }
@@ -90,7 +86,6 @@ public class Movie {
         return director;
     }
 
-    // --- genreId ---
     public int getGenreId() {
         return genreId.get();
     }
@@ -103,7 +98,6 @@ public class Movie {
         return genreId;
     }
 
-    // --- genreName ---
     public String getGenreName() {
         return genreName.get();
     }
@@ -116,7 +110,6 @@ public class Movie {
         return genreName;
     }
 
-    // --- rating ---
     public String getRating() {
         return rating.get();
     }
@@ -129,7 +122,6 @@ public class Movie {
         return rating;
     }
 
-    // --- posterUrl ---
     public String getPosterUrl() {
         return posterUrl.get();
     }
@@ -142,7 +134,6 @@ public class Movie {
         return posterUrl;
     }
 
-    // ✅ CORREGIDO: Ahora devuelve el String real, no el objeto Property
     @Override
     public String toString() {
         return getTitle();

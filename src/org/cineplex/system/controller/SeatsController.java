@@ -33,22 +33,10 @@ import org.cineplex.system.utils.Validations;
 public class SeatsController {
 
     @FXML
-    private Button btnRegisterRoom;
-
-    @FXML
     private Button btnRegresar;
 
     @FXML
-    private Button btnRegisterSeats;
-
-    @FXML
     private ComboBox<Auditorium> cmbRooms;
-
-    @FXML
-    private Label lblCapacity;
-
-    @FXML
-    private Label lblRooms;
 
     @FXML
     private TextField txtCapacity;

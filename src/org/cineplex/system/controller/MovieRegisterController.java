@@ -25,25 +25,35 @@ public class MovieRegisterController {
 
     @FXML
     private TableView<Movie> tableMovies;
+    
     @FXML
     private TableColumn<Movie, String> colTitulo;
+    
     @FXML
     private TableColumn<Movie, String> colGenero;
+    
     @FXML
     private TableColumn<Movie, Integer> colDuracion;
+    
     @FXML
     private TableColumn<Movie, String> colClasificacion;
+    
     @FXML
     private TableColumn<Movie, String> colDirector;
+    
     @FXML
     private TableColumn<Movie, String> colUrlPoster;
+    
 
     @FXML
     private Label lblTitle, lblGenre, lblLength, lblRating, lblDirector, lblPoster;
+    
     @FXML
     private TextField txtTitle, txtLength, txtRating, txtDirector, txtPoster;
+    
     @FXML
     private ComboBox<MovieRepository.GenreOption> cmbGenre;
+    
     @FXML
     private Button btnRegisterMovie, btnVerPoster;
 
@@ -99,7 +109,6 @@ public class MovieRegisterController {
     
     @FXML
     private void registerMovies() {
-        limpiarErroresVisuales();
         String title = txtTitle.getText().trim();
         String lengthText = txtLength.getText().trim();
         String director = txtDirector.getText().trim();
@@ -142,17 +151,49 @@ public class MovieRegisterController {
         try {
             int duration = Integer.parseInt(lengthText);
             int genreId = cmbGenre.getValue().getId();
+            
+            
+            int movieId = (movieSeleccionada != null) ? movieSeleccionada.getMovieId() : 0;
 
-            // Se crea la película (el repositorio debería manejar si es insert o update según tu lógica)
-            Movie movie = new Movie(0, title, duration, director, genreId, rating, posterUrl);
+            Movie movie = new Movie(movieId, title, duration, director, genreId, rating, posterUrl);
             movieRepository.saveMovie(movie);
 
             limpiarFormulario();
             cargarPeliculas();
-            alertInfo.viewAlert("INFORMATION", "Éxito", "Registro completado", "La película se guardó correctamente.");
+            
+            String mensajeExito = (movieSeleccionada != null) 
+                ? "La película se actualizó correctamente." 
+                : "La película se registró correctamente.";
+                
+            alertInfo.viewAlert("INFORMATION", "Éxito", "Operación completada", mensajeExito);
         } catch (Exception e) {
-            alertInfo.viewAlert("ERROR", "Error al registrar", "Error de sistema", "No se pudo registrar la película. Detalle: " + e.getMessage());
+            alertInfo.viewAlert("ERROR", "Error al guardar", "Error de sistema", "No se pudo guardar la película. Detalle: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void verPoster() {
+        String url = txtPoster.getText().trim();
+        
+        if (url.isEmpty()) {
+            Movie seleccionada = tableMovies.getSelectionModel().getSelectedItem();
+            if (seleccionada != null) {
+                url = seleccionada.getPosterUrl();
+            }
+        }
+
+        if (url == null || url.isEmpty()) {
+            alertInfo.viewAlert("ADVERTENCIA", "Sin URL", "No se puede ver el póster", 
+                "No hay una URL de póster ingresada o la película seleccionada no tiene una.");
+            return;
+        }
+
+        try {
+            java.awt.Desktop.getDesktop().browse(java.net.URI.create(url));
+        } catch (Exception e) {
+            alertInfo.viewAlert("ERROR", "Error al abrir", "No se pudo abrir el póster", 
+                "Verifica que la URL sea válida (debe empezar con http:// o https://). Detalle: " + e.getMessage());
         }
     }
 
@@ -205,13 +246,14 @@ public class MovieRegisterController {
         txtRating.setText(movie.getRating());
         txtPoster.setText(movie.getPosterUrl());
 
-        // Seleccionar el género correcto en el ComboBox
         for (MovieRepository.GenreOption genre : cmbGenre.getItems()) {
             if (genre.getId() == movie.getGenreId()) {
                 cmbGenre.setValue(genre);
                 break;
             }
         }
+        
+        btnRegisterMovie.setText("Actualizar Película");
     }
 
     private void limpiarFormulario() {
@@ -224,40 +266,7 @@ public class MovieRegisterController {
 
         movieSeleccionada = null;
         btnRegisterMovie.setText("Registrar");
-        limpiarErroresVisuales();
         txtTitle.requestFocus();
     }
 
-    private void limpiarErroresVisuales() {
-        lblTitle.setStyle("-fx-text-fill: black; -fx-font-weight: normal;");
-        lblLength.setStyle("-fx-text-fill: black; -fx-font-weight: normal;");
-        lblDirector.setStyle("-fx-text-fill: black; -fx-font-weight: normal;");
-        lblRating.setStyle("-fx-text-fill: black; -fx-font-weight: normal;");
-        lblGenre.setStyle("-fx-text-fill: black; -fx-font-weight: normal;");
-        lblPoster.setStyle("-fx-text-fill: black; -fx-font-weight: normal;");
-    }
-
-    @FXML
-    private void verPoster() {
-        Movie selectedMovie = tableMovies.getSelectionModel().getSelectedItem();
-
-        if (selectedMovie == null) {
-            alertInfo.viewAlert("WARNING", "Sin selección", "Advertencia",
-                    "Selecciona una película de la tabla para ver su póster.");
-            return;
-        }
-
-        String posterUrl = selectedMovie.getPosterUrl();
-
-        if (posterUrl == null || posterUrl.trim().isEmpty()) {
-            alertInfo.viewAlert("INFORMATION", "Sin póster", "Información",
-                    "Esta película no tiene una URL de póster registrada.");
-            return;
-        }
-
-        // Opción 1: Mostrar la URL en una alerta (simple)
-        alertInfo.viewAlert("INFORMATION", "URL del Póster", "Información",
-                "URL del póster:\n" + posterUrl);
-
-    }
 }

@@ -17,15 +17,32 @@ import org.cineplex.system.model.TicketData;
  */
 public class TicketController {
 
-    @FXML private Label lblTicketNumber;
-    @FXML private Label lblMovie;
-    @FXML private Label lblAuditorium;
-    @FXML private Label lblDate;
-    @FXML private Label lblTime;
-    @FXML private Label lblSeat;
-    @FXML private Label lblUser;
-    @FXML private Label lblIssueDate;
-    @FXML private Button btnClose;
+    @FXML
+    private Label lblTicketNumber;
+    
+    @FXML
+    private Label lblMovie;
+    
+    @FXML
+    private Label lblAuditorium;
+    
+    @FXML
+    private Label lblDate;
+    
+    @FXML
+    private Label lblTime;
+    
+    @FXML
+    private Label lblSeat;
+    
+    @FXML
+    private Label lblUser;
+    
+    @FXML
+    private Label lblIssueDate;
+    
+    @FXML
+    private Button btnClose;
 
     private TicketData ticketData;
 
@@ -35,22 +52,17 @@ public class TicketController {
     }
 
     private void cargarDatosTicket() {
-        // Número de ticket
         lblTicketNumber.setText("TICKET #" + String.format("%03d", ticketData.getTicketNumber()));
 
-        // Información de la función
         lblMovie.setText(ticketData.getMovieTitle());
         lblAuditorium.setText(ticketData.getAuditoriumName());
         lblDate.setText(ticketData.getShowDate().toString());
         lblTime.setText(ticketData.getShowTime().toString());
 
-        // Asiento
         lblSeat.setText("Asiento " + ticketData.getSeatNumber());
 
-        // Usuario
         lblUser.setText(ticketData.getUserName());
 
-        // Fecha de emisión
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         lblIssueDate.setText(ticketData.getIssueDate().format(formatter));
     }
@@ -61,4 +73,3 @@ public class TicketController {
         stage.close();
     }
 }
-    

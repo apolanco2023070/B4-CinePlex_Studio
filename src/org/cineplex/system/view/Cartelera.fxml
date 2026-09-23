@@ -9,35 +9,30 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<VBox xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="org.cineplex.system.controller.CarteleraController"
-      style="-fx-background-color: #ecf0f1;" prefWidth="700.0" prefHeight="500.0" spacing="15.0">
+<VBox prefHeight="500.0" prefWidth="700.0" spacing="15.0" style="-fx-background-color: #ecf0f1;" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cineplex.system.controller.CarteleraController">
     
     <padding>
-        <Insets top="20.0" right="20.0" bottom="20.0" left="20.0"/>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
 
-    <Label text="Cartelera de Películas" style="-fx-text-fill: #2c3e50;">
+    <Label style="-fx-text-fill: #2c3e50;" text="Cartelera de Películas">
         <font>
-            <Font size="24.0"/>
+            <Font size="24.0" />
         </font>
     </Label>
 
-    <ComboBox fx:id="cmbGenreFilter" 
-              promptText="Filtrar por género" 
-              prefWidth="200.0" />
+    <ComboBox fx:id="cmbGenreFilter" prefWidth="200.0" promptText="Filtrar por género" />
 
     <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
         <content>
-            <FlowPane fx:id="posterFlowPane" hgap="15.0" vgap="15.0" style="-fx-background-color: transparent;">
+            <FlowPane fx:id="posterFlowPane" hgap="15.0" style="-fx-background-color: transparent;" vgap="15.0">
                 <padding>
-                    <Insets top="10.0" right="10.0" bottom="10.0" left="10.0"/>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                 </padding>
             </FlowPane>
         </content>
     </ScrollPane>
 
-    <Button text="Volver" onAction="#goBack" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" prefWidth="120.0" />
+    <Button fx:id="btnBackToMenu" onAction="#goBackToMenu" prefWidth="120.0" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" text="Volver" />
     
 </VBox>

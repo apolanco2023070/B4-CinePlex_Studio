@@ -39,7 +39,6 @@ public class ConexionDB {
     public Connection getConnection() {
         try {
             if (this.connection == null || this.connection.isClosed()) {
-                System.out.println(" La conexión estaba cerrada. Reconectando a la base de datos...");
                 conectar();
             }
         } catch (SQLException e) {
@@ -56,7 +55,6 @@ public class ConexionDB {
         try {
             if (this.connection != null && !this.connection.isClosed()) {
                 this.connection.close();
-                System.out.println("Conexión cerrada correctamente al salir de la aplicación.");
             }
         } catch (SQLException e) {
             System.err.println("Error al cerrar la conexión: " + e.getMessage());

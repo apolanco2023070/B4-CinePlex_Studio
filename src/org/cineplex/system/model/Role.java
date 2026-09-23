@@ -4,7 +4,7 @@ public class Role {
 
     private int roleId;
     private String roleName;
-    private RoleType roleType; // Referencia al enum para validaciones rápidas (antes TypeRol)
+    private RoleType roleType;
 
     public Role() {
     }

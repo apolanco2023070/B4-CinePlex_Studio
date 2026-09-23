@@ -15,52 +15,46 @@ import org.cineplex.system.service.AuthService;
 public class LoginController {
 
     @FXML
-    private TextField usernameField; // Antes: campoUsuario
+    private TextField usernameField;
 
     @FXML
-    private PasswordField passwordField; // Antes: campoPassword
+    private PasswordField passwordField;
 
     @FXML
-    private Label lblErrorMessage; // Antes: mensajeError
+    private Label lblErrorMessage;
 
     private final AuthService authService = new AuthService();
 
     @FXML
-    public void handleLogin() { // Antes: iniciarSesion
+    public void handleLogin() {
         String username = usernameField.getText();
         String password = passwordField.getText();
 
-        // 1. Intentar login como ADMINISTRATOR
         AuthService.ResultadoLogin loginResult = authService.login(username, password, RoleType.ADMINISTRATOR);
 
         if (loginResult.exito) {
             lblErrorMessage.setText("");
             openAdministratorModule(loginResult.usuario);
         } else {
-            // 2. Si falla, intentar login como MANAGER
             loginResult = authService.login(username, password, RoleType.MANAGER);
 
             if (loginResult.exito) {
                 lblErrorMessage.setText("");
                 openManagerModule(loginResult.usuario);
             } else {
-                // 3. Si ambos fallan, mostrar el mensaje de error
                 lblErrorMessage.setText(loginResult.mensaje);
             }
         }
     }
 
-    private void openAdministratorModule(User loggedUser) { // Antes: abrirModuloAdministrador
+    private void openAdministratorModule(User loggedUser) {
         try {
-            System.out.println("HU1: Access granted to ADMINISTRATOR: " + loggedUser);
 
-            // Asegúrate de que el archivo FXML se llame Administrator.fxml 
-            // (o cámbialo a "Administrador.fxml" si no renombraste el archivo)
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Administrator.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Administrador.fxml"));
             Parent root = loader.load();
 
             AdministradorController controller = loader.getController();
-            controller.setUsuarioLogueado(loggedUser); // Antes: setUsuarioLogueado
+            controller.setUsuarioLogueado(loggedUser);
 
             Stage stage = (Stage) usernameField.getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -71,13 +65,10 @@ public class LoginController {
         }
     }
 
-    private void openManagerModule(User loggedUser) { // Antes: abrirModuloGerente
+    private void openManagerModule(User loggedUser) {
         try {
-            System.out.println("HU2: Access granted to MANAGER: " + loggedUser);
 
-            // Asegúrate de que el archivo FXML se llame Manager.fxml
-            // (o cámbialo a "Gerente.fxml" si no renombraste el archivo)
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Manager.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Gerente.fxml"));
             Parent root = loader.load();
 
             ManagerController controller = loader.getController();

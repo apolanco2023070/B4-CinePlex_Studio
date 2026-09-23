@@ -19,10 +19,8 @@ public class AlertInformation {
      */
     public static void viewAlert(String tipoAlerta, String titulo, String encabezado, String mensaje) {
 
-        // Variable local de tipo AlertType que almacenará el tipo de alerta a mostrar
         AlertType tipo;
  
-        // Switch para determinar el tipo de alerta según el parámetro recibido
         switch (tipoAlerta.toUpperCase()) {
             case "INFORMATION":
                 tipo = AlertType.INFORMATION;
