@@ -16,6 +16,9 @@ public class ConexionDB {
     private void conectar() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
+            String url = "jdbc:mysql://" + Enviroment.LOCATION_SERVICE + "/" + Enviroment.DATA_BASE;
+            System.out.println("🔍 Java está intentando conectar a: " + url);
+            System.out.println("🔍 Usuario: " + Enviroment.USER);
             this.connection = DriverManager.getConnection(
                     "jdbc:mysql://" + Enviroment.LOCATION_SERVICE + "/" + Enviroment.DATA_BASE,
                     Enviroment.USER,

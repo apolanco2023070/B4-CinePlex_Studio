@@ -6,17 +6,15 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/21" 
             xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="org.cineplex.system.controller.ScreeningConsultationController">
+            fx:controller="org.cineplex.system.controller.ReservationConsultationController">
 
-    <!-- Encabezado -->
     <top>
-        <HBox alignment="CENTER" spacing="10" style="-fx-background-color: #9b59b6; -fx-padding: 15;">
-            <Label text="🎬 Consultar y Editar Funciones Programadas" 
+        <HBox alignment="CENTER" spacing="10" style="-fx-background-color: #16a085; -fx-padding: 15;">
+            <Label text="🎫 Consultar y Cancelar Reservas" 
                    style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
         </HBox>
     </top>
 
-    <!-- Contenido Principal -->
     <center>
         <VBox spacing="15" style="-fx-background-color: #ecf0f1;">
             <padding>
@@ -26,17 +24,16 @@
             <!-- Filtros -->
             <HBox spacing="10" alignment="CENTER_LEFT" 
                   style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 8;">
-                <Label text="🎥 Película:" style="-fx-font-weight: bold;"/>
-                <ComboBox fx:id="comboBoxMovies" promptText="Todas las películas" 
-                          HBox.hgrow="ALWAYS"
-                          style="-fx-pref-width: 250px;"/>
+                <Label text="🎬 Película:" style="-fx-font-weight: bold;"/>
+                <ComboBox fx:id="comboBoxMovies" promptText="Todas" 
+                          HBox.hgrow="ALWAYS" style="-fx-pref-width: 250px;"/>
                 
-                <Label text="🎪 Sala:" style="-fx-font-weight: bold; -fx-margin-left: 20;"/>
-                <ComboBox fx:id="comboBoxAuditoriums" promptText="Todas las salas"
-                          style="-fx-pref-width: 200px;"/>
+                <Label text="📅 Fecha:" style="-fx-font-weight: bold; -fx-margin-left: 20;"/>
+                <DatePicker fx:id="datePickerFecha" promptText="Todas"
+                          style="-fx-pref-width: 150px;"/>
                 
                 <Button fx:id="btnFilter" text="🔍 Filtrar" 
-                        onAction="#cargarFunciones"
+                        onAction="#filtrarReservas"
                         style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 5; -fx-cursor: hand;"/>
                 
                 <Button fx:id="btnClear" text="🔄 Limpiar" 
@@ -44,33 +41,33 @@
                         style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 5; -fx-cursor: hand;"/>
             </HBox>
 
-            <!-- Tabla de Funciones -->
-            <TableView fx:id="tableViewScreenings" VBox.vgrow="ALWAYS" 
+            <!-- Tabla de Reservas -->
+            <TableView fx:id="tableViewReservations" VBox.vgrow="ALWAYS" 
                        style="-fx-background-color: white; -fx-background-radius: 8;">
                 <columns>
-                    <TableColumn fx:id="colMovie" text="Película" prefWidth="200"/>
-                    <TableColumn fx:id="colAuditorium" text="Sala" prefWidth="120"/>
-                    <TableColumn fx:id="colDate" text="Fecha" prefWidth="100"/>
-                    <TableColumn fx:id="colTime" text="Hora" prefWidth="80"/>
-                    <TableColumn fx:id="colDuration" text="Duración" prefWidth="80"/>
-                    <TableColumn fx:id="colActions" text="Acciones" prefWidth="100"/>
+                    <TableColumn fx:id="colUsuario" text="Usuario" prefWidth="150"/>
+                    <TableColumn fx:id="colPelicula" text="Película" prefWidth="200"/>
+                    <TableColumn fx:id="colSala" text="Sala" prefWidth="100"/>
+                    <TableColumn fx:id="colAsiento" text="Asiento" prefWidth="80"/>
+                    <TableColumn fx:id="colFecha" text="Fecha Función" prefWidth="100"/>
+                    <TableColumn fx:id="colHora" text="Hora" prefWidth="80"/>
+                    <TableColumn fx:id="colEstado" text="Estado" prefWidth="100"/>
+                    <TableColumn fx:id="colAcciones" text="Acciones" prefWidth="120"/>
                 </columns>
             </TableView>
 
-            <!-- Botones de acción -->
             <HBox spacing="10" alignment="CENTER">
                 <Button fx:id="btnRefresh" text="🔄 Actualizar" 
-                        onAction="#cargarFunciones"
+                        onAction="#cargarReservas"
                         style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 5; -fx-cursor: hand;"/>
             </HBox>
         </VBox>
     </center>
 
-    <!-- Pie de Página -->
     <bottom>
         <HBox spacing="10" alignment="CENTER_RIGHT" 
               style="-fx-background-color: #ecf0f1; -fx-padding: 15;">
-            <Button fx:id="btnBack" text=" Volver al Panel" 
+            <Button fx:id="btnBack" text="⬅ Volver al Panel" 
                     onAction="#volverAlPanel"
                     style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 5; -fx-cursor: hand;"/>
         </HBox>

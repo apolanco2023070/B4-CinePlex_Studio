@@ -582,4 +582,56 @@ BEGIN
     VALUES (p_full_name, p_username, p_password, p_email, p_role_id);
 END $$
 
+
+
+-- SP para obtener el ID de una película por su título
+CREATE PROCEDURE sp_get_movie_id_by_title(
+    IN p_title VARCHAR(200),
+    OUT p_movie_id INT
+)
+BEGIN
+    SELECT movie_id INTO p_movie_id FROM movie WHERE title = p_title LIMIT 1;
+END $$
+
+-- SP para obtener el ID de una sala por su nombre
+CREATE PROCEDURE sp_get_auditorium_id_by_name(
+    IN p_name VARCHAR(100),
+    OUT p_auditorium_id INT
+)
+BEGIN
+    SELECT auditorium_id INTO p_auditorium_id FROM auditorium WHERE name = p_name LIMIT 1;
+END $$
+
+-- SP para actualizar una función (con validación de conflictos)
+CREATE PROCEDURE sp_update_screening(
+    IN p_screening_id INT,
+    IN p_movie_id INT,
+    IN p_auditorium_id INT,
+    IN p_show_date DATE,
+    IN p_show_time TIME
+)
+BEGIN
+    DECLARE v_conflict INT DEFAULT 0;
+    
+    -- Verificar si existe conflicto de horario en la misma sala
+    SELECT COUNT(*) INTO v_conflict
+    FROM screening
+    WHERE auditorium_id = p_auditorium_id
+      AND show_date = p_show_date
+      AND show_time = p_show_time
+      AND screening_id != p_screening_id;
+    
+    IF v_conflict > 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'CONFLICTO: Ya existe una función en esa sala, fecha y hora.';
+    ELSE
+        UPDATE screening
+        SET movie_id = p_movie_id,
+            auditorium_id = p_auditorium_id,
+            show_date = p_show_date,
+            show_time = p_show_time
+        WHERE screening_id = p_screening_id;
+    END IF;
+END $$
+
 DELIMITER ;
