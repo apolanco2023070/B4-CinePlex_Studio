@@ -5,6 +5,8 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
@@ -29,24 +31,35 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
             <Label text="Sala" />
-            <Label text="Asiento" GridPane.rowIndex="1" />
-            <Label text="Pelicula" GridPane.rowIndex="2" />
-            <Label text="Horario" GridPane.rowIndex="3" />
+            <Label text="Asiento" GridPane.rowIndex="3" />
+            <Label text="Pelicula" GridPane.rowIndex="1" />
+            <Label text="Horario" GridPane.rowIndex="2" />
             <ComboBox fx:id="cmbAuditorium" prefWidth="150.0" GridPane.columnIndex="1" />
-            <ComboBox fx:id="cmbSeat" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <ComboBox fx:id="cmbMovie" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <ComboBox fx:id="cmbScreening" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <ComboBox fx:id="cmbSeat" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <ComboBox fx:id="cmbMovie" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <ComboBox fx:id="cmbScreening" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Label text="Reservación a nombre de:" GridPane.rowIndex="4" />
+            <TextField fx:id="txtReservationName" GridPane.columnIndex="1" GridPane.rowIndex="4" />
          </children>
          <VBox.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </VBox.margin>
       </GridPane>
       <Separator prefWidth="200.0" />
-      <Button mnemonicParsing="false" onAction="#reserveSeat" text="Reservar asiento" />
-      <Button fx:id="btnRegresar" mnemonicParsing="false" onAction="#regresarMenu" text="Regresar" />
+      <ToolBar prefHeight="40.0" prefWidth="200.0">
+        <items>
+            <Button mnemonicParsing="false" onAction="#reserveSeat" text="Reservar asiento" />
+          <Button fx:id="btnCreateTicket" mnemonicParsing="false" onAction="#generateTicket" text="Generar ticket" />
+            <Button fx:id="btnRegresar" mnemonicParsing="false" onAction="#regresarMenu" text="Regresar" />
+        </items>
+         <VBox.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </VBox.margin>
+      </ToolBar>
    </children>
    <padding>
       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

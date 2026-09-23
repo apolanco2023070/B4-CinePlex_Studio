@@ -22,19 +22,19 @@
 
     <children>
 
-        
         <TableView fx:id="tableMovies"
+                   onMouseClicked="#seleccionarPelicula"
                    prefHeight="200.0"
                    prefWidth="200.0"
                    VBox.vgrow="ALWAYS">
 
             <columns>
-                <TableColumn fx:id="colTitulo" prefWidth="100.0" text="Titulo" />
-                <TableColumn fx:id="colGenero" prefWidth="80.0" text="Genero" />
-                <TableColumn fx:id="colDuracion" prefWidth="80.0" text="Duracion" />
-                <TableColumn fx:id="colClasificacion" prefWidth="100.0" text="Clasificacion" />
+                <TableColumn fx:id="colTitulo" prefWidth="100.0" text="Título" />
+                <TableColumn fx:id="colGenero" prefWidth="80.0" text="Género" />
+                <TableColumn fx:id="colDuracion" prefWidth="80.0" text="Duración" />
+                <TableColumn fx:id="colClasificacion" prefWidth="100.0" text="Clasificación" />
                 <TableColumn fx:id="colDirector" prefWidth="100.0" text="Director" />
-                <TableColumn fx:id="colUrlPoster" prefWidth="140.0" text="URL Poster" />
+                <TableColumn fx:id="colUrlPoster" prefWidth="140.0" text="URL Póster" />
             </columns>
 
             <VBox.margin>
@@ -43,14 +43,11 @@
 
         </TableView>
 
-     
         <GridPane>
-
             <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                 <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
             </columnConstraints>
-
             <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -61,41 +58,32 @@
             </rowConstraints>
 
             <children>
-
-                <Label fx:id="lblTitle" text="Titulo" />
-                <Label fx:id="lblGenre" text="Genero" GridPane.rowIndex="1" />
-                <Label fx:id="lblLength" text="Duracion (min)" GridPane.rowIndex="2" />
-                <Label fx:id="lblRating" text="Clasificacion" GridPane.rowIndex="3" />
+                <Label fx:id="lblTitle" text="Título" />
+                <Label fx:id="lblGenre" text="Género" GridPane.rowIndex="1" />
+                <Label fx:id="lblLength" text="Duración (min)" GridPane.rowIndex="2" />
+                <Label fx:id="lblRating" text="Clasificación" GridPane.rowIndex="3" />
                 <Label fx:id="lblDirector" text="Director" GridPane.rowIndex="4" />
-                <Label fx:id="lblPoster" text="Poster" GridPane.rowIndex="5" />
+                <Label fx:id="lblPoster" text="Póster" GridPane.rowIndex="5" />
 
                 <TextField fx:id="txtTitle" GridPane.columnIndex="1" />
-
-                <!-- Género: ComboBox para coincidir con el Controller -->
                 <ComboBox fx:id="cmbGenre" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-
                 <TextField fx:id="txtLength" promptText="140, 160" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                 <TextField fx:id="txtRating" promptText="A, B, C" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                 <TextField fx:id="txtDirector" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                 <TextField fx:id="txtPoster" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-
             </children>
 
             <VBox.margin>
                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
             </VBox.margin>
-
         </GridPane>
 
-        
         <ToolBar prefHeight="40.0" prefWidth="200.0">
-
             <items>
                 <Button fx:id="btnRegisterMovie" mnemonicParsing="false" onAction="#registerMovies" text="Registrar" />
-                <Button fx:id="btnVerPoster" mnemonicParsing="false" onAction="#verPoster" text="Ver poster" />
+                <Button fx:id="btnVerPoster" mnemonicParsing="false" onAction="#verPoster" text="Ver póster" />
                 <Button mnemonicParsing="false" onAction="#regresarMenu" text="Regresar" />
             </items>
-
         </ToolBar>
 
     </children>

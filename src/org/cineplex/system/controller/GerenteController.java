@@ -7,22 +7,21 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
-import org.cineplex.system.model.Usuario;
+import org.cineplex.system.model.User;
 
 public class GerenteController {
 
     @FXML
     private Label lblBienvenida;
-    private Usuario usuarioLogueado;
+    private User usuarioLogueado;
 
-    public void setUsuarioLogueado(Usuario usuario) {
-        this.usuarioLogueado = usuario;
-        lblBienvenida.setText("Bienvenido, " + usuario.getNombreUsuario());
+    public void setUsuarioLogueado(User user) {
+        this.usuarioLogueado = user;
+        lblBienvenida.setText("Bienvenido, " + user.getUserName());
     }
 
     @FXML
     public void abrirCartelera() {
-        System.out.println("HU7/HU8/HU9: Gerente accede a Cartelera - PERMITIDO");
         try {
             String fxmlPath = "/org/cineplex/system/view/MovieRegister.fxml";
             java.net.URL fxmlLocation = getClass().getResource(fxmlPath);
@@ -39,7 +38,6 @@ public class GerenteController {
 
     @FXML
     public void consultarReservas() {
-        System.out.println("HU35: Gerente accede a Consultar Reservas - PERMITIDO");
         try {
             String fxmlPath = "/org/cineplex/system/view/ReservationConsultation.fxml";
             java.net.URL fxmlLocation = getClass().getResource(fxmlPath);

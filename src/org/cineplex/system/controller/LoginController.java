@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.cineplex.system.controller;
 
 import javafx.fxml.FXML;
@@ -12,79 +8,77 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import org.cineplex.system.model.TypeRol; 
-import org.cineplex.system.model.Usuario;
+import org.cineplex.system.model.RoleType;
+import org.cineplex.system.model.User;
 import org.cineplex.system.service.AuthService;
 
 public class LoginController {
 
     @FXML
-    private TextField campoUsuario;
+    private TextField usernameField;
 
     @FXML
-    private PasswordField campoPassword;
+    private PasswordField passwordField;
 
     @FXML
-    private Label mensajeError;
+    private Label lblErrorMessage;
 
     private final AuthService authService = new AuthService();
 
     @FXML
-    public void iniciarSesion() {
-        String usuario = campoUsuario.getText();
-        String password = campoPassword.getText();
+    public void handleLogin() {
+        String username = usernameField.getText();
+        String password = passwordField.getText();
 
-    
-        AuthService.ResultadoLogin resultado = authService.login(usuario, password, TypeRol.ADMINISTRATOR);
+        AuthService.ResultadoLogin loginResult = authService.login(username, password, RoleType.ADMINISTRATOR);
 
-        if (resultado.exito) {
-            mensajeError.setText("");
-            abrirModuloAdministrador(resultado.usuario);
+        if (loginResult.exito) {
+            lblErrorMessage.setText("");
+            openAdministratorModule(loginResult.usuario);
         } else {
-           
-            resultado = authService.login(usuario, password, TypeRol.MANAGER);
+            loginResult = authService.login(username, password, RoleType.MANAGER);
 
-            if (resultado.exito) {
-                mensajeError.setText("");
-                abrirModuloGerente(resultado.usuario);
+            if (loginResult.exito) {
+                lblErrorMessage.setText("");
+                openManagerModule(loginResult.usuario);
             } else {
-                mensajeError.setText(resultado.mensaje);
+                lblErrorMessage.setText(loginResult.mensaje);
             }
         }
     }
 
-    private void abrirModuloAdministrador(Usuario usuarioLogueado) {
+    private void openAdministratorModule(User loggedUser) {
         try {
-            System.out.println("HU1: Acceso concedido a ADMINISTRATOR: " + usuarioLogueado);
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Administrador.fxml"));
             Parent root = loader.load();
 
             AdministradorController controller = loader.getController();
-            controller.setUsuarioLogueado(usuarioLogueado);
+            controller.setUsuarioLogueado(loggedUser);
 
-            Stage stage = (Stage) campoUsuario.getScene().getWindow();
+            Stage stage = (Stage) usernameField.getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.setTitle("Panel Administrador - CinePlex");
+            stage.setTitle("Administrator Panel - CinePlex");
         } catch (Exception e) {
-            mensajeError.setText("Error al cargar el módulo: " + e.getMessage());
+            lblErrorMessage.setText("Error loading module: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private void abrirModuloGerente(Usuario usuarioLogueado) {
+    private void openManagerModule(User loggedUser) {
         try {
-            System.out.println("HU2: Acceso concedido a MANAGER: " + usuarioLogueado);
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Gerente.fxml"));
             Parent root = loader.load();
 
-            GerenteController controller = loader.getController();
-            controller.setUsuarioLogueado(usuarioLogueado);
+            ManagerController controller = loader.getController();
+            controller.setLoggedUser(loggedUser);
 
-            Stage stage = (Stage) campoUsuario.getScene().getWindow();
+            Stage stage = (Stage) usernameField.getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.setTitle("Panel Gerente - CinePlex");
+            stage.setTitle("Manager Panel - CinePlex");
         } catch (Exception e) {
-            mensajeError.setText("Error al cargar el módulo: " + e.getMessage());
+            lblErrorMessage.setText("Error loading module: " + e.getMessage());
             e.printStackTrace();
         }
     }

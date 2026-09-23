@@ -9,13 +9,32 @@
 <?import javafx.scene.text.Font?>
 
 <VBox alignment="CENTER" spacing="20.0" style="-fx-background-color: #f0f0f0;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21.0.1" fx:controller="org.cineplex.system.controller.LoginController">
-    <padding><Insets bottom="40.0" left="40.0" right="40.0" top="40.0" /></padding>
-    <Label style="-fx-text-fill: #2c3e50;" text="CinePlex"><font><Font size="32.0" /></font></Label>
-    <Label style="-fx-text-fill: #34495e;" text="Iniciar Sesión"><font><Font size="18.0" /></font></Label>
+    <padding>
+        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+    </padding>
+    
+    <Label style="-fx-text-fill: #2c3e50;" text="CinePlex">
+        <font>
+            <Font size="32.0" />
+        </font>
+    </Label>
+    <Label style="-fx-text-fill: #34495e;" text="Iniciar Sesión">
+        <font>
+            <Font size="18.0" />
+        </font>
+    </Label>
+    
     <VBox alignment="CENTER" maxWidth="300" spacing="10.0">
-        <TextField fx:id="campoUsuario" promptText="Usuario" />
-        <PasswordField fx:id="campoPassword" promptText="Contraseña" />
-        <Label fx:id="mensajeError" style="-fx-text-fill: red;" wrapText="true" />
-        <Button onAction="#iniciarSesion" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Iniciar Sesión" />
+        <!-- ✅ CAMBIO 1: fx:id actualizado -->
+        <TextField fx:id="usernameField" promptText="Usuario" />
+        
+        <!-- ✅ CAMBIO 2: fx:id actualizado -->
+        <PasswordField fx:id="passwordField" promptText="Contraseña" />
+        
+        <!-- ✅ CAMBIO 3: fx:id actualizado -->
+        <Label fx:id="lblErrorMessage" style="-fx-text-fill: red;" wrapText="true" />
+        
+        <!-- ✅ CAMBIO 4: onAction actualizado -->
+        <Button onAction="#handleLogin" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Iniciar Sesión" />
     </VBox>
 </VBox>

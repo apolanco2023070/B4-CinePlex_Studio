@@ -25,25 +25,35 @@ public class MovieRegisterController {
 
     @FXML
     private TableView<Movie> tableMovies;
+    
     @FXML
     private TableColumn<Movie, String> colTitulo;
+    
     @FXML
     private TableColumn<Movie, String> colGenero;
+    
     @FXML
     private TableColumn<Movie, Integer> colDuracion;
+    
     @FXML
     private TableColumn<Movie, String> colClasificacion;
+    
     @FXML
     private TableColumn<Movie, String> colDirector;
+    
     @FXML
     private TableColumn<Movie, String> colUrlPoster;
+    
 
     @FXML
     private Label lblTitle, lblGenre, lblLength, lblRating, lblDirector, lblPoster;
+    
     @FXML
     private TextField txtTitle, txtLength, txtRating, txtDirector, txtPoster;
+    
     @FXML
     private ComboBox<MovieRepository.GenreOption> cmbGenre;
+    
     @FXML
     private Button btnRegisterMovie, btnVerPoster;
 
@@ -51,7 +61,6 @@ public class MovieRegisterController {
     private final AlertInformation alertInfo;
     private final Validations validations;
 
-    // Variable para almacenar la película seleccionada para editar
     private Movie movieSeleccionada;
 
     public MovieRegisterController() {
@@ -93,9 +102,13 @@ public class MovieRegisterController {
         }
     }
 
+    /**
+     * @param registerMovies
+     * El metodo registra las peliculas 
+     */
+    
     @FXML
     private void registerMovies() {
-        limpiarErroresVisuales();
         String title = txtTitle.getText().trim();
         String lengthText = txtLength.getText().trim();
         String director = txtDirector.getText().trim();
@@ -253,16 +266,7 @@ public class MovieRegisterController {
 
         movieSeleccionada = null;
         btnRegisterMovie.setText("Registrar");
-        limpiarErroresVisuales();
         txtTitle.requestFocus();
     }
 
-    private void limpiarErroresVisuales() {
-        lblTitle.setStyle("-fx-text-fill: black; -fx-font-weight: normal;");
-        lblLength.setStyle("-fx-text-fill: black; -fx-font-weight: normal;");
-        lblDirector.setStyle("-fx-text-fill: black; -fx-font-weight: normal;");
-        lblRating.setStyle("-fx-text-fill: black; -fx-font-weight: normal;");
-        lblGenre.setStyle("-fx-text-fill: black; -fx-font-weight: normal;");
-        lblPoster.setStyle("-fx-text-fill: black; -fx-font-weight: normal;");
-    }
 }

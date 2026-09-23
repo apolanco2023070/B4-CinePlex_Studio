@@ -5,46 +5,31 @@
 package org.cineplex.system.model;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 /**
  *
  * @author informatica
  */
-public class Screening {
+public class TicketData {
 
-    private Integer screeningId;
-    private Integer movieId;
+    private Integer ticketNumber;
     private String movieTitle;
-    private Integer auditoriumId;
     private String auditoriumName;
     private LocalDate showDate;
     private LocalTime showTime;
+    private Integer seatNumber;
+    private String userName;
+    private LocalDateTime issueDate;
 
-    public Screening() {
+    // Getters y Setters
+    public Integer getTicketNumber() {
+        return ticketNumber;
     }
 
-    public Screening(Integer movieId, Integer auditoriumId, LocalDate showDate, LocalTime showTime) {
-        this.movieId = movieId;
-        this.auditoriumId = auditoriumId;
-        this.showDate = showDate;
-        this.showTime = showTime;
-    }
-
-    public Integer getScreeningId() {
-        return screeningId;
-    }
-
-    public void setScreeningId(Integer screeningId) {
-        this.screeningId = screeningId;
-    }
-
-    public Integer getMovieId() {
-        return movieId;
-    }
-
-    public void setMovieId(Integer movieId) {
-        this.movieId = movieId;
+    public void setTicketNumber(Integer ticketNumber) {
+        this.ticketNumber = ticketNumber;
     }
 
     public String getMovieTitle() {
@@ -53,14 +38,6 @@ public class Screening {
 
     public void setMovieTitle(String movieTitle) {
         this.movieTitle = movieTitle;
-    }
-
-    public Integer getAuditoriumId() {
-        return auditoriumId;
-    }
-
-    public void setAuditoriumId(Integer auditoriumId) {
-        this.auditoriumId = auditoriumId;
     }
 
     public String getAuditoriumName() {
@@ -87,12 +64,28 @@ public class Screening {
         this.showTime = showTime;
     }
 
-    @Override
-    public String toString() {
-        return showDate + " " + showTime;
+    public Integer getSeatNumber() {
+        return seatNumber;
     }
 
-    public String getShowTimeString() {
-        return showTime != null ? showTime.toString() : "";
+    public void setSeatNumber(Integer seatNumber) {
+        this.seatNumber = seatNumber;
     }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public LocalDateTime getIssueDate() {
+        return issueDate;
+    }
+
+    public void setIssueDate(LocalDateTime issueDate) {
+        this.issueDate = issueDate;
+    }
+
 }
