@@ -43,6 +43,42 @@ public class GerenteController {
         }
     }
     @FXML
+    public void verDisponibilidadAsientos() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/SeatAvailability.fxml"));
+            Parent root = loader.load();
+
+            SeatAvailabilityController controller = loader.getController();
+            controller.setUsuarioLogueado(usuarioLogueado);
+
+            Stage stage = (Stage) lblBienvenida.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Disponibilidad de Asientos - CinePlex");
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarMensaje("Error", "No se pudo cargar la disponibilidad de asientos: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    public void abrirEmisionBoletos() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Ticket.fxml"));
+            Parent root = loader.load();
+
+            TicketController controller = loader.getController();
+            controller.setUsuarioLogueado(usuarioLogueado);
+
+            Stage stage = (Stage) lblBienvenida.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Emitir Boleto - CinePlex");
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarMensaje("Error", "No se pudo cargar la emisión de boletos: " + e.getMessage());
+        }
+    }
+
+    @FXML
     public void verVentas() {
         System.out.println("HU3: Gerente accede a Ventas - PERMITIDO");
         mostrarMensaje("Ventas", "Viendo ventas del día");
@@ -79,3 +115,4 @@ public class GerenteController {
         alert.showAndWait();
     }
 }
+    

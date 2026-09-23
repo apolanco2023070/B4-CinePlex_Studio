@@ -47,6 +47,11 @@ public class MovieRegisterController {
     @FXML
     private Button btnRegisterMovie, btnVerPoster;
 
+    @FXML
+    private void verPoster() {
+        Movie movieSeleccionada = tableMovies.getSelectionModel().getSelectedItem();
+    }
+
     private final MovieRepository movieRepository;
 
     private final AlertInformation alertInfo;
@@ -146,11 +151,11 @@ public class MovieRegisterController {
             cargarPeliculas();
             alertInfo.viewAlert("INFORMATION", "Éxito", "Registro completado", "La película se guardó correctamente.");
         } catch (Exception e) {
-          
+
             alertInfo.viewAlert("ERROR", "Error al registrar", "Error de sistema", "Detalle: " + e.getMessage());
-             
-             alertInfo.viewAlert("ERROR", "Error al registrar", "Error de sistema",
-                            "No se pudo registrar la película. Detalle: " + e.getMessage());
+
+            alertInfo.viewAlert("ERROR", "Error al registrar", "Error de sistema",
+                    "No se pudo registrar la película. Detalle: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -187,7 +192,7 @@ public class MovieRegisterController {
                 return 3;
             default:
                 return 1;
-                
+
         }
     }
 

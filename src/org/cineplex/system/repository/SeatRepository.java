@@ -57,6 +57,33 @@ public class SeatRepository {
         return seats;
     }
 
+    public List<Seat> findAvailabilityByScreening(Integer screeningId) {
+        List<Seat> seats = new ArrayList<>();
+        String sql = "{call sp_get_seat_availability_by_screening(?)}";
+
+        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
+             CallableStatement cstmt = conn.prepareCall(sql)) {
+
+            cstmt.setInt(1, screeningId);
+
+            try (ResultSet rs = cstmt.executeQuery()) {
+                while (rs.next()) {
+                    Seat seat = new Seat();
+                    seat.setSeatId(rs.getInt("seat_id"));
+                    seat.setSeatNumber(rs.getInt("seat_number"));
+                    seat.setAuditoriumId(rs.getInt("auditorium_id"));
+                    seat.setStatus(rs.getString("status"));
+                    seats.add(seat);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error al consultar disponibilidad: " + e.getMessage());
+            throw new RuntimeException("No se pudo consultar la disponibilidad de asientos.", e);
+        }
+        return seats;
+    }
+
     public boolean existsByAuditoriumId(Integer auditoriumId) {
         String sql = "{call sp_check_seats_exist(?)}";
         
@@ -91,5 +118,15 @@ public class SeatRepository {
             System.err.println("Error al eliminar asientos: " + e.getMessage());
             throw new RuntimeException("No se pudo eliminar los asientos.", e);
         }
+    }
+
+    public List<Seat> getAvailableSeatsForScreening(int screeningId) {
+        List<Seat> disponibles = new ArrayList<>();
+        for (Seat seat : findAvailabilityByScreening(screeningId)) {
+            if ("Disponible".equals(seat.getStatus())) {
+                disponibles.add(seat);
+            }
+        }
+        return disponibles;
     }
 }

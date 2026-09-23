@@ -183,8 +183,6 @@ INSERT INTO users (full_name, username, password, email, role_id) VALUES
 
 -- ============================================================
 
-USE cineplex_IN4AM;
-
 -- 1. Tabla GENRE (Padre)
 CREATE TABLE IF NOT EXISTS genre (
     genre_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -258,8 +256,6 @@ SELECT * FROM reservation;
 SELECT * FROM ticket;
 
  # Stores Procedures
- USE cineplex_IN4AM;
-
 
 Delimiter $$
 CREATE PROCEDURE sp_insert_movie(
@@ -267,7 +263,7 @@ CREATE PROCEDURE sp_insert_movie(
     IN p_duration INT,
     IN p_director VARCHAR(150),
     IN p_genre_id INT,
-    IN p_rating_id INT,
+    IN p_rating_id varchar(1),
     IN p_poster_url VARCHAR(500)
 )
 BEGIN
@@ -277,24 +273,57 @@ END $$
 
 Delimiter ;
 
-Delimiter $$
+
+ 
+-- 1. Verificar que sp_get_all_movies devuelva genre_name
+delimiter $$
 CREATE PROCEDURE sp_get_all_movies()
+
+BEGIN
+
+    SELECT 
+        m.movie_id,
+        m.title,
+        m.duration,
+        m.director,
+        m.genre_id,
+        g.name AS genre_name,   -- ✅ Debe llamarse genre_name
+        m.rating_id,
+        m.poster_url
+    FROM movie m
+    INNER JOIN genre g ON m.genre_id = g.genre_id
+    ORDER BY m.title ASC;
+END $$
+DELIMITER ;
+
+-- 2. Verificar que sp_get_movies_by_genre_id devuelva genre_name 
+DELIMITER $$
+CREATE PROCEDURE sp_get_movies_by_genre_id(IN p_genre_id INT)
 BEGIN
     SELECT 
         m.movie_id,
         m.title,
         m.duration,
         m.director,
-        g.name AS genre_name,
-        r.name AS rating_name,
+        m.genre_id,
+        g.name AS genre_name,   -- ✅ Debe llamarse genre_name
+        m.rating_id,
         m.poster_url
     FROM movie m
+
     INNER JOIN genre g ON m.genre_id = g.genre_id
-    INNER JOIN rating r ON m.rating_id = r.rating_id
+
+    WHERE m.genre_id = p_genre_id
+
     ORDER BY m.title ASC;
-END 
+
+END $$
 
 DELIMITER ;
+ 
+-- 3. Verificar que sp_get_movie_by_id devuelva genre_name
+ 
+ 
 
 
 -- ============================================================
@@ -322,16 +351,22 @@ END $$
 Delimiter ;
 
 -- 3. Obtener todas las películas (CORREGIDO: r.rating_id en lugar de r.name)
-Delimiter $$
+
+
+DROP PROCEDURE IF EXISTS sp_get_all_movies;
+
+DELIMITER $$
+
 CREATE PROCEDURE sp_get_all_movies()
 BEGIN
-    SELECT
+    SELECT 
         m.movie_id,
         m.title,
         m.duration,
         m.director,
+        g.genre_id,              -- AGREGADO: Incluir genre_id
         g.name AS genre_name,
-        r.rating_id AS rating_name, 
+        r.rating_id,             -- AGREGADO: Incluir rating_id
         m.poster_url
     FROM movie m
     INNER JOIN genre g ON m.genre_id = g.genre_id
@@ -339,9 +374,11 @@ BEGIN
     ORDER BY m.title ASC;
 END $$
 
+DELIMITER ;
+
 
 -- SP para insertar sala
-
+delimiter $$
 CREATE PROCEDURE sp_insert_auditorium(
     IN p_name VARCHAR(100),
     IN p_capacity INT
@@ -349,14 +386,18 @@ CREATE PROCEDURE sp_insert_auditorium(
 BEGIN
     INSERT INTO auditorium (name, capacity) VALUES (p_name, p_capacity);
 END $$
+delimiter ;
 
 -- 5. Obtener todas las salas
+delimiter $$
 CREATE PROCEDURE sp_get_all_auditoriums()
 BEGIN
     SELECT * FROM auditorium ORDER BY name;
 END $$
+delimiter ;
 
 -- 6. Insertar asiento
+delimiter $$
 CREATE PROCEDURE sp_insert_seat(
     IN p_seat_number INT,
     IN p_auditorium_id INT
@@ -364,16 +405,20 @@ CREATE PROCEDURE sp_insert_seat(
 BEGIN
     INSERT INTO seat (seat_number, auditorium_id) VALUES (p_seat_number, p_auditorium_id);
 END $$
+delimiter ;
 
 -- 7. Obtener asientos por sala
+delimiter $$
 CREATE PROCEDURE sp_get_seats_by_auditorium(
     IN p_auditorium_id INT
 )
 BEGIN
     SELECT * FROM seat WHERE auditorium_id = p_auditorium_id ORDER BY seat_number;
 END $$
+delimiter ;
 
 -- 8. Verificar si existen asientos en una sala
+delimiter $$
 CREATE PROCEDURE sp_check_seats_exist(
     IN p_auditorium_id INT
 )
@@ -385,22 +430,194 @@ BEGIN
     FROM seat 
     WHERE auditorium_id = p_auditorium_id;
 END $$
+delimiter ;
 
 -- 9. Eliminar asientos por sala (Útil antes de borrar una sala)
+delimiter $$
 CREATE PROCEDURE sp_delete_seats_by_auditorium(
     IN p_auditorium_id INT
 )
 BEGIN
     DELETE FROM seat WHERE auditorium_id = p_auditorium_id;
 END $$
+delimiter ;
 
 -- 10. Eliminar sala
+delimiter $$
 CREATE PROCEDURE sp_delete_auditorium(
     IN p_auditorium_id INT
 )
 BEGIN
     DELETE FROM auditorium WHERE auditorium_id = p_auditorium_id;
 END $$
+delimiter ;
+
+-- ============================================================
+-- Procedimientos de Funciones / Disponibilidad / Reservas
+-- (antes vivían en un script aparte que no quedó en el repo:
+--  quedan aquí para que no se vuelvan a perder al hacer commit)
+-- ============================================================
+
+-- 11. Listar todas las funciones (usado por el combo de Gerente/Administrador)
+delimiter $$
+CREATE PROCEDURE sp_get_all_screenings()
+BEGIN
+    SELECT
+        s.screening_id,
+        s.movie_id,
+        s.auditorium_id,
+        s.show_date,
+        s.show_time,
+        m.title AS movie_title,
+        a.name AS auditorium_name
+    FROM screening s
+    INNER JOIN movie m ON s.movie_id = m.movie_id
+    INNER JOIN auditorium a ON s.auditorium_id = a.auditorium_id
+    ORDER BY s.show_date, s.show_time;
+END $$
+delimiter ;
+
+-- 12. Consultar disponibilidad de asientos de una función específica
+delimiter $$
+CREATE PROCEDURE sp_get_seat_availability_by_screening(IN p_screening_id INT)
+BEGIN
+    SELECT
+        se.seat_id,
+        se.seat_number,
+        se.auditorium_id,
+        CASE WHEN r.reservation_id IS NULL THEN 'Disponible' ELSE 'Reservado' END AS status
+    FROM seat se
+    INNER JOIN screening sc ON sc.auditorium_id = se.auditorium_id
+    LEFT JOIN reservation r
+        ON r.seat_id = se.seat_id
+        AND r.screening_id = sc.screening_id
+        AND r.status = 'RESERVED'
+    WHERE sc.screening_id = p_screening_id
+    ORDER BY se.seat_number;
+END $$
+delimiter ;
+
+-- 13. Crear la relación Reserva-Asiento-Función
+delimiter $$
+CREATE PROCEDURE sp_create_reservation(
+    IN p_user_id INT,
+    IN p_screening_id INT,
+    IN p_seat_id INT
+)
+BEGIN
+    INSERT INTO reservation (user_id, screening_id, seat_id, status)
+    VALUES (p_user_id, p_screening_id, p_seat_id, 'RESERVED');
+END $$
+delimiter ;
+
+-- 14. Verificar conflicto de horario en una sala (usado al programar una función)
+delimiter $$
+CREATE PROCEDURE sp_check_screening_conflict(
+    IN p_auditorium_id INT,
+    IN p_show_date DATE,
+    IN p_show_time TIME
+)
+BEGIN
+    SELECT COUNT(*) AS conflict_count
+    FROM screening
+    WHERE auditorium_id = p_auditorium_id
+      AND show_date = p_show_date
+      AND show_time = p_show_time;
+END $$
+delimiter ;
+
+-- 15. Eliminar una función (HU28)
+delimiter $$
+CREATE PROCEDURE sp_delete_screening(
+    IN p_screening_id INT
+)
+BEGIN
+    DELETE FROM screening WHERE screening_id = p_screening_id;
+END $$
+delimiter ;
+
+-- 16. Obtener el detalle completo de una reserva (película, función, sala y asiento) para el boleto (HU37/HU38)
+delimiter $$
+CREATE PROCEDURE sp_get_reservation_details(
+    IN p_reservation_id INT
+)
+BEGIN
+    SELECT
+        r.reservation_id,
+        r.status AS reservation_status,
+        r.reservation_date,
+        u.full_name AS customer_name,
+        m.title AS movie_title,
+        m.duration,
+        a.name AS auditorium_name,
+        s.show_date,
+        s.show_time,
+        se.seat_number
+    FROM reservation r
+    INNER JOIN users u ON r.user_id = u.user_id
+    INNER JOIN screening s ON r.screening_id = s.screening_id
+    INNER JOIN movie m ON s.movie_id = m.movie_id
+    INNER JOIN auditorium a ON s.auditorium_id = a.auditorium_id
+    INNER JOIN seat se ON r.seat_id = se.seat_id
+    WHERE r.reservation_id = p_reservation_id;
+END $$
+delimiter ;
+
+-- 17. Listar reservas activas (para elegir cual emitir como boleto en HU37)
+delimiter $$
+CREATE PROCEDURE sp_get_active_reservations()
+BEGIN
+    SELECT
+        r.reservation_id,
+        u.full_name AS customer_name,
+        m.title AS movie_title,
+        a.name AS auditorium_name,
+        s.show_date,
+        s.show_time,
+        se.seat_number,
+        (t.ticket_id IS NOT NULL) AS has_ticket
+    FROM reservation r
+    INNER JOIN users u ON r.user_id = u.user_id
+    INNER JOIN screening s ON r.screening_id = s.screening_id
+    INNER JOIN movie m ON s.movie_id = m.movie_id
+    INNER JOIN auditorium a ON s.auditorium_id = a.auditorium_id
+    INNER JOIN seat se ON r.seat_id = se.seat_id
+    LEFT JOIN ticket t ON t.reservation_id = r.reservation_id
+    WHERE r.status = 'RESERVED'
+    ORDER BY s.show_date, s.show_time;
+END $$
+delimiter ;
+
+delimiter $$
+-- 18. Emitir boleto (crea la fila en ticket) (HU37)
+CREATE PROCEDURE sp_issue_ticket(
+    IN p_reservation_id INT
+)
+BEGIN
+    INSERT INTO ticket (reservation_id) VALUES (p_reservation_id);
+END $$
+DELIMITER ;
+
+
+DELIMITER $$
+
+CREATE PROCEDURE sp_get_all_genres()
+BEGIN
+    SELECT genre_id, name 
+    FROM genre 
+    ORDER BY name ASC;
+END $$
+delimiter ;
+
+delimiter $$
+CREATE PROCEDURE sp_get_all_ratings()
+BEGIN
+    SELECT rating_id, rating_id as name
+    FROM rating 
+    ORDER BY rating_id ASC;
+END $$
 
 DELIMITER ;
+
+
 

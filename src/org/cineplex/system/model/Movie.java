@@ -102,4 +102,9 @@ public class Movie {
     
     public StringProperty posterUrlProperty() { 
         return posterUrl; }
+
+    @Override
+    public String toString() {
+        return getTitle();
+    }
 }

@@ -13,6 +13,8 @@
     <VBox spacing="15.0" alignment="CENTER" maxWidth="300">
         <Button text="Ver Cartelera" onAction="#verCartelera" style="-fx-background-color: #3498db; -fx-text-fill: white;" prefWidth="300" />
         <Button text="Ventas del Día" onAction="#verVentas" style="-fx-background-color: #3498db; -fx-text-fill: white;" prefWidth="300" />
+        <Button text="Disponibilidad de Asientos" onAction="#verDisponibilidadAsientos" style="-fx-background-color: #3498db; -fx-text-fill: white;" prefWidth="300" />
+        <Button text="Emitir Boleto" onAction="#abrirEmisionBoletos" style="-fx-background-color: #3498db; -fx-text-fill: white;" prefWidth="300" />
         <Button text="Cerrar Sesión" onAction="#cerrarSesion" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" prefWidth="300" />
     </VBox>
 </VBox>
