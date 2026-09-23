@@ -30,6 +30,7 @@ public class ReservationConsultationController implements Initializable {
     @FXML private TableColumn<Reserva, String> colFecha;
     @FXML private TableColumn<Reserva, String> colHora;
     @FXML private TableColumn<Reserva, String> colEstado;
+    @FXML private TableColumn<Reserva, Void> colAcciones;
     @FXML private Button btnBack;
 
     private Connection connection;
@@ -55,6 +56,32 @@ public class ReservationConsultationController implements Initializable {
         colFecha.setCellValueFactory(new PropertyValueFactory<>("fechaFuncion"));
         colHora.setCellValueFactory(new PropertyValueFactory<>("horaFuncion"));
         colEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
+        
+        // Botón Cancelar en cada fila
+        colAcciones.setCellFactory(param -> new TableCell<>() {
+            private final Button btnCancelar = new Button("❌ Cancelar");
+            {
+                btnCancelar.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
+                btnCancelar.setOnAction(event -> cancelarReserva(getTableView().getItems().get(getIndex())));
+            }
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    Reserva reserva = getTableView().getItems().get(getIndex());
+                    if (reserva != null && "CANCELLED".equals(reserva.getEstado())) {
+                        btnCancelar.setDisable(true);
+                        btnCancelar.setStyle("-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-cursor: default;");
+                    } else {
+                        btnCancelar.setDisable(false);
+                        btnCancelar.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
+                    }
+                    setGraphic(btnCancelar);
+                }
+            }
+        });
         
         reservasList = FXCollections.observableArrayList();
         tableViewReservations.setItems(reservasList);
@@ -93,6 +120,7 @@ public class ReservationConsultationController implements Initializable {
                 String hora = horaSql != null ? horaSql.toLocalTime().format(tf) : "N/A";
                 
                 reservasList.add(new Reserva(
+                    rs.getInt("reservation_id"),
                     rs.getString("usuario"),
                     rs.getString("pelicula"),
                     rs.getString("sala"),
@@ -115,7 +143,7 @@ public class ReservationConsultationController implements Initializable {
         LocalDate fecha = datePickerFecha.getValue();
         
         StringBuilder sql = new StringBuilder(
-            "SELECT u.full_name AS usuario, m.title AS pelicula, " +
+            "SELECT r.reservation_id, u.full_name AS usuario, m.title AS pelicula, " +
             "a.name AS sala, s.seat_number AS asiento, " +
             "sc.show_date AS fecha_funcion, sc.show_time AS hora_funcion, " +
             "r.status AS estado " +
@@ -159,6 +187,7 @@ public class ReservationConsultationController implements Initializable {
                 String hora = horaSql != null ? horaSql.toLocalTime().format(tf) : "N/A";
                 
                 reservasList.add(new Reserva(
+                    rs.getInt("reservation_id"),
                     rs.getString("usuario"),
                     rs.getString("pelicula"),
                     rs.getString("sala"),
@@ -180,6 +209,42 @@ public class ReservationConsultationController implements Initializable {
         cargarReservas();
     }
 
+    // ===== MÉTODO PARA CANCELAR RESERVA (HU36) =====
+    private void cancelarReserva(Reserva reserva) {
+        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmacion.setTitle("Confirmar Cancelación");
+        confirmacion.setHeaderText("¿Estás seguro de cancelar esta reserva?");
+        confirmacion.setContentText("Usuario: " + reserva.getUsuario() + "\n" +
+                                   "Película: " + reserva.getPelicula() + "\n" +
+                                   "Asiento: " + reserva.getAsiento());
+        
+        confirmacion.showAndWait().ifPresent(respuesta -> {
+            if (respuesta == ButtonType.OK) {
+                if (ejecutarCancelacion(reserva.getId())) {
+                    mostrarExito("Éxito", "La reserva ha sido cancelada y el asiento liberado.");
+                    cargarReservas();
+                }
+            }
+        });
+    }
+
+    private boolean ejecutarCancelacion(int reservationId) {
+        String sql = "{CALL sp_cancel_reservation(?)}";
+        
+        try (CallableStatement cstmt = connection.prepareCall(sql)) {
+            cstmt.setInt(1, reservationId);
+            cstmt.execute();
+            return true;
+        } catch (SQLException e) {
+            if (e.getMessage().contains("ERROR")) {
+                mostrarError("Error", e.getMessage());
+            } else {
+                mostrarError("Error", "No se pudo cancelar la reserva: " + e.getMessage());
+            }
+            return false;
+        }
+    }
+
     @FXML
     private void volverAlPanel() {
         try {
@@ -195,12 +260,18 @@ public class ReservationConsultationController implements Initializable {
     private void mostrarError(String t, String c) {
         new Alert(Alert.AlertType.ERROR, c) {{ setTitle(t); showAndWait(); }};
     }
+    
+    private void mostrarExito(String t, String c) {
+        new Alert(Alert.AlertType.INFORMATION, c) {{ setTitle(t); showAndWait(); }};
+    }
 
     // Clase interna
     public static class Reserva {
+        private final int id;
         private final javafx.beans.property.SimpleStringProperty usuario, pelicula, sala, asiento, fechaFuncion, horaFuncion, estado;
 
-        public Reserva(String u, String p, String s, String a, String f, String h, String e) {
+        public Reserva(int id, String u, String p, String s, String a, String f, String h, String e) {
+            this.id = id;
             this.usuario = new javafx.beans.property.SimpleStringProperty(u);
             this.pelicula = new javafx.beans.property.SimpleStringProperty(p);
             this.sala = new javafx.beans.property.SimpleStringProperty(s);
@@ -210,6 +281,7 @@ public class ReservationConsultationController implements Initializable {
             this.estado = new javafx.beans.property.SimpleStringProperty(e);
         }
 
+        public int getId() { return id; }
         public String getUsuario() { return usuario.get(); }
         public String getPelicula() { return pelicula.get(); }
         public String getSala() { return sala.get(); }

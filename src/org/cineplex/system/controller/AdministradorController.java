@@ -28,12 +28,10 @@ public class AdministradorController {
             java.net.URL fxmlLocation = getClass().getResource(fxmlPath);
             FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent root = loader.load();
-
             Stage stage = (Stage) lblBienvenida.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("Gestión de Cartelera - CinePlex");
         } catch (Exception e) {
-            System.err.println("Error inesperado al cargar la vista:");
             e.printStackTrace();
             mostrarMensaje("Error de Navegación", "No se pudo cargar la vista:\n" + e.getMessage());
         }
@@ -67,12 +65,10 @@ public class AdministradorController {
             java.net.URL fxmlLocation = getClass().getResource(fxmlPath);
             FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent root = loader.load();
-
             Stage stage = (Stage) lblBienvenida.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("CinePlex - Gestión de Salas y Asientos");
         } catch (Exception e) {
-            System.err.println("Error inesperado al cargar la vista:");
             e.printStackTrace();
             mostrarMensaje("Error de Navegación", "No se pudo cargar la vista:\n" + e.getMessage());
         }
@@ -85,12 +81,10 @@ public class AdministradorController {
             java.net.URL fxmlLocation = getClass().getResource(fxmlPath);
             FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent root = loader.load();
-
             Stage stage = (Stage) lblBienvenida.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("CinePlex - Gestión de Cartelera");
         } catch (Exception e) {
-            System.err.println("Error inesperado al cargar la vista:");
             e.printStackTrace();
             mostrarMensaje("Error de Navegación", "No se pudo cargar la vista:\n" + e.getMessage());
         }
@@ -103,12 +97,24 @@ public class AdministradorController {
             java.net.URL fxmlLocation = getClass().getResource(fxmlPath);
             FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent root = loader.load();
-
             Stage stage = (Stage) lblBienvenida.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("CinePlex - Gestión de Cartelera");
         } catch (Exception e) {
-            System.err.println("Error inesperado al cargar la vista:");
+            e.printStackTrace();
+            mostrarMensaje("Error de Navegación", "No se pudo cargar la vista:\n" + e.getMessage());
+        }
+    }
+
+    @FXML
+    public void consultarFunciones() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/ScreeningConsultation.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) lblBienvenida.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("CinePlex - Consultar Funciones");
+        } catch (Exception e) {
             e.printStackTrace();
             mostrarMensaje("Error de Navegación", "No se pudo cargar la vista:\n" + e.getMessage());
         }
@@ -133,21 +139,5 @@ public class AdministradorController {
         alert.setHeaderText(null);
         alert.setContentText(contenido);
         alert.showAndWait();
-    }
-
-    @FXML
-    public void consultarFunciones() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/ScreeningConsultation.fxml"));
-            Parent root = loader.load();
-
-            Stage stage = (Stage) lblBienvenida.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("CinePlex - Consultar Funciones");
-        } catch (Exception e) {
-            System.err.println("Error al cargar la vista:");
-            e.printStackTrace();
-            mostrarMensaje("Error de Navegación", "No se pudo cargar la vista:\n" + e.getMessage());
-        }
     }
 }
