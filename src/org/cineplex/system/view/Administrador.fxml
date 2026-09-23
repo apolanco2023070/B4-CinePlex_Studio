@@ -13,14 +13,11 @@
     <VBox alignment="CENTER" maxWidth="300" spacing="15.0">
         <Button onAction="#abrirCartelera" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Gestionar Cartelera" />
         <Button onAction="#abrirUsuarios" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Gestionar Usuarios" />
-      <Button fx:id="btnManageSeatsAndAuditoriums" onAction="#manageSeatsAndAuditoriums" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Gestionar Salas y Asientos" />
-      <Button fx:id="btnConsultarFunciones" 
-        text="Consultar Funciones" 
-        onAction="#consultarFunciones"
-        style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-size: 14px;"/>
+        <Button fx:id="btnManageSeatsAndAuditoriums" onAction="#manageSeatsAndAuditoriums" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Gestionar Salas y Asientos" />
+        <Button fx:id="btnConsultarFunciones" text="Consultar Funciones" onAction="#consultarFunciones" style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-size: 14px;"/>
         <Button onAction="#abrirReportes" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Reportes" />
-      <Button onAction="#manageScreening" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Gestionar funciones" />
-      <Button onAction="#seatReservation" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Reservar Asientos" />
+        <Button onAction="#manageScreening" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Gestionar funciones" />
+        <Button onAction="#seatReservation" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Reservar Asientos" />
         <Button onAction="#cerrarSesion" prefWidth="300" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" text="Cerrar Sesión" />
     </VBox>
 </VBox>
