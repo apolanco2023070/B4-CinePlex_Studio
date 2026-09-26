@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.cineplex.system.controller;
 
 import java.util.List;
@@ -19,55 +15,31 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-import org.cineplex.system.controller.GerenteController;
 import org.cineplex.system.model.Reservation;
 import org.cineplex.system.model.Screening;
 import org.cineplex.system.model.Seat;
-import org.cineplex.system.model.Usuario;
+import org.cineplex.system.model.User; // ✅ CORREGIDO: Usa User, NO Usuario
 import org.cineplex.system.repository.ReservationRepository;
 import org.cineplex.system.repository.ScreeningRepository;
 import org.cineplex.system.repository.SeatRepository;
 import org.cineplex.system.utils.AlertInformation;
 
-/**
- * HU Gerente: visualizar los asientos disponibles de una función para
- * seleccionar una ubicación.
- * HU Sistema: marcar un asiento como reservado para evitar que sea
- * asignado nuevamente.
- *
- * @author informatica
- */
 public class SeatAvailabilityController {
 
-    @FXML
-    private ComboBox<Screening> cmbFunciones;
-
-    @FXML
-    private Button btnConsultar;
-
-    @FXML
-    private Button btnReservar;
-
-    @FXML
-    private Button btnRegresar;
-
-    @FXML
-    private Label lblFuncion;
-
-    @FXML
-    private TableView<Seat> tblAsientos;
-
-    @FXML
-    private TableColumn<Seat, Integer> colNumero;
-
-    @FXML
-    private TableColumn<Seat, String> colEstado;
+    @FXML private ComboBox<Screening> cmbFunciones;
+    @FXML private Button btnConsultar;
+    @FXML private Button btnReservar;
+    @FXML private Button btnRegresar;
+    @FXML private Label lblFuncion;
+    @FXML private TableView<Seat> tblAsientos;
+    @FXML private TableColumn<Seat, Integer> colNumero;
+    @FXML private TableColumn<Seat, String> colEstado;
 
     private final ScreeningRepository screeningRepository;
     private final SeatRepository seatRepository;
     private final ReservationRepository reservationRepository;
 
-    private Usuario usuarioLogueado;
+    private User usuarioLogueado; // ✅ CORREGIDO: Usa User, NO Usuario
 
     public SeatAvailabilityController() {
         this.screeningRepository = new ScreeningRepository();
@@ -75,7 +47,7 @@ public class SeatAvailabilityController {
         this.reservationRepository = new ReservationRepository();
     }
 
-    public void setUsuarioLogueado(Usuario usuario) {
+    public void setUsuarioLogueado(User usuario) { // ✅ CORREGIDO: Usa User
         this.usuarioLogueado = usuario;
     }
 
@@ -126,7 +98,6 @@ public class SeatAvailabilityController {
     @FXML
     private void consultarDisponibilidad() {
         Screening screening = cmbFunciones.getValue();
-
         if (screening == null) {
             AlertInformation.viewAlert("WARNING", "Atención", "Sin selección", "Selecciona una función.");
             return;
@@ -137,7 +108,6 @@ public class SeatAvailabilityController {
     private void cargarAsientos(int screeningId) {
         try {
             tblAsientos.getItems().clear();
-
             List<Seat> seats = seatRepository.findAvailabilityByScreening(screeningId);
             tblAsientos.setItems(FXCollections.observableArrayList(seats));
             tblAsientos.refresh();
@@ -164,13 +134,13 @@ public class SeatAvailabilityController {
             return;
         }
         if (usuarioLogueado == null) {
-            AlertInformation.viewAlert("ERROR", "Error", "Sesión inválida", "No hay un usuario logueado.");
+            AlertInformation.viewAlert("ERROR", "Error", "Sesión inválida", "No hay un usuario logueado. Por favor, cierra sesión y vuelve a iniciar.");
             return;
         }
 
         try {
             Reservation reservation = new Reservation(
-                    usuarioLogueado.getIdUsuario(),
+                    usuarioLogueado.getIdUser(), // ✅ CORREGIDO: Usa getIdUser(), NO getIdUsuario()
                     screening.getScreeningId(),
                     seat.getSeatId()
             );
@@ -179,7 +149,6 @@ public class SeatAvailabilityController {
             AlertInformation.viewAlert("INFORMATION", "Éxito", "Asiento reservado",
                     "El asiento " + seat.getSeatNumber() + " fue reservado correctamente.");
 
-            // Refrescar disponibilidad para reflejar el cambio de estado inmediatamente.
             cargarAsientos(screening.getScreeningId());
 
         } catch (Exception e) {
@@ -191,17 +160,18 @@ public class SeatAvailabilityController {
     private void regresarMenu() {
         try {
             Stage stageActual = (Stage) btnRegresar.getScene().getWindow();
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Gerente.fxml"));
             Parent root = loader.load();
-
             GerenteController controller = loader.getController();
-            controller.setUsuarioLogueado(usuarioLogueado);
-
+            
+            // ✅ Protección: solo pasa el usuario si no es null
+            if (this.usuarioLogueado != null) {
+                controller.setUsuarioLogueado(this.usuarioLogueado);
+            }
+            
             Scene escenaNueva = new Scene(root);
             stageActual.setScene(escenaNueva);
             stageActual.show();
-
         } catch (Exception e) {
             e.printStackTrace();
             AlertInformation.viewAlert("ERROR", "Error de navegación", "No se pudo cargar la vista", e.getMessage());

@@ -16,12 +16,17 @@ public class UserManagementController {
 
     @FXML
     private TextField txtFullName;
+
+    
     @FXML
     private TextField txtUsername;
+    
     @FXML
     private PasswordField txtPassword;
+    
     @FXML
     private TextField txtEmail;
+    
     @FXML
     private Label lblMensaje;
 
@@ -30,15 +35,15 @@ public class UserManagementController {
 
     @FXML
     public void registrarGerente() {
-        // Obtener valores
+
         String fullName = txtFullName.getText().trim();
         String username = txtUsername.getText().trim();
         String password = txtPassword.getText().trim();
         String email = txtEmail.getText().trim();
 
-        // Validaciones básicas
-        if (validaciones.emptyText(fullName) || validaciones.emptyText(username) || 
-            validaciones.emptyText(password) || validaciones.emptyText(email)) {
+
+        if (validaciones.emptyText(fullName) || validaciones.emptyText(username)
+                || validaciones.emptyText(password) || validaciones.emptyText(email)) {
             mostrarAlerta("Error", "Todos los campos son obligatorios.");
             return;
         }
@@ -53,7 +58,7 @@ public class UserManagementController {
             return;
         }
 
-        // Intentar registrar (role_id = 2 es MANAGER/Gerente)
+
         boolean exito = usuarioDAO.registrarUsuario(fullName, username, password, email, 2);
 
         if (exito) {

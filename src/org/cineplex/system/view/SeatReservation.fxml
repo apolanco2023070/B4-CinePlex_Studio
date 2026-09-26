@@ -5,6 +5,8 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
@@ -13,12 +15,13 @@
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cineplex.system.controller.SeatReservationController">
    <children>
-      <Label text="Reservacion de asientos">
+      <Label text="Reservación de Asientos">
          <font>
             <Font size="24.0" />
          </font>
       </Label>
       <Separator prefWidth="200.0" />
+      
       <GridPane>
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -28,27 +31,41 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Label text="Sala" />
-            <Label text="Asiento" GridPane.rowIndex="1" />
-            <Label text="Pelicula" GridPane.rowIndex="2" />
-            <Label text="Horario" GridPane.rowIndex="3" />
-            <ComboBox fx:id="cmbAuditorium" prefWidth="150.0" GridPane.columnIndex="1" />
-            <ComboBox fx:id="cmbSeat" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <ComboBox fx:id="cmbMovie" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <ComboBox fx:id="cmbScreening" prefWidth="150.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Label text="Sala:" />
+            <Label text="Película:" GridPane.rowIndex="1" />
+            <Label text="Horario:" GridPane.rowIndex="2" />
+            <Label text="Asiento:" GridPane.rowIndex="3" />
+            <Label text="Reservación a nombre de:" GridPane.rowIndex="4" />
+            
+            <ComboBox fx:id="cmbAuditorium" prefWidth="200.0" GridPane.columnIndex="1" />
+            <ComboBox fx:id="cmbMovie" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <ComboBox fx:id="cmbScreening" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <ComboBox fx:id="cmbSeat" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <TextField fx:id="txtReservationName" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
          </children>
+         <VBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </VBox.margin>
+      </GridPane>
+      
+      <Separator prefWidth="200.0" />
+      
+      <ToolBar prefHeight="40.0" prefWidth="200.0">
+        <items>
+            <Button mnemonicParsing="false" onAction="#reserveSeat" style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold;" text="Reservar Asiento" />
+            <Button fx:id="btnCreateTicket" mnemonicParsing="false" onAction="#generateTicket" style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-weight: bold;" text="Generar Ticket" />
+            <Button fx:id="btnRegresar" mnemonicParsing="false" onAction="#regresarMenu" style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold;" text="Regresar" />
+        </items>
          <VBox.margin>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </VBox.margin>
-      </GridPane>
-      <Separator prefWidth="200.0" />
-      <Button mnemonicParsing="false" onAction="#reserveSeat" text="Reservar asiento" />
-      <Button fx:id="btnRegresar" mnemonicParsing="false" onAction="#regresarMenu" text="Regresar" />
+      </ToolBar>
    </children>
    <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
    </padding>
 </VBox>

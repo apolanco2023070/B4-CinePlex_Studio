@@ -1,33 +1,27 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.cineplex.system.service;
 
-
-import org.cineplex.system.repository.UsuarioRepository;
-import org.cineplex.system.model.TypeRol;
-import org.cineplex.system.model.Usuario;
+import org.cineplex.system.model.RoleType;
+import org.cineplex.system.repository.UserRepository;
+import org.cineplex.system.model.User;
 
 public class AuthService {
-    private final UsuarioRepository usuarioDAO = new UsuarioRepository();
-    
+
+    private final UserRepository usuarioDAO = new UserRepository();
 
     public static class ResultadoLogin {
+
         public final boolean exito;
         public final String mensaje;
-        public final Usuario usuario;
-        
-        public ResultadoLogin(boolean exito, String mensaje, Usuario usuario) {
+        public final User usuario;
+
+        public ResultadoLogin(boolean exito, String mensaje, User usuario) {
             this.exito = exito;
             this.mensaje = mensaje;
             this.usuario = usuario;
         }
     }
-    
- 
-    public ResultadoLogin login(String nombreUsuario, String passwordPlano, TypeRol rolEsperado) {
-       
+
+    public ResultadoLogin login(String nombreUsuario, String passwordPlano, RoleType rolEsperado) {
         if (nombreUsuario == null || nombreUsuario.isBlank()) {
             return new ResultadoLogin(false, "El usuario no puede estar vacío.", null);
         }
@@ -35,25 +29,22 @@ public class AuthService {
             return new ResultadoLogin(false, "La contraseña no puede estar vacía.", null);
         }
 
-        Usuario usuario = usuarioDAO.buscarPorNombreUsuario(nombreUsuario);
-        
+        User usuario = usuarioDAO.findByUsername(nombreUsuario);
+
         if (usuario == null) {
-       
             return new ResultadoLogin(false, "Usuario o contraseña incorrectos.", null);
         }
-        
 
         boolean passwordValida = passwordPlano.equals(usuario.getPassword());
         if (!passwordValida) {
             return new ResultadoLogin(false, "Usuario o contraseña incorrectos.", null);
         }
-        
 
-        if (!usuario.tieneRol(rolEsperado)) {
+        if (usuario.getRole() == null || usuario.getRole().getRoleType() != rolEsperado) {
             return new ResultadoLogin(
-                false, 
-                "Este usuario no tiene permisos de " + rolEsperado.getNombre() + ".", 
-                null
+                    false,
+                    "Este usuario no tiene permisos de " + rolEsperado.getName() + ".",
+                    null
             );
         }
 

@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.cineplex.system.controller;
 
 import javafx.fxml.FXML;
@@ -11,35 +7,32 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
-import org.cineplex.system.model.Usuario;
+import org.cineplex.system.model.User;
 
 public class GerenteController {
 
     @FXML
     private Label lblBienvenida;
-    private Usuario usuarioLogueado;
+    private User usuarioLogueado;
 
-    public void setUsuarioLogueado(Usuario usuario) {
-        this.usuarioLogueado = usuario;
-        lblBienvenida.setText("Bienvenido, " + usuario.getNombreUsuario());
+    public void setUsuarioLogueado(User user) {
+        this.usuarioLogueado = user;
+        lblBienvenida.setText("Bienvenido, " + user.getUserName());
     }
 
-        @FXML
-    public void verCartelera() {
-        System.out.println("HU3: Gerente accede a Cartelera - PERMITIDO (Solo lectura)");
+    @FXML
+    public void abrirCartelera() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Cartelera.fxml"));
+            String fxmlPath = "/org/cineplex/system/view/MovieRegister.fxml";
+            java.net.URL fxmlLocation = getClass().getResource(fxmlPath);
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
             Parent root = loader.load();
-
-            CarteleraController controller = loader.getController();
-            controller.setUsuarioLogueado(usuarioLogueado);
-
             Stage stage = (Stage) lblBienvenida.getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.setTitle("Cartelera - CinePlex");
+            stage.setTitle("Gestión de Cartelera - CinePlex");
         } catch (Exception e) {
             e.printStackTrace();
-            mostrarMensaje("Error", "No se pudo cargar la cartelera: " + e.getMessage());
+            mostrarMensaje("Error de Navegación", "No se pudo cargar la vista:\n" + e.getMessage());
         }
     }
     @FXML
@@ -49,7 +42,7 @@ public class GerenteController {
             Parent root = loader.load();
 
             SeatAvailabilityController controller = loader.getController();
-            controller.setUsuarioLogueado(usuarioLogueado);
+            controller.setUsuarioLogueado(this.usuarioLogueado);
 
             Stage stage = (Stage) lblBienvenida.getScene().getWindow();
             stage.setScene(new Scene(root));
@@ -85,13 +78,19 @@ public class GerenteController {
     }
 
     @FXML
-    public void intentarAccederGestionUsuarios() {
-        System.out.println("HU3: Gerente intenta acceder a Gestión de Usuarios - DENEGADO");
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Acceso Denegado");
-        alert.setHeaderText("Permisos Insuficientes");
-        alert.setContentText("Solo el Administrador puede gestionar usuarios.");
-        alert.showAndWait();
+    public void consultarReservas() {
+        try {
+            String fxmlPath = "/org/cineplex/system/view/ReservationConsultation.fxml";
+            java.net.URL fxmlLocation = getClass().getResource(fxmlPath);
+            FXMLLoader loader = new FXMLLoader(fxmlLocation);
+            Parent root = loader.load();
+            Stage stage = (Stage) lblBienvenida.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("CinePlex - Consultar Reservas");
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarMensaje("Error de Navegación", "No se pudo cargar la vista:\n" + e.getMessage());
+        }
     }
 
     @FXML
@@ -114,5 +113,5 @@ public class GerenteController {
         alert.setContentText(contenido);
         alert.showAndWait();
     }
+
 }
-    

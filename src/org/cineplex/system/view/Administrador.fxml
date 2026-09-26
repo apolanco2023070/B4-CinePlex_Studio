@@ -7,20 +7,26 @@
 <?import javafx.scene.text.Font?>
 
 <VBox alignment="CENTER" spacing="20.0" style="-fx-background-color: #ecf0f1;" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cineplex.system.controller.AdministradorController">
-    <padding><Insets bottom="40.0" left="40.0" right="40.0" top="40.0" /></padding>
-    <Label style="-fx-text-fill: #2c3e50;" text="Panel Administrador"><font><Font size="28.0" /></font></Label>
-    <Label fx:id="lblWelcome" style="-fx-text-fill: #34495e;" text="Bienvenido"><font><Font size="16.0" /></font></Label>
+    <padding>
+        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+    </padding>
+    
+    <Label style="-fx-text-fill: #2c3e50;" text="Panel Administrador">
+        <font><Font size="28.0" /></font>
+    </Label>
+    
+    <Label fx:id="lblWelcome" style="-fx-text-fill: #34495e;" text="Bienvenido">
+        <font><Font size="16.0" /></font>
+    </Label>
+    
     <VBox alignment="CENTER" maxWidth="300" spacing="15.0">
         <Button onAction="#abrirCartelera" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Gestionar Cartelera" />
         <Button onAction="#abrirUsuarios" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Gestionar Usuarios" />
-      <Button fx:id="btnManageSeatsAndAuditoriums" onAction="#manageSeatsAndAuditoriums" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Gestionar Salas y Asientos" />
-      <Button fx:id="btnConsultarFunciones" 
-        text="Consultar Funciones" 
-        onAction="#consultarFunciones"
-        style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-size: 14px;"/>
+        <Button fx:id="btnManageSeatsAndAuditoriums" onAction="#manageSeatsAndAuditoriums" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Gestionar Salas y Asientos" />
+        <Button fx:id="btnConsultarFunciones" text="Consultar Funciones" onAction="#consultarFunciones" style="-fx-background-color: #9b59b6; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-size: 14px;"/>
         <Button onAction="#abrirReportes" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Reportes" />
-      <Button onAction="#manageScreening" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Gestionar funciones" />
-      <Button onAction="#seatReservation" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Reservar Asientos" />
+        <Button onAction="#manageScreening" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Gestionar Funciones" />
+        <Button onAction="#seatReservation" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Reservar Asientos" />
         <Button onAction="#cerrarSesion" prefWidth="300" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" text="Cerrar Sesión" />
     </VBox>
 </VBox>

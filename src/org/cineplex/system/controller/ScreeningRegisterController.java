@@ -118,7 +118,7 @@ public class ScreeningRegisterController {
         LocalDate date = dpDate.getValue();
         String timeText = txtTime.getText().trim();
 
-        // Validaciones
+
         if (selectedMovie == null || selectedAuditorium == null || date == null || validations.emptyText(timeText)) {
             AlertInformation.viewAlert("ERROR", "Campos incompletos", "Validación", "Todos los campos son obligatorios.");
             return;
@@ -131,7 +131,7 @@ public class ScreeningRegisterController {
 
         try {
             LocalTime time = LocalTime.parse(timeText);
-            Screening screening = new Screening( 1, selectedMovie.getMovieId(), selectedAuditorium.getAuditoriumId(), date, time);
+            Screening screening = new Screening(selectedMovie.getMovieId(), selectedAuditorium.getAuditoriumId(), date, time);
 
             screeningRepository.saveScreening(screening);
 

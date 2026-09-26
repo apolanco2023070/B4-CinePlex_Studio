@@ -22,7 +22,6 @@ public class AuditoriumRepository {
      public void saveAuditorium(Auditorium auditorium) {
         String sql = "{call sp_insert_auditorium(?,?)}";
 
-        // Try-with-resources: Connection y CallableStatement se cierran solos al terminar
         try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
      CallableStatement callSP = conn.prepareCall(sql)) {
 

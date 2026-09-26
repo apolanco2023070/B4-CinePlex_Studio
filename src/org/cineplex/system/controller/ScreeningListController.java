@@ -13,6 +13,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
@@ -47,8 +48,6 @@ public class ScreeningListController {
     @FXML
     private TableColumn<Screening, String> colTime;
 
-    @FXML
-    private Button btnViewSeats;
 
     private final ScreeningRepository screeningRepository;
     private ObservableList<Screening> allScreenings;
@@ -68,20 +67,18 @@ public class ScreeningListController {
         colAuditorium.setCellValueFactory(new PropertyValueFactory<>("auditoriumName"));
         colDate.setCellValueFactory(new PropertyValueFactory<>("showDate"));
 
-        colTime.setCellValueFactory(data -> data.getValue().showTimeProperty());
+
+        colTime.setCellValueFactory(new PropertyValueFactory<>("showTimeString"));
     }
 
     private void loadAllScreenings() {
         try {
-            System.out.println("Intentando cargar funciones...");
 
-            List<Screening> screenings = screeningRepository.getAllScreenings();
-            System.out.println("Funciones encontradas: " + screenings.size());
+            List<Screening> screenings = screeningRepository.getAllScreening();
 
             allScreenings = FXCollections.observableArrayList(screenings);
             tblScreenings.setItems(allScreenings);
 
-            System.out.println("Tabla actualizada correctamente");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -168,7 +165,8 @@ public class ScreeningListController {
         } catch (Exception e) {
             e.printStackTrace();
             AlertInformation.viewAlert("ERROR", "Error de navegación", "No se pudo cargar la vista",
-                    "Detalle: " + e.getMessage() + "\nVerifica la ruta del archivo Administrador.fxml en el código Java.");
+
+                    "Detalle: " + e.getMessage() + "\nVerifica la ruta del archivo Administrador.fxml");
         }
     }
 

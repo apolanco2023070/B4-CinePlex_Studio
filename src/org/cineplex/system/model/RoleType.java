@@ -8,27 +8,28 @@ package org.cineplex.system.model;
  * Enum que representa los tipos de rol disponibles en el sistema. Los valores
  * deben coincidir exactamente con los almacenados en la tabla 'role' de la BD.
  */
-public enum TypeRol {
+
+public enum RoleType {
     ADMINISTRATOR("ADMINISTRATOR"),
     MANAGER("MANAGER");
 
-    private final String nombre;
+    private final String name;
 
-    TypeRol(String nombre) {
-        this.nombre = nombre;
+    RoleType(String name) {
+        this.name = name;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getName() {
+        return name;
     }
 
-    public static TypeRol fromString(String nombreRol) {
-        if (nombreRol == null) {
+    public static RoleType fromString(String roleName) {
+        if (roleName == null) {
             return null;
         }
-        for (TypeRol tipo : TypeRol.values()) {
-            if (tipo.nombre.equalsIgnoreCase(nombreRol)) {
-                return tipo;
+        for (RoleType type : RoleType.values()) {
+            if (type.name.equalsIgnoreCase(roleName)) {
+                return type;
             }
         }
         return null;

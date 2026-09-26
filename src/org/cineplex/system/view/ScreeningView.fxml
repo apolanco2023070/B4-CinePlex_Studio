@@ -33,7 +33,7 @@
       </TableView>
       <Separator prefWidth="200.0" />
       <Button mnemonicParsing="false" onAction="#addScreening" text="Agregar funcion" />
-      <Button fx:id="btnEliminar" mnemonicParsing="false" onAction="#eliminarFuncion" text="Eliminar funcion seleccionada" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" />
+
       <Button fx:id="btnRegresar" mnemonicParsing="false" onAction="#regresarMenu" text="Regresar" />
    </children>
    <opaqueInsets>

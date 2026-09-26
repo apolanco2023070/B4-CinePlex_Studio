@@ -1,8 +1,12 @@
 package org.cineplex.system.model;
 
-import javafx.beans.property.*;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
 public class Movie {
+
     private final IntegerProperty movieId;
     private final StringProperty title;
     private final IntegerProperty duration;
@@ -34,77 +38,106 @@ public class Movie {
         this.posterUrl.set(posterUrl);
     }
 
-    // Getters y Setters
-    public int getMovieId() { 
-        return movieId.get(); }
-    
+    public int getMovieId() {
+        return movieId.get();
+    }
+
     public void setMovieId(int value) {
-        movieId.set(value); }
-    
+        movieId.set(value);
+    }
+
     public IntegerProperty movieIdProperty() {
-        return movieId; }
+        return movieId;
+    }
 
-    public String getTitle() { 
-        return title.get(); }
-    public void setTitle(String value) { 
-        title.set(value); }
-    public StringProperty titleProperty() { 
-        return title; }
+    public String getTitle() {
+        return title.get();
+    }
 
-    public int getDuration() { 
-        return duration.get(); }
-    public void setDuration(int value) { 
-        duration.set(value); }
-    public IntegerProperty durationProperty() { 
-        return duration; }
+    public void setTitle(String value) {
+        title.set(value);
+    }
+
+    public StringProperty titleProperty() {
+        return title;
+    }
+
+    public int getDuration() {
+        return duration.get();
+    }
+
+    public void setDuration(int value) {
+        duration.set(value);
+    }
+
+    public IntegerProperty durationProperty() {
+        return duration;
+    }
 
     public String getDirector() {
-        return director.get(); }
-    
-    public void setDirector(String value) { 
-        director.set(value); }
-    
+        return director.get();
+    }
+
+    public void setDirector(String value) {
+        director.set(value);
+    }
+
     public StringProperty directorProperty() {
-        return director; }
+        return director;
+    }
 
     public int getGenreId() {
-        return genreId.get(); }
-    
+        return genreId.get();
+    }
+
     public void setGenreId(int value) {
-        genreId.set(value); }
-    
-    public IntegerProperty genreIdProperty() { 
-        return genreId; }
+        genreId.set(value);
+    }
+
+    public IntegerProperty genreIdProperty() {
+        return genreId;
+    }
 
     public String getGenreName() {
-        return genreName.get(); }
-    
-    public void setGenreName(String value) { 
-        genreName.set(value); }
-    
-    public StringProperty genreNameProperty() { 
-        return genreName; }
+        return genreName.get();
+    }
+
+    public void setGenreName(String value) {
+        genreName.set(value);
+    }
+
+    public StringProperty genreNameProperty() {
+        return genreName;
+    }
 
     public String getRating() {
-        return rating.get(); }
-    
-    public void setRating(String value) { 
-        rating.set(value); }
-    
-    public StringProperty ratingProperty() { 
-        return rating; }
+        return rating.get();
+    }
 
-    public String getPosterUrl() { 
-        return posterUrl.get(); }
-    
+    public void setRating(String value) {
+        rating.set(value);
+    }
+
+    public StringProperty ratingProperty() {
+        return rating;
+    }
+
+    public String getPosterUrl() {
+        return posterUrl.get();
+    }
+
     public void setPosterUrl(String value) {
-        posterUrl.set(value); }
-    
-    public StringProperty posterUrlProperty() { 
-        return posterUrl; }
+
+        posterUrl.set(value);
+    }
+
+    public StringProperty posterUrlProperty() {
+        return posterUrl;
+    }
 
     @Override
     public String toString() {
         return getTitle();
     }
+
 }

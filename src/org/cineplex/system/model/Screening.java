@@ -1,165 +1,97 @@
-/*
-
-* Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-
-* Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
-
-*/
-
 package org.cineplex.system.model;
- 
-import java.time.LocalDate;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 
-import javafx.beans.property.SimpleStringProperty;
- 
+/**
+ * 
+ * @author informatica
+ */
 public class Screening {
-
-    private int screeningId;
-
-    private int movieId;
-
-    private int auditoriumId;
-
+    private Integer screeningId;
+    private Integer movieId;
+    private String movieTitle;
+    private Integer auditoriumId;
+    private String auditoriumName;
     private LocalDate showDate;
     private LocalTime showTime;
-    private String movieTitle;
 
-    private String auditoriumName;
-
-    public Screening() {}
-
-    public Screening(int screeningId, int movieId, int auditoriumId, 
-
-                     LocalDate showDate, LocalTime showTime) {
-
-        this.screeningId = screeningId;
-
-        this.movieId = movieId;
-
-        this.auditoriumId = auditoriumId;
-
-        this.showDate = showDate;
-
-        this.showTime = showTime;
-
+    public Screening() {
     }
- 
-    public int getScreeningId() {
 
+    public Screening(Integer movieId, Integer auditoriumId, LocalDate showDate, LocalTime showTime) {
+        this.movieId = movieId;
+        this.auditoriumId = auditoriumId;
+        this.showDate = showDate;
+        this.showTime = showTime;
+    }
+
+    // Getters y Setters
+    public Integer getScreeningId() {
         return screeningId;
-
     }
- 
-    public void setScreeningId(int screeningId) {
 
+    public void setScreeningId(Integer screeningId) {
         this.screeningId = screeningId;
-
     }
- 
-    public int getMovieId() {
 
+    public Integer getMovieId() {
         return movieId;
-
     }
- 
-    public void setMovieId(int movieId) {
 
+    public void setMovieId(Integer movieId) {
         this.movieId = movieId;
-
     }
- 
-    public int getAuditoriumId() {
 
-        return auditoriumId;
-
-    }
- 
-    public void setAuditoriumId(int auditoriumId) {
-
-        this.auditoriumId = auditoriumId;
-
-    }
- 
-    public LocalDate getShowDate() {
-
-        return showDate;
-
-    }
- 
-    public void setShowDate(LocalDate showDate) {
-
-        this.showDate = showDate;
-
-    }
- 
-    public LocalTime getShowTime() {
-
-        return showTime;
-
-    }
- 
-    public void setShowTime(LocalTime showTime) {
-
-        this.showTime = showTime;
-
-    }
- 
     public String getMovieTitle() {
-
         return movieTitle;
-
     }
- 
+
     public void setMovieTitle(String movieTitle) {
-
         this.movieTitle = movieTitle;
-
     }
- 
+
+    public Integer getAuditoriumId() {
+        return auditoriumId;
+    }
+
+    public void setAuditoriumId(Integer auditoriumId) {
+        this.auditoriumId = auditoriumId;
+    }
+
     public String getAuditoriumName() {
-
         return auditoriumName;
-
     }
- 
+
     public void setAuditoriumName(String auditoriumName) {
-
         this.auditoriumName = auditoriumName;
-
-    }
- 
-    public SimpleStringProperty auditoriumNameProperty() {
-
-        return new SimpleStringProperty(getAuditoriumName() != null ? getAuditoriumName() : "Sala " + getAuditoriumId());
-
     }
 
-    public SimpleStringProperty movieTitleProperty() {
-
-        return new SimpleStringProperty(getMovieTitle() != null ? getMovieTitle() : "Película ID: " + getMovieId());
-
+    public LocalDate getShowDate() {
+        return showDate;
     }
 
-    public SimpleStringProperty showDateProperty() {
-
-        return new SimpleStringProperty(getShowDate() != null ? getShowDate().toString() : "");
-
+    public void setShowDate(LocalDate showDate) {
+        this.showDate = showDate;
     }
 
-    public SimpleStringProperty showTimeProperty() {
+    public LocalTime getShowTime() {
+        return showTime;
+    }
 
-        return new SimpleStringProperty(getShowTime() != null ? getShowTime().toString() : "");
+    public void setShowTime(LocalTime showTime) {
+        this.showTime = showTime;
+    }
 
+    // Método auxiliar para mostrar la hora como String
+    public String getShowTimeString() {
+        return showTime != null ? showTime.toString() : "";
     }
 
     @Override
     public String toString() {
-        return (getMovieTitle() != null ? getMovieTitle() : "Película " + getMovieId())
-                + " - " + (getAuditoriumName() != null ? getAuditoriumName() : "Sala " + getAuditoriumId())
-                + " (" + getShowDate() + " " + getShowTime() + ")";
+        return (movieTitle != null ? movieTitle : "") + " - " + 
+               (auditoriumName != null ? auditoriumName : "") + 
+               " (" + showDate + " " + showTime + ")";
     }
-
 }
- 

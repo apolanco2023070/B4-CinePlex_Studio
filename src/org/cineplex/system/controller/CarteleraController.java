@@ -1,101 +1,106 @@
 package org.cineplex.system.controller;
 
 import java.util.List;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 import org.cineplex.system.model.Movie;
-import org.cineplex.system.model.Usuario;
+import javafx.stage.Stage;
+import org.cineplex.system.model.User;
 import org.cineplex.system.repository.MovieRepository;
 import org.cineplex.system.utils.AlertInformation;
 
 public class CarteleraController {
 
-    @FXML private FlowPane flowPosters;
-    @FXML private ComboBox<MovieRepository.GenreOption> cmbFiltroGenero; 
+    @FXML
+    private FlowPane posterFlowPane;
+    @FXML
+    private ComboBox<MovieRepository.GenreOption> cmbGenreFilter;
 
+    @FXML
+    private Button btnBackToMenu;
+    
     private final MovieRepository movieRepository = new MovieRepository();
     private final AlertInformation alertInfo = new AlertInformation();
-    private Usuario usuarioLogueado;
-    private List<Movie> todasLasPeliculas; 
+    private User loggedUser;
+    private List<Movie> allMovies;
 
-    private static final String POSTER_DEFECTO = "https://via.placeholder.com/180x260.png?text=Sin+Poster";
+    private static final String DEFAULT_POSTER = "https://via.placeholder.com/180x260.png?text=Sin+Poster";
 
-    public void setUsuarioLogueado(Usuario usuario) {
-        this.usuarioLogueado = usuario;
+    public void setLoggedUser(User user) {
+        this.loggedUser = user;
     }
 
     @FXML
     public void initialize() {
-        inicializarFiltroGenero();
-        cargarCartelera();
+        initializeGenreFilter();
+        loadBoxOffice();
     }
 
-    private void inicializarFiltroGenero() {
+    private void initializeGenreFilter() {
         try {
-            MovieRepository.GenreOption todos = new MovieRepository.GenreOption(0, "Todos los géneros");
-            cmbFiltroGenero.getItems().add(todos);
-            cmbFiltroGenero.getItems().addAll(movieRepository.getAllGenres());
-            cmbFiltroGenero.setValue(todos);
-            
-            cmbFiltroGenero.setOnAction(e -> filtrarPorGenero());
+            MovieRepository.GenreOption allGenres = new MovieRepository.GenreOption(0, "Todos los géneros");
+            cmbGenreFilter.getItems().add(allGenres);
+            cmbGenreFilter.getItems().addAll(movieRepository.getAllGenres());
+            cmbGenreFilter.setValue(allGenres);
+
+            cmbGenreFilter.setOnAction(e -> filterByGenre());
         } catch (Exception e) {
             alertInfo.viewAlert("ERROR", "Error", "No se pudieron cargar los géneros", e.getMessage());
         }
     }
 
-    private void cargarCartelera() {
+    private void loadBoxOffice() {
         try {
-            todasLasPeliculas = movieRepository.getAllMovies();
-            mostrarPeliculas(todasLasPeliculas);
+            allMovies = movieRepository.getAllMovies();
+            displayMovies(allMovies);
         } catch (Exception e) {
-            alertInfo.viewAlert("ERROR", "Error de carga", "No se pudo cargar la cartelera", e.getMessage());
+            alertInfo.viewAlert("ERROR", "Load Error", "No se pudo cargar la cartelera", e.getMessage());
         }
     }
 
-    private void filtrarPorGenero() {
+    private void filterByGenre() {
         try {
-            MovieRepository.GenreOption seleccionado = cmbFiltroGenero.getValue();
-            if (seleccionado.getId() == 0) {
-                mostrarPeliculas(todasLasPeliculas);
+            MovieRepository.GenreOption selected = cmbGenreFilter.getValue();
+            if (selected.getId() == 0) {
+                displayMovies(allMovies);
             } else {
-                List<Movie> filtradas = movieRepository.getMoviesByGenreId(seleccionado.getId());
-                mostrarPeliculas(filtradas);
+                List<Movie> filteredMovies = movieRepository.getMoviesByGenreId(selected.getId());
+                displayMovies(filteredMovies);
             }
         } catch (Exception e) {
-            alertInfo.viewAlert("ERROR", "Error de filtro", "No se pudo filtrar", e.getMessage());
+            alertInfo.viewAlert("ERROR", "Filter Error", "No se pudo filtrar", e.getMessage());
         }
     }
 
-    private void mostrarPeliculas(List<Movie> movies) {
-        flowPosters.getChildren().clear();
+    private void displayMovies(List<Movie> movies) {
+        posterFlowPane.getChildren().clear();
 
         if (movies == null || movies.isEmpty()) {
-            Label lblVacio = new Label("No hay películas en esta categoría.");
-            lblVacio.setStyle("-fx-text-fill: #7f8c8d;");
-            flowPosters.getChildren().add(lblVacio);
+            Label lblEmpty = new Label("No hay películas en esta categoría.");
+            lblEmpty.setStyle("-fx-text-fill: #7f8c8d;");
+            posterFlowPane.getChildren().add(lblEmpty);
             return;
         }
 
         for (Movie movie : movies) {
-            flowPosters.getChildren().add(crearTarjetaPelicula(movie));
+            posterFlowPane.getChildren().add(createMovieCard(movie));
         }
     }
 
-      private VBox crearTarjetaPelicula(Movie movie) {
+    private VBox createMovieCard(Movie movie) {
         String url = movie.getPosterUrl();
         if (url == null || url.trim().isEmpty()) {
-            url = POSTER_DEFECTO;
+            url = DEFAULT_POSTER;
         }
 
         ImageView imageView = new ImageView();
@@ -109,44 +114,38 @@ public class CarteleraController {
             imageView.setImage(image);
             image.errorProperty().addListener((obs, wasError, isError) -> {
                 if (isError) {
-                    imageView.setImage(new Image(POSTER_DEFECTO, 150, 220, true, true));
+                    imageView.setImage(new Image(DEFAULT_POSTER, 150, 220, true, true));
                 }
             });
         } catch (Exception e) {
-            imageView.setImage(new Image(POSTER_DEFECTO, 150, 220, true, true));
+            imageView.setImage(new Image(DEFAULT_POSTER, 150, 220, true, true));
         }
 
-        Label lblTitulo = new Label(movie.getTitle());
-        lblTitulo.setWrapText(true);
-        lblTitulo.setMaxWidth(150);
-        lblTitulo.setStyle("-fx-font-weight: bold; -fx-text-alignment: center; -fx-alignment: center;");
+        Label lblTitle = new Label(movie.getTitle());
+        lblTitle.setWrapText(true);
+        lblTitle.setMaxWidth(150);
+        Label lblGenre = new Label(movie.getGenreName() != null ? movie.getGenreName() : "Sin género");
 
-        Label lblGenero = new Label(movie.getGenreName() != null ? movie.getGenreName() : "Sin género");
-        lblGenero.setStyle("-fx-text-fill: #7f8c8d; -fx-font-size: 11px;");
-
-        VBox card = new VBox(6, imageView, lblTitulo, lblGenero);
+        VBox card = new VBox(6, imageView, lblTitle, lblGenre);
         card.setAlignment(Pos.TOP_CENTER);
         card.setPrefWidth(170);
-        card.setStyle("-fx-background-color: white; -fx-padding: 10; -fx-background-radius: 8; "
-                + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 6, 0, 0, 2);");
-        
-        return card; 
+        return card;
     }
 
-   @FXML
-    public void volver() {
+    @FXML
+    public void goBackToMenu() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Gerente.fxml"));
             Parent root = loader.load();
 
-            GerenteController controller = loader.getController();
-            controller.setUsuarioLogueado(usuarioLogueado);
+            ManagerController controller = loader.getController();
+            controller.setLoggedUser(loggedUser);
 
-            Stage stage = (Stage) flowPosters.getScene().getWindow();
+            Stage stage = (Stage) posterFlowPane.getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.setTitle("Panel Gerente - CinePlex");
+            stage.setTitle("Manager Panel - CinePlex");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-}   
+}

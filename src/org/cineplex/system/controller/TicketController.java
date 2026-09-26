@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.cineplex.system.controller;
 
 import java.time.format.DateTimeFormatter;
@@ -26,9 +22,9 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.cineplex.system.controller.GerenteController;
+import org.cineplex.system.model.TicketData;
 import org.cineplex.system.model.TicketInfo;
-import org.cineplex.system.model.Usuario;
+import org.cineplex.system.model.User;
 import org.cineplex.system.repository.TicketRepository;
 import org.cineplex.system.utils.AlertInformation;
 
@@ -42,6 +38,9 @@ import org.cineplex.system.utils.AlertInformation;
  */
 public class TicketController {
 
+    // ==========================================
+    // Componentes para la vista de Lista de Reservas
+    // ==========================================
     @FXML
     private TableView<TicketInfo> tblReservas;
 
@@ -72,21 +71,58 @@ public class TicketController {
     @FXML
     private Button btnRegresar;
 
+    // ==========================================
+    // Componentes para la vista individual del Ticket
+    // ==========================================
+    @FXML
+    private Label lblTicketNumber;
+    
+    @FXML
+    private Label lblMovie;
+    
+    @FXML
+    private Label lblAuditorium;
+    
+    @FXML
+    private Label lblDate;
+    
+    @FXML
+    private Label lblTime;
+    
+    @FXML
+    private Label lblSeat;
+    
+    @FXML
+    private Label lblUser;
+    
+    @FXML
+    private Label lblIssueDate;
+    
+    @FXML
+    private Button btnClose;
+
+    // ==========================================
+    // Lógica del Controlador
+    // ==========================================
     private final TicketRepository ticketRepository;
-    private Usuario usuarioLogueado;
+    private User usuarioLogueado;
+    private TicketData ticketData;
 
     public TicketController() {
         this.ticketRepository = new TicketRepository();
     }
 
-    public void setUsuarioLogueado(Usuario usuario) {
+    public void setUsuarioLogueado(User usuario) {
         this.usuarioLogueado = usuario;
     }
 
     @FXML
     public void initialize() {
-        configurarTabla();
-        cargarReservas();
+        // Solo configuramos la tabla si los campos existen en el FXML actual
+        if (tblReservas != null) {
+            configurarTabla();
+            cargarReservas();
+        }
     }
 
     private void configurarTabla() {
@@ -140,8 +176,7 @@ public class TicketController {
     }
 
     /**
-     * Muestra el boleto en una ventana angosta, tamaño ticket, con opción de
-     * imprimir (HU37: "Configurar tamaño ticket" / "Probar impresión").
+     * Muestra el boleto en una ventana angosta, tamaño ticket, con opción de imprimir.
      */
     private void mostrarBoleto(TicketInfo info) {
         VBox boleto = new VBox(6);
@@ -196,7 +231,6 @@ public class TicketController {
                 btnCerrar
         );
 
-        // Tamaño ticket: angosto y alargado, como un comprobante de caja.
         Scene escenaBoleto = new Scene(boleto, 280, 460);
         stageBoleto.setScene(escenaBoleto);
         stageBoleto.showAndWait();
@@ -220,24 +254,52 @@ public class TicketController {
         }
     }
 
-    @FXML
-    private void regresarMenu() {
-        try {
-            Stage stageActual = (Stage) btnRegresar.getScene().getWindow();
-
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Gerente.fxml"));
-            Parent root = loader.load();
-
-            GerenteController controller = loader.getController();
-            controller.setUsuarioLogueado(usuarioLogueado);
-
-            Scene escenaNueva = new Scene(root);
-            stageActual.setScene(escenaNueva);
-            stageActual.show();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            AlertInformation.viewAlert("ERROR", "Error de navegación", "No se pudo cargar la vista", e.getMessage());
+@FXML
+private void regresarMenu() {
+    try {
+        Stage stageActual = (Stage) btnRegresar.getScene().getWindow();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Gerente.fxml"));
+        Parent root = loader.load();
+        GerenteController controller = loader.getController();
+        
+        // ✅ Validación: solo pasar el usuario si no es null
+        if (this.usuarioLogueado != null) {
+            controller.setUsuarioLogueado(this.usuarioLogueado);
         }
+        
+        Scene escenaNueva = new Scene(root);
+        stageActual.setScene(escenaNueva);
+        stageActual.show();
+    } catch (Exception e) {
+        e.printStackTrace();
+        AlertInformation.viewAlert("ERROR", "Error de navegación", "No se pudo cargar la vista", e.getMessage());
+    }
+}
+
+    public void initData(TicketData ticketData) {
+        this.ticketData = ticketData;
+        cargarDatosTicket();
+    }
+
+    private void cargarDatosTicket() {
+        // Validación de seguridad por si se llama antes de que el FXML cargue
+        if (lblTicketNumber != null && ticketData != null) {
+            lblTicketNumber.setText("TICKET #" + String.format("%03d", ticketData.getTicketNumber()));
+            lblMovie.setText(ticketData.getMovieTitle());
+            lblAuditorium.setText(ticketData.getAuditoriumName());
+            lblDate.setText(ticketData.getShowDate().toString());
+            lblTime.setText(ticketData.getShowTime().toString());
+            lblSeat.setText("Asiento " + ticketData.getSeatNumber());
+            lblUser.setText(ticketData.getUserName());
+            
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            lblIssueDate.setText(ticketData.getIssueDate().format(formatter));
+        }
+    }
+
+    @FXML
+    private void cerrarTicket() {
+        Stage stage = (Stage) btnClose.getScene().getWindow();
+        stage.close();
     }
 }

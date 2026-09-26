@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.cineplex.system.config;
 
 import java.sql.Connection;
@@ -13,15 +9,16 @@ public class ConexionDB {
     private static ConexionDB instanciaConexionDB;
     private Connection connection;
 
-    
     private ConexionDB() {
         conectar();
     }
 
-    
     private void conectar() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
+            String url = "jdbc:mysql://" + Enviroment.LOCATION_SERVICE + "/" + Enviroment.DATA_BASE;
+            System.out.println("🔍 Java está intentando conectar a: " + url);
+            System.out.println("🔍 Usuario: " + Enviroment.USER);
             this.connection = DriverManager.getConnection(
                     "jdbc:mysql://" + Enviroment.LOCATION_SERVICE + "/" + Enviroment.DATA_BASE,
                     Enviroment.USER,
@@ -42,11 +39,9 @@ public class ConexionDB {
         return instanciaConexionDB;
     }
 
- 
     public Connection getConnection() {
         try {
             if (this.connection == null || this.connection.isClosed()) {
-                System.out.println(" La conexión estaba cerrada. Reconectando a la base de datos...");
                 conectar();
             }
         } catch (SQLException e) {
@@ -59,12 +54,10 @@ public class ConexionDB {
         this.connection = connection;
     }
 
-  
     public void cerrarConexion() {
         try {
             if (this.connection != null && !this.connection.isClosed()) {
                 this.connection.close();
-                System.out.println("Conexión cerrada correctamente al salir de la aplicación.");
             }
         } catch (SQLException e) {
             System.err.println("Error al cerrar la conexión: " + e.getMessage());
