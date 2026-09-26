@@ -1,18 +1,13 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.cineplex.system.model;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 /**
- *
+ * 
  * @author informatica
  */
 public class Screening {
-
     private Integer screeningId;
     private Integer movieId;
     private String movieTitle;
@@ -31,6 +26,7 @@ public class Screening {
         this.showTime = showTime;
     }
 
+    // Getters y Setters
     public Integer getScreeningId() {
         return screeningId;
     }
@@ -87,12 +83,15 @@ public class Screening {
         this.showTime = showTime;
     }
 
-    @Override
-    public String toString() {
-        return showDate + " " + showTime;
-    }
-
+    // Método auxiliar para mostrar la hora como String
     public String getShowTimeString() {
         return showTime != null ? showTime.toString() : "";
+    }
+
+    @Override
+    public String toString() {
+        return (movieTitle != null ? movieTitle : "") + " - " + 
+               (auditoriumName != null ? auditoriumName : "") + 
+               " (" + showDate + " " + showTime + ")";
     }
 }

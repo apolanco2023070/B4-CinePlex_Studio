@@ -16,6 +16,7 @@ public class UserManagementController {
 
     @FXML
     private TextField txtFullName;
+
     
     @FXML
     private TextField txtUsername;
@@ -34,10 +35,12 @@ public class UserManagementController {
 
     @FXML
     public void registrarGerente() {
+
         String fullName = txtFullName.getText().trim();
         String username = txtUsername.getText().trim();
         String password = txtPassword.getText().trim();
         String email = txtEmail.getText().trim();
+
 
         if (validaciones.emptyText(fullName) || validaciones.emptyText(username)
                 || validaciones.emptyText(password) || validaciones.emptyText(email)) {
@@ -54,6 +57,7 @@ public class UserManagementController {
             mostrarAlerta("Error", "El email no es válido.");
             return;
         }
+
 
         boolean exito = usuarioDAO.registrarUsuario(fullName, username, password, email, 2);
 

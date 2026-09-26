@@ -37,7 +37,6 @@ public class LoginController {
             openAdministratorModule(loginResult.usuario);
         } else {
             loginResult = authService.login(username, password, RoleType.MANAGER);
-
             if (loginResult.exito) {
                 lblErrorMessage.setText("");
                 openManagerModule(loginResult.usuario);
@@ -49,36 +48,36 @@ public class LoginController {
 
     private void openAdministratorModule(User loggedUser) {
         try {
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Administrador.fxml"));
             Parent root = loader.load();
-
             AdministradorController controller = loader.getController();
             controller.setUsuarioLogueado(loggedUser);
-
             Stage stage = (Stage) usernameField.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("Administrator Panel - CinePlex");
         } catch (Exception e) {
-            lblErrorMessage.setText("Error loading module: " + e.getMessage());
+            lblErrorMessage.setText("Error: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
+    // ✅ AQUÍ ESTÁ LA CORRECCIÓN CLAVE
     private void openManagerModule(User loggedUser) {
         try {
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Gerente.fxml"));
             Parent root = loader.load();
-
-            ManagerController controller = loader.getController();
-            controller.setLoggedUser(loggedUser);
-
+            
+            // ✅ CAMBIO 1: GerenteController en lugar de ManagerController
+            GerenteController controller = loader.getController();
+            
+            // ✅ CAMBIO 2: setUsuarioLogueado en lugar de setLoggedUser
+            controller.setUsuarioLogueado(loggedUser);
+            
             Stage stage = (Stage) usernameField.getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.setTitle("Manager Panel - CinePlex");
+            stage.setTitle("Panel Gerente - CinePlex");
         } catch (Exception e) {
-            lblErrorMessage.setText("Error loading module: " + e.getMessage());
+            lblErrorMessage.setText("Error: " + e.getMessage());
             e.printStackTrace();
         }
     }

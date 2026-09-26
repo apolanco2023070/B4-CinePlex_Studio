@@ -40,6 +40,7 @@ public class SeatReservationController {
 
     @FXML
     private Button btnRegresar;
+
     
     @FXML
     private TextField txtReservationName;
@@ -107,6 +108,7 @@ public class SeatReservationController {
         }
 
         try {
+
             List<Screening> allScreenings = screeningRepository.getAllScreening();
             List<Screening> filtered = new ArrayList<>();
 
@@ -154,6 +156,7 @@ public class SeatReservationController {
             showAlert("Campos incompletos", "Selecciona todos los campos");
             return;
         }
+
 
         String nombreCliente = txtReservationName.getText().trim();
         if (nombreCliente.isEmpty()) {
@@ -234,7 +237,6 @@ public class SeatReservationController {
                     "Detalle: " + e.getMessage() + "\nVerifica la ruta del archivo Administrador.fxml");
         }
     }
-
     @FXML
     private void generateTicket() {
         if (lastReservationId == null) {

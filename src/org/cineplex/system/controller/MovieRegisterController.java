@@ -57,6 +57,7 @@ public class MovieRegisterController {
     @FXML
     private Button btnRegisterMovie, btnVerPoster;
 
+
     private final MovieRepository movieRepository;
     private final AlertInformation alertInfo;
     private final Validations validations;
@@ -167,6 +168,7 @@ public class MovieRegisterController {
                 
             alertInfo.viewAlert("INFORMATION", "Éxito", "Operación completada", mensajeExito);
         } catch (Exception e) {
+
             alertInfo.viewAlert("ERROR", "Error al guardar", "Error de sistema", "No se pudo guardar la película. Detalle: " + e.getMessage());
             e.printStackTrace();
         }
@@ -224,6 +226,7 @@ public class MovieRegisterController {
                 return 3;
             default:
                 return 1;
+
         }
     }
 

@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.cineplex.system.controller;
 
 import java.util.List;
@@ -26,33 +22,26 @@ import org.cineplex.system.repository.SeatRepository;
 import org.cineplex.system.utils.AlertInformation;
 import org.cineplex.system.utils.Validations;
 
-/**
- *
- * @author informatica
- */
 public class SeatsController {
-
     @FXML
     private Button btnRegresar;
-
     @FXML
     private ComboBox<Auditorium> cmbRooms;
-
     @FXML
     private TextField txtCapacity;
-
     @FXML
     private TableView<Seat> tblSeats;
-
     @FXML
     private TableColumn<Seat, Integer> colNumber;
-
     @FXML
     private TableColumn<Seat, String> colStatus;
 
     private final AuditoriumRepository auditoriumRepository;
     private final SeatRepository seatRepository;
     private final Validations validations;
+    
+    // ✅ Límite máximo de asientos por sala
+    private static final int MAX_CAPACITY = 250;
 
     public SeatsController() {
         this.auditoriumRepository = new AuditoriumRepository();
@@ -84,7 +73,7 @@ public class SeatsController {
     private void loadAuditoriums() {
         try {
             ObservableList<Auditorium> auditoriums = FXCollections.observableArrayList(
-                    auditoriumRepository.getAuditoriums()
+                auditoriumRepository.getAuditoriums()
             );
             cmbRooms.setItems(auditoriums);
         } catch (Exception e) {
@@ -96,58 +85,73 @@ public class SeatsController {
     private void saveAuditorium() {
         String auditoriumName = "Room " + (cmbRooms.getItems().size() + 1);
         String capacityText = txtCapacity.getText().trim();
-
+        
+        // ✅ VALIDACIÓN 1: Verificar que la capacidad no exceda 250
         if (validations.emptyText(capacityText) || !validations.isPositiveNumber(capacityText)) {
-            AlertInformation.viewAlert("ERROR", "Invalid Capacity", "Validation", "Capacity must be a number greater than 0.");
+            AlertInformation.viewAlert("ERROR", "Capacidad Inválida", "Validación", 
+                "La capacidad debe ser un número mayor a 0.");
             return;
         }
-
+        
+        int capacity = Integer.parseInt(capacityText);
+        if (capacity > MAX_CAPACITY) {
+            AlertInformation.viewAlert("ERROR", "Capacidad Excedida", "Límite de Asientos", 
+                "La capacidad máxima permitida es de " + MAX_CAPACITY + " asientos. " +
+                "Por favor, ingrese un valor menor o igual a " + MAX_CAPACITY + ".");
+            return;
+        }
+        
         try {
-            Auditorium auditorium = new Auditorium(auditoriumName, Integer.parseInt(capacityText));
+            Auditorium auditorium = new Auditorium(auditoriumName, capacity);
             auditoriumRepository.saveAuditorium(auditorium);
-
-            AlertInformation.viewAlert("INFORMATION", "Success", "Auditorium Registered", "The auditorium was registered successfully.");
+            AlertInformation.viewAlert("INFORMATION", "Éxito", "Sala Registrada", 
+                "La sala fue registrada exitosamente con capacidad para " + capacity + " asientos.");
             txtCapacity.clear();
             loadAuditoriums();
-
         } catch (Exception e) {
-            AlertInformation.viewAlert("ERROR", "Save Error", "Could not save auditorium", e.getMessage());
+            AlertInformation.viewAlert("ERROR", "Error al Guardar", "No se pudo guardar la sala", e.getMessage());
         }
     }
 
     @FXML
     private void generateSeats() {
         Auditorium selectedAuditorium = cmbRooms.getValue();
-
+        
         if (selectedAuditorium == null) {
-            AlertInformation.viewAlert("WARNING", "No Selection", "Attention", "Please select an auditorium from the combo box.");
+            AlertInformation.viewAlert("WARNING", "Sin Selección", "Atención", 
+                "Por favor, seleccione una sala del combo box.");
             return;
         }
-
+        
+        // ✅ VALIDACIÓN 2: Verificar que la capacidad de la sala no exceda 250
+        if (selectedAuditorium.getCapacity() > MAX_CAPACITY) {
+            AlertInformation.viewAlert("ERROR", "Capacidad Excedida", "Límite de Asientos", 
+                "La sala \"" + selectedAuditorium.getName() + "\" tiene una capacidad de " + 
+                selectedAuditorium.getCapacity() + " asientos, lo cual excede el límite máximo de " + 
+                MAX_CAPACITY + " asientos. No se pueden generar los asientos.");
+            return;
+        }
+        
         if (seatRepository.existsByAuditoriumId(selectedAuditorium.getAuditoriumId())) {
-            AlertInformation.viewAlert("WARNING", "Seats Exist", "Attention", "This auditorium already has generated seats.");
+            AlertInformation.viewAlert("WARNING", "Asientos Existentes", "Atención", 
+                "Esta sala ya tiene asientos generados.");
             return;
         }
-
+        
         try {
             int capacity = selectedAuditorium.getCapacity();
             createSeatsForAuditorium(selectedAuditorium.getAuditoriumId(), capacity);
-
-            AlertInformation.viewAlert("INFORMATION", "Success", "Seats Generated",
-                    capacity + " seats were generated for " + selectedAuditorium.getName());
-
+            AlertInformation.viewAlert("INFORMATION", "Éxito", "Asientos Generados",
+                "Se generaron " + capacity + " asientos para " + selectedAuditorium.getName());
             loadSeats(selectedAuditorium.getAuditoriumId());
-
         } catch (Exception e) {
-            AlertInformation.viewAlert("ERROR", "Generation Error", "Could not generate seats", e.getMessage());
+            AlertInformation.viewAlert("ERROR", "Error de Generación", "No se pudieron generar los asientos", e.getMessage());
         }
     }
 
     private void createSeatsForAuditorium(Integer auditoriumId, int capacity) {
         for (int i = 1; i <= capacity; i++) {
-
             Seat seat = new Seat(i, auditoriumId);
-
             seatRepository.saveSeat(seat);
         }
     }
@@ -155,16 +159,13 @@ public class SeatsController {
     private void loadSeats(Integer auditoriumId) {
         try {
             tblSeats.getItems().clear();
-
             List<Seat> seatsFromDB = seatRepository.findByAuditoriumId(auditoriumId);
             System.out.println("Asientos encontrados en BD: " + seatsFromDB.size());
-
             ObservableList<Seat> seats = FXCollections.observableArrayList(seatsFromDB);
             tblSeats.setItems(seats);
             tblSeats.refresh();
-
         } catch (Exception e) {
-            AlertInformation.viewAlert("ERROR", "Load Error", "Could not load seats", e.getMessage());
+            AlertInformation.viewAlert("ERROR", "Error de Carga", "No se pudieron cargar los asientos", e.getMessage());
             e.printStackTrace();
         }
     }
@@ -172,22 +173,16 @@ public class SeatsController {
     @FXML
     private void regresarMenu() {
         try {
-
             Stage stageActual = (Stage) btnRegresar.getScene().getWindow();
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Administrador.fxml"));
-
             Parent root = loader.load();
-
             Scene escenaNueva = new Scene(root);
-
             stageActual.setScene(escenaNueva);
             stageActual.show();
-
         } catch (Exception e) {
             e.printStackTrace();
-            AlertInformation.viewAlert("ERROR", "Error de navegación", "No se pudo cargar la vista",
-                    "Detalle: " + e.getMessage() + "\nVerifica la ruta del archivo Administrador.fxml en el código Java.");
+            AlertInformation.viewAlert("ERROR", "Error de Navegación", "No se pudo cargar la vista",
+                "Detalle: " + e.getMessage() + "\nVerifica la ruta del archivo Administrador.fxml en el código Java.");
         }
     }
 }

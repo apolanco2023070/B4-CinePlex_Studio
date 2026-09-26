@@ -1,5 +1,6 @@
 package org.cineplex.system.controller;
 
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -9,6 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
@@ -40,6 +42,7 @@ import java.util.ResourceBundle;
 
 public class ScreeningConsultationController implements Initializable {
 
+
     @FXML
     private ComboBox<String> comboBoxMovies;
     @FXML
@@ -67,7 +70,11 @@ public class ScreeningConsultationController implements Initializable {
     @FXML
     private Button btnBack;
 
+    // ===== Variables de instancia =====
+    private Connection connection;
     private ObservableList<Funcion> funcionesList;
+
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -76,18 +83,19 @@ public class ScreeningConsultationController implements Initializable {
             cargarCombos();
             cargarFunciones();
         } catch (Exception e) {
+
             mostrarError("Error de inicialización", "No se pudo cargar la vista: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
+    // ===== Configurar tabla =====
     private void configurarTabla() {
         colMovie.setCellValueFactory(new PropertyValueFactory<>("pelicula"));
         colAuditorium.setCellValueFactory(new PropertyValueFactory<>("sala"));
         colDate.setCellValueFactory(new PropertyValueFactory<>("fecha"));
         colTime.setCellValueFactory(new PropertyValueFactory<>("hora"));
         colDuration.setCellValueFactory(new PropertyValueFactory<>("duracion"));
-
         // Configurar el botón de editar en cada fila
         colActions.setCellFactory(param -> new TableCell<>() {
             private final Button btnEdit = new Button("️ Editar");
@@ -107,6 +115,7 @@ public class ScreeningConsultationController implements Initializable {
         funcionesList = FXCollections.observableArrayList();
         tableViewScreenings.setItems(funcionesList);
     }
+
 
     private void cargarCombos() {
         cargarComboSP(comboBoxMovies, "{CALL sp_get_movies_for_combo()}", "Todas las películas");
@@ -132,10 +141,12 @@ public class ScreeningConsultationController implements Initializable {
         }
     }
 
+
     public void cargarFunciones() {
         filtrarFunciones();
     }
 
+    
     @FXML
     private void filtrarFunciones() {
         funcionesList.clear();
@@ -329,6 +340,7 @@ public class ScreeningConsultationController implements Initializable {
         alert.setContentText(contenido);
         alert.showAndWait();
     }
+
 
     private void mostrarExito(String titulo, String contenido) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

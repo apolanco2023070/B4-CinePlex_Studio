@@ -33,6 +33,7 @@
       </TableView>
       <Separator prefWidth="200.0" />
       <Button mnemonicParsing="false" onAction="#addScreening" text="Agregar funcion" />
+
       <Button fx:id="btnRegresar" mnemonicParsing="false" onAction="#regresarMenu" text="Regresar" />
    </children>
    <opaqueInsets>

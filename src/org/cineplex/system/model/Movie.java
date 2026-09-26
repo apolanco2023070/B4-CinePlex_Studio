@@ -127,6 +127,7 @@ public class Movie {
     }
 
     public void setPosterUrl(String value) {
+
         posterUrl.set(value);
     }
 
@@ -138,4 +139,5 @@ public class Movie {
     public String toString() {
         return getTitle();
     }
+
 }

@@ -13,41 +13,24 @@ public class AdministradorController {
 
     @FXML
     private Label lblWelcome;
+    
     private User usuarioLogueado;
 
     public void setUsuarioLogueado(User user) {
         this.usuarioLogueado = user;
-        lblWelcome.setText("Bienvenido, " + user.getUserName());
+        if (lblWelcome != null) {
+            lblWelcome.setText("Bienvenido, " + user.getUserName());
+        }
     }
 
     @FXML
     public void abrirCartelera() {
-        try {
-            String fxmlPath = "/org/cineplex/system/view/MovieRegister.fxml";
-            java.net.URL fxmlLocation = getClass().getResource(fxmlPath);
-            FXMLLoader loader = new FXMLLoader(fxmlLocation);
-            Parent root = loader.load();
-            Stage stage = (Stage) lblWelcome.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Gestión de Cartelera - CinePlex");
-        } catch (Exception e) {
-            e.printStackTrace();
-            mostrarMensaje("Error de Navegación", "No se pudo cargar la vista:\n" + e.getMessage());
-        }
+        navegarA("/org/cineplex/system/view/MovieRegister.fxml", "Gestión de Cartelera - CinePlex");
     }
 
     @FXML
     public void abrirUsuarios() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/UserManagement.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) lblWelcome.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Gestión de Usuarios - CinePlex");
-        } catch (Exception e) {
-            e.printStackTrace();
-            mostrarMensaje("Error", "No se pudo cargar la pantalla de usuarios.");
-        }
+        navegarA("/org/cineplex/system/view/UserManagement.fxml", "Gestión de Usuarios - CinePlex");
     }
 
     @FXML
@@ -58,76 +41,39 @@ public class AdministradorController {
 
     @FXML
     public void manageSeatsAndAuditoriums() {
-        try {
-            String fxmlPath = "/org/cineplex/system/view/SeatsAndRoomsManagment.fxml";
-            java.net.URL fxmlLocation = getClass().getResource(fxmlPath);
-            FXMLLoader loader = new FXMLLoader(fxmlLocation);
-            Parent root = loader.load();
-            Stage stage = (Stage) lblWelcome.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("CinePlex - Gestión de Salas y Asientos");
-        } catch (Exception e) {
-            e.printStackTrace();
-            mostrarMensaje("Error de Navegación", "No se pudo cargar la vista:\n" + e.getMessage());
-        }
+        navegarA("/org/cineplex/system/view/SeatsAndRoomsManagment.fxml", "CinePlex - Gestión de Salas y Asientos");
     }
 
     @FXML
     public void manageScreening() {
-        try {
-            String fxmlPath = "/org/cineplex/system/view/ScreeningView.fxml";
-            java.net.URL fxmlLocation = getClass().getResource(fxmlPath);
-            FXMLLoader loader = new FXMLLoader(fxmlLocation);
-            Parent root = loader.load();
-            Stage stage = (Stage) lblWelcome.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("CinePlex - Gestión de Cartelera");
-        } catch (Exception e) {
-            e.printStackTrace();
-            mostrarMensaje("Error de Navegación", "No se pudo cargar la vista:\n" + e.getMessage());
-        }
+        navegarA("/org/cineplex/system/view/ScreeningView.fxml", "CinePlex - Gestión de Funciones");
     }
 
     @FXML
     public void seatReservation() {
-        try {
-            String fxmlPath = "/org/cineplex/system/view/SeatReservation.fxml";
-            java.net.URL fxmlLocation = getClass().getResource(fxmlPath);
-            FXMLLoader loader = new FXMLLoader(fxmlLocation);
-            Parent root = loader.load();
-            Stage stage = (Stage) lblWelcome.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("CinePlex - Gestión de Cartelera");
-        } catch (Exception e) {
-            e.printStackTrace();
-            mostrarMensaje("Error de Navegación", "No se pudo cargar la vista:\n" + e.getMessage());
-        }
+        navegarA("/org/cineplex/system/view/SeatReservation.fxml", "CinePlex - Reservar Asientos");
     }
 
     @FXML
     public void consultarFunciones() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/ScreeningConsultation.fxml"));
-            Parent root = loader.load();
-            Stage stage = (Stage) lblWelcome.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("CinePlex - Consultar Funciones");
-        } catch (Exception e) {
-            e.printStackTrace();
-            mostrarMensaje("Error de Navegación", "No se pudo cargar la vista:\n" + e.getMessage());
-        }
+        navegarA("/org/cineplex/system/view/ScreeningConsultation.fxml", "CinePlex - Consultar Funciones");
     }
 
     @FXML
     public void cerrarSesion() {
+        navegarA("/org/cineplex/system/view/Login.fxml", "CinePlex - Iniciar Sesión");
+    }
+
+    private void navegarA(String fxmlPath, String titulo) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Login.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
             Stage stage = (Stage) lblWelcome.getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.setTitle("CinePlex - Iniciar Sesión");
+            stage.setTitle(titulo);
         } catch (Exception e) {
             e.printStackTrace();
+            mostrarMensaje("Error de Navegación", "No se pudo cargar la vista:\n" + e.getMessage());
         }
     }
 

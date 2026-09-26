@@ -6,58 +6,44 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<<<<<<< HEAD
-<VBox alignment="CENTER" spacing="20.0" style="-fx-background-color: #ecf0f1;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21.0.1" fx:controller="org.cineplex.system.controller.ManagerController">
-=======
 <VBox alignment="CENTER" spacing="20.0" style="-fx-background-color: #ecf0f1;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cineplex.system.controller.GerenteController">
     
->>>>>>> 71b23bb45c4bef983fe8be4d38755af1e09e262a
     <padding>
         <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
     </padding>
     
-<<<<<<< HEAD
-    <Label style="-fx-text-fill: #2c3e50;" text="Panel de Gerente">
-=======
-    <!-- Título del Panel -->
+    <!-- Título del Panel con estilo mejorado -->
     <Label style="-fx-text-fill: #16a085; -fx-font-weight: bold;" text="Panel Gerente">
->>>>>>> 71b23bb45c4bef983fe8be4d38755af1e09e262a
         <font>
             <Font size="28.0" />
         </font>
     </Label>
     
-<<<<<<< HEAD
-    <Label fx:id="lblWelcome" style="-fx-text-fill: #34495e;" text="Bienvenido">
-=======
-    <!-- Label que se actualiza con el nombre del usuario -->
+    <!-- Label de bienvenida -->
     <Label fx:id="lblBienvenida" style="-fx-text-fill: #34495e;" text="Bienvenido">
->>>>>>> 71b23bb45c4bef983fe8be4d38755af1e09e262a
         <font>
             <Font size="16.0" />
         </font>
     </Label>
     
-<<<<<<< HEAD
+    <!-- Botones de acción con estilo unificado y moderno -->
     <VBox alignment="CENTER" maxWidth="300" spacing="15.0">
-        <Button onAction="#viewBoxOffice" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Ver Cartelera" />
-        
-        <Button onAction="#viewSales" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Ventas del Día" />
-        
-        <Button onAction="#logout" prefWidth="300" style="-fx-background-color: #e74c3c; -fx-text-fill: white;" text="Cerrar Sesión" />
-    </VBox>
-</VBox>
-=======
-    <!-- Botones de acción -->
-    <VBox alignment="CENTER" maxWidth="300" spacing="15.0">
-        
-        <Button onAction="#abrirCartelera" prefWidth="300" 
-                style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-font-size: 14px;" 
-                text="Gestionar Cartelera" />
         
         <Button onAction="#consultarReservas" prefWidth="300" 
                 style="-fx-background-color: #16a085; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-font-size: 14px;" 
                 text="Consultar Reservas" />
+        
+        <Button onAction="#verDisponibilidadAsientos" prefWidth="300" 
+                style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-font-size: 14px;" 
+                text="Disponibilidad de Asientos" />
+        
+        <Button onAction="#abrirEmisionBoletos" prefWidth="300" 
+                style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-font-size: 14px;" 
+                text="Emitir Boleto" />
+        
+        <Button onAction="#verVentas" prefWidth="300" 
+                style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-font-size: 14px;" 
+                text="Ventas del Día" />
         
         <Button onAction="#cerrarSesion" prefWidth="300" 
                 style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-font-size: 14px;" 
@@ -66,4 +52,3 @@
     </VBox>
     
 </VBox>
->>>>>>> 71b23bb45c4bef983fe8be4d38755af1e09e262a

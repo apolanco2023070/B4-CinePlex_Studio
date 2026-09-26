@@ -8,6 +8,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -45,6 +48,9 @@ public class ScreeningRegisterController {
 
     @FXML
     private Button btnCancel;
+
+    @FXML
+    private Button btnRegresar;
 
     private final ScreeningRepository screeningRepository;
     private final MovieRepository movieRepository;
@@ -112,6 +118,7 @@ public class ScreeningRegisterController {
         LocalDate date = dpDate.getValue();
         String timeText = txtTime.getText().trim();
 
+
         if (selectedMovie == null || selectedAuditorium == null || date == null || validations.emptyText(timeText)) {
             AlertInformation.viewAlert("ERROR", "Campos incompletos", "Validación", "Todos los campos son obligatorios.");
             return;
@@ -146,4 +153,23 @@ public class ScreeningRegisterController {
         ((Stage) btnCancel.getScene().getWindow()).close();
     }
 
+    @FXML
+    private void regresarMenu() {
+        try {
+            Stage stageActual = (Stage) btnRegresar.getScene().getWindow();
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Administrador.fxml"));
+            Parent root = loader.load();
+
+            Scene escenaNueva = new Scene(root);
+
+            stageActual.setScene(escenaNueva);
+            stageActual.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertInformation.viewAlert("ERROR", "Error de navegación", "No se pudo cargar la vista",
+                    "Detalle: " + e.getMessage() + "\nVerifica la ruta del archivo Administrador.fxml");
+        }
+    }
 }

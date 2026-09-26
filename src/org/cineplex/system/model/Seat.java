@@ -13,6 +13,7 @@ public class Seat {
     private Integer seatId;
     private Integer seatNumber;
     private Integer auditoriumId;
+    private String status = "Disponible";
 
     public Seat() {
     }
@@ -48,7 +49,11 @@ public class Seat {
     }
 
     public String getStatus() {
-        return "Disponible";
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     @Override

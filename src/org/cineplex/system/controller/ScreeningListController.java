@@ -12,7 +12,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -45,6 +48,7 @@ public class ScreeningListController {
     @FXML
     private TableColumn<Screening, String> colTime;
 
+
     private final ScreeningRepository screeningRepository;
     private ObservableList<Screening> allScreenings;
 
@@ -63,6 +67,7 @@ public class ScreeningListController {
         colAuditorium.setCellValueFactory(new PropertyValueFactory<>("auditoriumName"));
         colDate.setCellValueFactory(new PropertyValueFactory<>("showDate"));
 
+
         colTime.setCellValueFactory(new PropertyValueFactory<>("showTimeString"));
     }
 
@@ -73,6 +78,7 @@ public class ScreeningListController {
 
             allScreenings = FXCollections.observableArrayList(screenings);
             tblScreenings.setItems(allScreenings);
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -112,6 +118,36 @@ public class ScreeningListController {
     }
 
     @FXML
+    private void eliminarFuncion() {
+        Screening seleccionada = tblScreenings.getSelectionModel().getSelectedItem();
+        if (seleccionada == null) {
+            AlertInformation.viewAlert("WARNING", "Atención", "Sin selección",
+                    "Selecciona una función de la tabla para eliminarla.");
+            return;
+        }
+
+        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmacion.setTitle("Confirmar eliminación");
+        confirmacion.setHeaderText(null);
+        confirmacion.setContentText("¿Seguro que deseas eliminar la función de \""
+                + seleccionada.getMovieTitle() + "\" (" + seleccionada.getShowDate()
+                + " " + seleccionada.getShowTime() + ")? Esta acción no se puede deshacer.");
+
+        confirmacion.showAndWait().ifPresent(respuesta -> {
+            if (respuesta == ButtonType.OK) {
+                try {
+                    screeningRepository.deleteScreening(seleccionada.getScreeningId());
+                    AlertInformation.viewAlert("INFORMATION", "Éxito", "Función eliminada",
+                            "La función se eliminó correctamente.");
+                    loadAllScreenings();
+                } catch (Exception e) {
+                    AlertInformation.viewAlert("ERROR", "Error", "No se pudo eliminar la función", e.getMessage());
+                }
+            }
+        });
+    }
+
+    @FXML
     private void regresarMenu() {
         try {
 
@@ -129,6 +165,7 @@ public class ScreeningListController {
         } catch (Exception e) {
             e.printStackTrace();
             AlertInformation.viewAlert("ERROR", "Error de navegación", "No se pudo cargar la vista",
+
                     "Detalle: " + e.getMessage() + "\nVerifica la ruta del archivo Administrador.fxml");
         }
     }
