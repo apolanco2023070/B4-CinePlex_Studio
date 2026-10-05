@@ -1,11 +1,9 @@
 
+
 package org.cineplex.system.utils;
 
-/*
- * Clase de utilidades para validaciones de datos.
- * @author informatica
- */
 public class Validations {
+
 
     public Validations() {
     }
@@ -35,9 +33,7 @@ public class Validations {
     }
 
     public boolean isPositiveNumber(String text) {
-        if (!isNumeric(text)) {
-            return false;
-        }
+        if (!isNumeric(text)) return false;
         return Integer.parseInt(text) > 0;
     }
 
@@ -54,5 +50,6 @@ public class Validations {
                g.equals("drama") || 
                g.equals("comedy") || g.equals("comedia");
     }
+
 }
 

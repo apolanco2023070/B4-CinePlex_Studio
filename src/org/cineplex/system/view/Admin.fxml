@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" spacing="20.0" styleClass="root" stylesheets="@/org/cineplex/system/resources/styles/cineplex.css"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="org.cineplex.system.controller.AdminController">
+    <padding>
+        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+    </padding>
+
+    <Label styleClass="title-label" text="Panel Administrador" />
+    <Label fx:id="lblWelcome" styleClass="subtitle-label" text="Bienvenido" />
+
+    <VBox alignment="CENTER" maxWidth="320" spacing="12.0" styleClass="filter-bar">
+        <Button onAction="#openMovieRegister" prefWidth="300" text="🎬 Gestionar Cartelera" />
+        <Button onAction="#openUserManagement" prefWidth="300" text="👤 Gestionar Usuarios" />
+        <Button fx:id="btnManageSeatsAndAuditoriums" onAction="#manageSeatsAndAuditoriums" prefWidth="300" text="🎪 Gestionar Salas y Asientos" />
+        <Button fx:id="btnConsultScreenings" onAction="#consultScreenings" prefWidth="300" styleClass="btn-secondary" text="🔍 Consultar Funciones" />
+        <Button onAction="#manageScreening" prefWidth="300" text="📋 Gestionar Funciones" />
+        <Button onAction="#seatReservation" prefWidth="300" text="🎟 Reservar Asientos" />
+        <Button onAction="#logout" prefWidth="300" styleClass="btn-danger" text="🚪 Cerrar Sesión" />
+    </VBox>
+</VBox>

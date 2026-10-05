@@ -1,81 +1,135 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.cineplex.system.repository;
 
-import java.sql.Connection;
 import java.sql.CallableStatement;
-import org.cineplex.system.config.ConexionDB;
-import org.cineplex.system.model.Movie;
-import java.sql.SQLException;
+import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import org.cineplex.system.config.DatabaseConnection;
+import org.cineplex.system.model.Movie;
 
-/**
- *
- * @author informatica
- */
 public class MovieRepository {
 
-    /**
-     * 
-     * @param saveMovie 
-     * 
-     * Procedimiento que llama al SP en la database para guardar peliculas
-     */
-    public void saveMovie(Movie movie) {
-        String sql = "{call sp_insert_movie(?,?,?,?,?,?)}";
+    public static class GenreOption {
+        private final int id;
+        private final String name;
 
-        // Try-with-resources: Connection y CallableStatement se cierran solos al terminar
-        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
-     CallableStatement callSP = conn.prepareCall(sql)) {
+        public GenreOption(int id, String name) {
+            this.id = id;
+            this.name = name;
+        }
 
-            callSP.setString(1, movie.getTitle());
-            callSP.setInt(2, movie.getDuration());
-            callSP.setString(3, movie.getDirector());
-            callSP.setInt(4, movie.getGenreId());
-            callSP.setString(5, movie.getRating());
-            callSP.setString(6, movie.getPosterUrl());
+        public int getId() {
+            return id;
+        }
 
-            callSP.executeUpdate();
+        public String getName() {
+            return name;
+        }
 
-        } catch (SQLException e) {
-            System.err.println("Error al guardar la película: " + e.getMessage());
-            throw new RuntimeException("No se pudo registrar la película. Verifica los datos.", e);
+        @Override
+        public String toString() {
+            return name;
         }
     }
 
-    /**
-     * HU8: Obtiene todas las películas llamando al Stored Procedure.
-     */
-    public List<Movie> getAllMovies() {
-        List<Movie> moviesList = new ArrayList<>();
-        String sql = "{call sp_get_all_movies()}";
+    public void saveMovie(Movie movie) throws Exception {
+        boolean isUpdate = movie.getMovieId() > 0;
+        String sql = isUpdate
+                ? "{CALL sp_update_movie(?, ?, ?, ?, ?, ?, ?)}"
+                : "{CALL sp_insert_movie(?, ?, ?, ?, ?, ?)}";
 
-        // Try-with-resources: Connection, CallableStatement y ResultSet se cierran solos
-        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection();
-                CallableStatement callSP = conn.prepareCall(sql); ResultSet rs = callSP.executeQuery()) {
+        try (Connection conn = DatabaseConnection.getDatabaseConnectionInstance().getConnection();
+             CallableStatement cstmt = conn.prepareCall(sql)) {
+
+            int index = 1;
+            if (isUpdate) {
+                cstmt.setInt(index++, movie.getMovieId());
+            }
+            cstmt.setString(index++, movie.getTitle());
+            cstmt.setInt(index++, movie.getDuration());
+            cstmt.setString(index++, movie.getDirector());
+            cstmt.setInt(index++, movie.getGenreId());
+            cstmt.setString(index++, movie.getRating());
+            cstmt.setString(index, movie.getPosterUrl());
+
+            cstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new Exception("Error al guardar la película: " + e.getMessage(), e);
+        }
+    }
+
+    public List<Movie> getAllMovies() throws Exception {
+        List<Movie> movies = new ArrayList<>();
+        String sql = "{CALL sp_get_all_movies()}";
+
+        try (Connection conn = DatabaseConnection.getDatabaseConnectionInstance().getConnection(); 
+             CallableStatement cstmt = conn.prepareCall(sql); 
+             ResultSet rs = cstmt.executeQuery()) {
 
             while (rs.next()) {
-                Movie movie = new Movie();
-
-                movie.setMovieId(rs.getInt("movie_id"));
-                movie.setTitle(rs.getString("title"));
-                movie.setDuration(rs.getInt("duration"));
-                movie.setDirector(rs.getString("director"));
+                Movie movie = new Movie(
+                        rs.getInt("movie_id"),
+                        rs.getString("title"),
+                        rs.getInt("duration"),
+                        rs.getString("director"),
+                        rs.getInt("genre_id"),
+                        rs.getString("rating_id"),
+                        rs.getString("poster_url")
+                );
                 movie.setGenreName(rs.getString("genre_name"));
-                movie.setRating(rs.getString("rating_id"));
-                movie.setPosterUrl(rs.getString("poster_url"));
-
-                moviesList.add(movie);
+                movies.add(movie);
             }
-
         } catch (SQLException e) {
-            
+            throw new Exception("Error al obtener películas: " + e.getMessage(), e);
         }
+        return movies;
+    }
 
-        return moviesList;
+    public List<Movie> getMoviesByGenreId(int genreId) throws Exception {
+        List<Movie> movies = new ArrayList<>();
+          String sql = "{CALL sp_get_movies_by_genre_id(?)}";
+
+        try (Connection conn = DatabaseConnection.getDatabaseConnectionInstance().getConnection(); 
+             CallableStatement cstmt = conn.prepareCall(sql)) {
+
+            cstmt.setInt(1, genreId);
+            try (ResultSet rs = cstmt.executeQuery()) {
+                while (rs.next()) {
+                    Movie movie = new Movie(
+                            rs.getInt("movie_id"),
+                            rs.getString("title"),
+                            rs.getInt("duration"),
+                            rs.getString("director"),
+                            rs.getInt("genre_id"),
+                            rs.getString("rating_id"),
+                            rs.getString("poster_url")
+                    );
+                    movie.setGenreName(rs.getString("genre_name"));
+                    movies.add(movie);
+                }
+            }
+        } catch (SQLException e) {
+            throw new Exception("Error al obtener películas por género: " + e.getMessage(), e);
+        }
+        return movies;
+    }
+
+    public List<GenreOption> getAllGenres() throws Exception {
+        List<GenreOption> genres = new ArrayList<>();
+        String sql = "{CALL sp_get_all_genres()}";
+
+        try (Connection conn = DatabaseConnection.getDatabaseConnectionInstance().getConnection(); 
+             CallableStatement cstmt = conn.prepareCall(sql); 
+             ResultSet rs = cstmt.executeQuery()) {
+
+            while (rs.next()) {
+                genres.add(new GenreOption(rs.getInt("genre_id"), rs.getString("name")));
+            }
+        } catch (SQLException e) {
+            throw new Exception("Error al obtener géneros: " + e.getMessage(), e);
+        }
+        return genres;
     }
 }

@@ -10,47 +10,43 @@ public class AlertInformation {
     }
  
     /**
-     * Muestra una alerta de JavaFX con el tipo, título, encabezado y mensaje especificados.
+     * Shows a JavaFX alert with the specified type, title, header and message.
      *
-     * @param tipoAlerta  Tipo de alerta como String (INFORMATION, WARNING, ERROR, CONFIRMATION, NONE)
-     * @param titulo      Título de la ventana de alerta
-     * @param encabezado  Texto del encabezado (puede ser null)
-     * @param mensaje     Contenido principal del mensaje
+     * @param alertType  Alert type as a String (INFORMATION, WARNING, ERROR, CONFIRMATION, NONE)
+     * @param title      Alert window title
+     * @param header     Header text (may be null)
+     * @param message    Main message content
      */
-    public static void viewAlert(String tipoAlerta, String titulo, String encabezado, String mensaje) {
+    public static void viewAlert(String alertType, String title, String header, String message) {
 
-        // Variable local de tipo AlertType que almacenará el tipo de alerta a mostrar
-        AlertType tipo;
+        AlertType type;
  
-        // Switch para determinar el tipo de alerta según el parámetro recibido
-        switch (tipoAlerta.toUpperCase()) {
+        switch (alertType.toUpperCase()) {
             case "INFORMATION":
-                tipo = AlertType.INFORMATION;
+                type = AlertType.INFORMATION;
                 break;
             case "WARNING":
-                tipo = AlertType.WARNING;
+                type = AlertType.WARNING;
                 break;
             case "ERROR":
-                tipo = AlertType.ERROR;
+                type = AlertType.ERROR;
                 break;
             case "CONFIRMATION":
-                tipo = AlertType.CONFIRMATION;
+                type = AlertType.CONFIRMATION;
                 break;
             case "NONE":
-                tipo = AlertType.NONE;
+                type = AlertType.NONE;
                 break;
             default:
-                tipo = AlertType.INFORMATION;
+                type = AlertType.INFORMATION;
                 break;
         }
  
-        // Creación y configuración de la alerta
-        Alert alert = new Alert(tipo);
-        alert.setTitle(titulo);
-        alert.setHeaderText(encabezado);
-        alert.setContentText(mensaje);
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(message);
  
-        // Mostrar la alerta
         alert.showAndWait();
     }
     

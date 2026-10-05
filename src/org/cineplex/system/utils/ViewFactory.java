@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.cineplex.system.utils;
 
 import java.io.IOException;
@@ -10,13 +6,11 @@ import java.net.URL;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.JavaFXBuilderFactory;
 import javafx.scene.Scene;
+import javafx.stage.Stage;
 import org.cineplex.system.MainClass;
 
-/**
- *
- * @author informatica
- */
 public class ViewFactory {
+
     private final String PATH_VIEWS = "/org/cineplex/system/view/";
 
     public Scene loadFileFXML(String nameFXML, int width, int height) {
@@ -25,6 +19,9 @@ public class ViewFactory {
             FXMLLoader loader = new FXMLLoader();
 
             URL urlFile = MainClass.class.getResource(filePath);
+            if (urlFile == null) {
+                throw new IllegalStateException("No se encontró la vista: " + filePath);
+            }
             loader.setBuilderFactory(new JavaFXBuilderFactory());
             loader.setLocation(urlFile);
 
@@ -33,47 +30,67 @@ public class ViewFactory {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
 
+    private void prepareStage(String title) {
+        Stage stage = SceneManager.getSceneManagerInstance().getPrimaryStage();
+        stage.setTitle(title);
+        stage.setResizable(false);
     }
 
     public void loadScene(String FXMLname) {
-        Scene scene = null;
+        Scene scene;
         try {
             switch (FXMLname) {
                 case "register" -> {
-                    SceneManager.getSceneManagerInstance().getPrimaryStage().setTitle("Registro de Peliculas");
-                    SceneManager.getSceneManagerInstance().getPrimaryStage().setResizable(false);
-                    scene = loadFileFXML("MovieRegister.fxml", 650, 400);
+                    prepareStage("Registro de Películas");
+                    scene = loadFileFXML("MovieRegister.fxml", 700, 500);
                 }
-            case "login" -> {
-                    SceneManager.getSceneManagerInstance().getPrimaryStage().setTitle("Inicio de sesión");
-                    SceneManager.getSceneManagerInstance().getPrimaryStage().setResizable(false);
-                    scene = loadFileFXML("Login.fxml", 380, 316);
+                case "login" -> {
+                    prepareStage("Inicio de sesión");
+                    scene = loadFileFXML("Login.fxml", 400, 380);
                 }
-            case "seatManagment" -> {
-                    SceneManager.getSceneManagerInstance().getPrimaryStage().setTitle("Inicio de sesión");
-                    SceneManager.getSceneManagerInstance().getPrimaryStage().setResizable(false);
-                    scene = loadFileFXML("SeatsAndRoomsManagment.fxml", 600, 400);
+                case "seatManagment" -> {
+                    prepareStage("Gestión de Salas y Asientos");
+                    scene = loadFileFXML("SeatsAndRoomsManagment.fxml", 700, 500);
                 }
-                default ->
-
-                    scene = loadFileFXML("MovieRegister.fxml", 300, 400);
+                case "screeningView" -> {
+                    prepareStage("Gestión de Funciones");
+                    scene = loadFileFXML("ScreeningView.fxml", 650, 450);
+                }
+                case "seatReservation" -> {
+                    prepareStage("Reserva de Asientos");
+                    scene = loadFileFXML("SeatReservation.fxml", 700, 500);
+                }
+                default -> {
+                    prepareStage("Inicio de sesión");
+                    scene = loadFileFXML("Login.fxml", 400, 380);
+                }
             }
             SceneManager.getSceneManagerInstance().changeScene(scene);
-        } catch (NullPointerException objetonulo) {
-            System.out.println("error loading the scene");
+        } catch (RuntimeException e) {
+            System.err.println("Error loading the scene '" + FXMLname + "': " + e.getMessage());
+            e.printStackTrace();
         }
     }
-    
-    public void viewMovieRegister(){
+
+    public void viewMovieRegister() {
         loadScene("register");
     }
-    
-    public void viewLogin(){
+
+    public void viewLogin() {
         loadScene("login");
     }
-    
-    public void viewSeatsAndAuditoriumManagment(){
+
+    public void viewSeatsAndAuditoriumManagment() {
         loadScene("seatManagment");
+    }
+
+    public void viewScreeningView() {
+        loadScene("screeningView");
+    }
+
+    public void viewSeatReservation() {
+        loadScene("seatReservation");
     }
 }

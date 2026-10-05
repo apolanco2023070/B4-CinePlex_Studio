@@ -22,7 +22,7 @@ public class Auditorium {
         this.capacity = capacity;
     }
 
-    // Getters y Setters
+    // Getters and Setters
     public Integer getAuditoriumId() {
         return auditoriumId;
     }
