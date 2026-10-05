@@ -59,8 +59,8 @@ public class User {
 
     @Override
     public String toString() {
-        return "Usuario{idUsuario=" + idUser
-                + ", nombreUsuario='" + userName
-                + "', rol=" + (role != null ? role.getRoleName(): "null") + "}";
+        return "User{idUser=" + idUser
+                + ", userName='" + userName
+                + "', role=" + (role != null ? role.getRoleName(): "null") + "}";
     }
 }

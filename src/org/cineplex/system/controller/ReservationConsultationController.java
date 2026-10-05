@@ -7,287 +7,339 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-import org.cineplex.system.config.ConexionDB;
+import org.cineplex.system.config.DatabaseConnection;
+import org.cineplex.system.model.User;
+import org.cineplex.system.utils.Session;
 
 import java.net.URL;
-import java.sql.*;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 
 public class ReservationConsultationController implements Initializable {
 
-    @FXML private ComboBox<String> comboBoxMovies;
-    @FXML private DatePicker datePickerFecha;
-    @FXML private TableView<Reserva> tableViewReservations;
-    @FXML private TableColumn<Reserva, String> colUsuario;
-    @FXML private TableColumn<Reserva, String> colPelicula;
-    @FXML private TableColumn<Reserva, String> colSala;
-    @FXML private TableColumn<Reserva, String> colAsiento;
-    @FXML private TableColumn<Reserva, String> colFecha;
-    @FXML private TableColumn<Reserva, String> colHora;
-    @FXML private TableColumn<Reserva, String> colEstado;
-    @FXML private TableColumn<Reserva, Void> colAcciones;
-    @FXML private Button btnBack;
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm");
 
-    private Connection connection;
-    private ObservableList<Reserva> reservasList;
+    @FXML
+    private ComboBox<String> comboBoxMovies;
+    @FXML
+    private DatePicker datePickerDate;
+    @FXML
+    private TableView<Reservation> tableViewReservations;
+    @FXML
+    private TableColumn<Reservation, String> colUser;
+    @FXML
+    private TableColumn<Reservation, String> colMovie;
+    @FXML
+    private TableColumn<Reservation, String> colAuditorium;
+    @FXML
+    private TableColumn<Reservation, String> colSeat;
+    @FXML
+    private TableColumn<Reservation, String> colDate;
+    @FXML
+    private TableColumn<Reservation, String> colTime;
+    @FXML
+    private TableColumn<Reservation, String> colStatus;
+    @FXML
+    private TableColumn<Reservation, Void> colActions;
+    @FXML
+    private Button btnBack;
+
+    private ObservableList<Reservation> reservationsList;
+    private User loggedUser;
+
+    public void setLoggedUser(User user) {
+        this.loggedUser = (user != null) ? user : Session.getCurrentUser();
+    }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        try {
-            connection = ConexionDB.getInstanciaConexionDB().getConnection();
-            configurarTabla();
-            cargarCombos();
-            cargarReservas();
-        } catch (Exception e) {
-            mostrarError("Error", "No se pudo conectar: " + e.getMessage());
-        }
+        configureTable();
+        loadCombos();
+        loadReservations();
     }
 
-    private void configurarTabla() {
-        colUsuario.setCellValueFactory(new PropertyValueFactory<>("usuario"));
-        colPelicula.setCellValueFactory(new PropertyValueFactory<>("pelicula"));
-        colSala.setCellValueFactory(new PropertyValueFactory<>("sala"));
-        colAsiento.setCellValueFactory(new PropertyValueFactory<>("asiento"));
-        colFecha.setCellValueFactory(new PropertyValueFactory<>("fechaFuncion"));
-        colHora.setCellValueFactory(new PropertyValueFactory<>("horaFuncion"));
-        colEstado.setCellValueFactory(new PropertyValueFactory<>("estado"));
-        
-        // Botón Cancelar en cada fila
-        colAcciones.setCellFactory(param -> new TableCell<>() {
-            private final Button btnCancelar = new Button("❌ Cancelar");
+    private void configureTable() {
+        colUser.setCellValueFactory(new PropertyValueFactory<>("user"));
+        colMovie.setCellValueFactory(new PropertyValueFactory<>("movie"));
+        colAuditorium.setCellValueFactory(new PropertyValueFactory<>("auditorium"));
+        colSeat.setCellValueFactory(new PropertyValueFactory<>("seat"));
+        colDate.setCellValueFactory(new PropertyValueFactory<>("showDate"));
+        colTime.setCellValueFactory(new PropertyValueFactory<>("showTime"));
+        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+
+        colActions.setCellFactory(param -> new TableCell<>() {
+            private final Button btnCancel = new Button("Cancelar");
+
             {
-                btnCancelar.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
-                btnCancelar.setOnAction(event -> cancelarReserva(getTableView().getItems().get(getIndex())));
+                btnCancel.setOnAction(event -> {
+                    int index = getIndex();
+                    if (index >= 0 && index < getTableView().getItems().size()) {
+                        cancelReservation(getTableView().getItems().get(index));
+                    }
+                });
             }
+
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                if (empty) {
+                int index = getIndex();
+                if (empty || index < 0 || index >= getTableView().getItems().size()) {
                     setGraphic(null);
                 } else {
-                    Reserva reserva = getTableView().getItems().get(getIndex());
-                    if (reserva != null && "CANCELLED".equals(reserva.getEstado())) {
-                        btnCancelar.setDisable(true);
-                        btnCancelar.setStyle("-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-cursor: default;");
-                    } else {
-                        btnCancelar.setDisable(false);
-                        btnCancelar.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
-                    }
-                    setGraphic(btnCancelar);
+                    Reservation reservation = getTableView().getItems().get(index);
+                    btnCancel.setDisable("CANCELLED".equals(reservation.getStatus()));
+                    setGraphic(btnCancel);
                 }
             }
         });
-        
-        reservasList = FXCollections.observableArrayList();
-        tableViewReservations.setItems(reservasList);
+
+        reservationsList = FXCollections.observableArrayList();
+        tableViewReservations.setItems(reservationsList);
     }
 
-    private void cargarCombos() {
+    private void loadCombos() {
         comboBoxMovies.getItems().add("Todas");
         comboBoxMovies.setValue("Todas");
-        
-        String sql = "SELECT title FROM movie ORDER BY title";
-        try (PreparedStatement pstmt = connection.prepareStatement(sql);
+
+        String sql = "SELECT DISTINCT title FROM movie ORDER BY title";
+        try (Connection conn = DatabaseConnection.getDatabaseConnectionInstance().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
                 comboBoxMovies.getItems().add(rs.getString("title"));
             }
         } catch (SQLException e) {
-            mostrarError("Error", "No se cargaron películas: " + e.getMessage());
+            showError("Error", "No se cargaron películas: " + e.getMessage());
         }
     }
 
     @FXML
-    private void cargarReservas() {
-        reservasList.clear();
-        
+    private void loadReservations() {
+        reservationsList.clear();
+
         String sql = "{CALL sp_get_all_reservations()}";
-        
-        try (CallableStatement cstmt = connection.prepareCall(sql);
+
+        try (Connection conn = DatabaseConnection.getDatabaseConnectionInstance().getConnection();
+             CallableStatement cstmt = conn.prepareCall(sql);
              ResultSet rs = cstmt.executeQuery()) {
-            
-            DateTimeFormatter df = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            DateTimeFormatter tf = DateTimeFormatter.ofPattern("HH:mm");
-            
+
             while (rs.next()) {
-                LocalDate fecha = rs.getDate("fecha_funcion").toLocalDate();
-                java.sql.Time horaSql = rs.getTime("hora_funcion");
-                String hora = horaSql != null ? horaSql.toLocalTime().format(tf) : "N/A";
-                
-                reservasList.add(new Reserva(
-                    rs.getInt("reservation_id"),
-                    rs.getString("usuario"),
-                    rs.getString("pelicula"),
-                    rs.getString("sala"),
-                    String.valueOf(rs.getInt("asiento")),
-                    fecha.format(df),
-                    hora,
-                    rs.getString("estado")
-                ));
+                reservationsList.add(readReservation(rs));
             }
         } catch (SQLException e) {
-            mostrarError("Error", "No se cargaron reservas: " + e.getMessage());
+            showError("Error", "No se cargaron reservas: " + e.getMessage());
         }
     }
 
-    @FXML
-    private void filtrarReservas() {
-        reservasList.clear();
-        
-        String pelicula = comboBoxMovies.getValue();
-        LocalDate fecha = datePickerFecha.getValue();
-        
-        StringBuilder sql = new StringBuilder(
-            "SELECT r.reservation_id, u.full_name AS usuario, m.title AS pelicula, " +
-            "a.name AS sala, s.seat_number AS asiento, " +
-            "sc.show_date AS fecha_funcion, sc.show_time AS hora_funcion, " +
-            "r.status AS estado " +
-            "FROM reservation r " +
-            "INNER JOIN users u ON r.user_id = u.user_id " +
-            "INNER JOIN screening sc ON r.screening_id = sc.screening_id " +
-            "INNER JOIN movie m ON sc.movie_id = m.movie_id " +
-            "INNER JOIN auditorium a ON sc.auditorium_id = a.auditorium_id " +
-            "INNER JOIN seat s ON r.seat_id = s.seat_id " +
-            "WHERE 1=1"
+    private Reservation readReservation(ResultSet rs) throws SQLException {
+        String date = rs.getDate("show_date").toLocalDate().format(DATE_FORMAT);
+        java.sql.Time sqlTime = rs.getTime("show_time");
+        String time = sqlTime != null ? sqlTime.toLocalTime().format(TIME_FORMAT) : "N/A";
+
+        return new Reservation(
+                rs.getInt("reservation_id"),
+                rs.getString("user_name"),
+                rs.getString("movie_title"),
+                rs.getString("auditorium_name"),
+                String.valueOf(rs.getInt("seat_number")),
+                date,
+                time,
+                rs.getString("status")
         );
-        
-        if (pelicula != null && !pelicula.equals("Todas")) {
+    }
+
+    @FXML
+    private void filterReservations() {
+        reservationsList.clear();
+
+        String movie = comboBoxMovies.getValue();
+        LocalDate date = datePickerDate.getValue();
+
+        StringBuilder sql = new StringBuilder(
+                "SELECT r.reservation_id, COALESCE(r.customer_name, u.full_name) AS user_name, "
+                + "m.title AS movie_title, "
+                + "a.name AS auditorium_name, s.seat_number AS seat_number, "
+                + "sc.show_date AS show_date, sc.show_time AS show_time, "
+                + "r.status AS status "
+                + "FROM reservation r "
+                + "INNER JOIN users u ON r.user_id = u.user_id "
+                + "INNER JOIN screening sc ON r.screening_id = sc.screening_id "
+                + "INNER JOIN movie m ON sc.movie_id = m.movie_id "
+                + "INNER JOIN auditorium a ON sc.auditorium_id = a.auditorium_id "
+                + "INNER JOIN seat s ON r.seat_id = s.seat_id "
+                + "WHERE 1=1"
+        );
+
+        boolean byMovie = movie != null && !movie.equals("Todas");
+        if (byMovie) {
             sql.append(" AND m.title = ?");
         }
-        
-        if (fecha != null) {
+        if (date != null) {
             sql.append(" AND sc.show_date = ?");
         }
-        
         sql.append(" ORDER BY r.reservation_date DESC");
-        
-        try (PreparedStatement pstmt = connection.prepareStatement(sql.toString())) {
+
+        try (Connection conn = DatabaseConnection.getDatabaseConnectionInstance().getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
+
             int paramIndex = 1;
-            
-            if (pelicula != null && !pelicula.equals("Todas")) {
-                pstmt.setString(paramIndex++, pelicula);
+            if (byMovie) {
+                pstmt.setString(paramIndex++, movie);
             }
-            
-            if (fecha != null) {
-                pstmt.setDate(paramIndex, Date.valueOf(fecha));
+            if (date != null) {
+                pstmt.setDate(paramIndex, java.sql.Date.valueOf(date));
             }
-            
-            ResultSet rs = pstmt.executeQuery();
-            DateTimeFormatter df = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            DateTimeFormatter tf = DateTimeFormatter.ofPattern("HH:mm");
-            
-            while (rs.next()) {
-                LocalDate fechaFuncion = rs.getDate("fecha_funcion").toLocalDate();
-                java.sql.Time horaSql = rs.getTime("hora_funcion");
-                String hora = horaSql != null ? horaSql.toLocalTime().format(tf) : "N/A";
-                
-                reservasList.add(new Reserva(
-                    rs.getInt("reservation_id"),
-                    rs.getString("usuario"),
-                    rs.getString("pelicula"),
-                    rs.getString("sala"),
-                    String.valueOf(rs.getInt("asiento")),
-                    fechaFuncion.format(df),
-                    hora,
-                    rs.getString("estado")
-                ));
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    reservationsList.add(readReservation(rs));
+                }
             }
         } catch (SQLException e) {
-            mostrarError("Error", "No se filtraron reservas: " + e.getMessage());
+            showError("Error", "No se filtraron reservas: " + e.getMessage());
         }
     }
 
     @FXML
-    private void limpiarFiltros() {
+    private void clearFilters() {
         comboBoxMovies.setValue("Todas");
-        datePickerFecha.setValue(null);
-        cargarReservas();
+        datePickerDate.setValue(null);
+        loadReservations();
     }
 
-    // ===== MÉTODO PARA CANCELAR RESERVA (HU36) =====
-    private void cancelarReserva(Reserva reserva) {
-        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmacion.setTitle("Confirmar Cancelación");
-        confirmacion.setHeaderText("¿Estás seguro de cancelar esta reserva?");
-        confirmacion.setContentText("Usuario: " + reserva.getUsuario() + "\n" +
-                                   "Película: " + reserva.getPelicula() + "\n" +
-                                   "Asiento: " + reserva.getAsiento());
-        
-        confirmacion.showAndWait().ifPresent(respuesta -> {
-            if (respuesta == ButtonType.OK) {
-                if (ejecutarCancelacion(reserva.getId())) {
-                    mostrarExito("Éxito", "La reserva ha sido cancelada y el asiento liberado.");
-                    cargarReservas();
+    private void cancelReservation(Reservation reservation) {
+        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmation.setTitle("Confirmar Cancelación");
+        confirmation.setHeaderText("¿Estás seguro de cancelar esta reserva?");
+        confirmation.setContentText("Cliente: " + reservation.getUser() + "\n"
+                + "Película: " + reservation.getMovie() + "\n"
+                + "Asiento: " + reservation.getSeat());
+
+        confirmation.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                if (executeCancellation(reservation.getId())) {
+                    showSuccess("Éxito", "La reserva ha sido cancelada y el asiento liberado.");
+                    filterReservations();
                 }
             }
         });
     }
 
-    private boolean ejecutarCancelacion(int reservationId) {
+    private boolean executeCancellation(int reservationId) {
         String sql = "{CALL sp_cancel_reservation(?)}";
-        
-        try (CallableStatement cstmt = connection.prepareCall(sql)) {
+
+        try (Connection conn = DatabaseConnection.getDatabaseConnectionInstance().getConnection();
+             CallableStatement cstmt = conn.prepareCall(sql)) {
             cstmt.setInt(1, reservationId);
             cstmt.execute();
             return true;
         } catch (SQLException e) {
-            if (e.getMessage().contains("ERROR")) {
-                mostrarError("Error", e.getMessage());
-            } else {
-                mostrarError("Error", "No se pudo cancelar la reserva: " + e.getMessage());
-            }
+            showError("Error", "No se pudo cancelar la reserva: " + e.getMessage());
             return false;
         }
     }
 
     @FXML
-    private void volverAlPanel() {
+    private void goBackToPanel() {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/org/cineplex/system/view/Gerente.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Manager.fxml"));
+            Parent root = loader.load();
+
+            ManagerController controller = loader.getController();
+            if (controller != null) {
+                controller.setLoggedUser(this.loggedUser);
+            }
+
             Stage stage = (Stage) btnBack.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("Panel de Gerente - CinePlex");
         } catch (Exception e) {
-            mostrarError("Error", "No se pudo volver al panel.");
+            showError("Error", "No se pudo volver al panel.");
+            e.printStackTrace();
         }
     }
 
-    private void mostrarError(String t, String c) {
-        new Alert(Alert.AlertType.ERROR, c) {{ setTitle(t); showAndWait(); }};
-    }
-    
-    private void mostrarExito(String t, String c) {
-        new Alert(Alert.AlertType.INFORMATION, c) {{ setTitle(t); showAndWait(); }};
+    private void showError(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
-    // Clase interna
-    public static class Reserva {
+    private void showSuccess(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    // Inner class for the table model
+    public static class Reservation {
+
         private final int id;
-        private final javafx.beans.property.SimpleStringProperty usuario, pelicula, sala, asiento, fechaFuncion, horaFuncion, estado;
+        private final javafx.beans.property.SimpleStringProperty user, movie, auditorium, seat, showDate, showTime, status;
 
-        public Reserva(int id, String u, String p, String s, String a, String f, String h, String e) {
+        public Reservation(int id, String user, String movie, String auditorium, String seat,
+                String showDate, String showTime, String status) {
             this.id = id;
-            this.usuario = new javafx.beans.property.SimpleStringProperty(u);
-            this.pelicula = new javafx.beans.property.SimpleStringProperty(p);
-            this.sala = new javafx.beans.property.SimpleStringProperty(s);
-            this.asiento = new javafx.beans.property.SimpleStringProperty(a);
-            this.fechaFuncion = new javafx.beans.property.SimpleStringProperty(f);
-            this.horaFuncion = new javafx.beans.property.SimpleStringProperty(h);
-            this.estado = new javafx.beans.property.SimpleStringProperty(e);
+            this.user = new javafx.beans.property.SimpleStringProperty(user);
+            this.movie = new javafx.beans.property.SimpleStringProperty(movie);
+            this.auditorium = new javafx.beans.property.SimpleStringProperty(auditorium);
+            this.seat = new javafx.beans.property.SimpleStringProperty(seat);
+            this.showDate = new javafx.beans.property.SimpleStringProperty(showDate);
+            this.showTime = new javafx.beans.property.SimpleStringProperty(showTime);
+            this.status = new javafx.beans.property.SimpleStringProperty(status);
         }
 
-        public int getId() { return id; }
-        public String getUsuario() { return usuario.get(); }
-        public String getPelicula() { return pelicula.get(); }
-        public String getSala() { return sala.get(); }
-        public String getAsiento() { return asiento.get(); }
-        public String getFechaFuncion() { return fechaFuncion.get(); }
-        public String getHoraFuncion() { return horaFuncion.get(); }
-        public String getEstado() { return estado.get(); }
+        public int getId() {
+            return id;
+        }
+
+        public String getUser() {
+            return user.get();
+        }
+
+        public String getMovie() {
+            return movie.get();
+        }
+
+        public String getAuditorium() {
+            return auditorium.get();
+        }
+
+        public String getSeat() {
+            return seat.get();
+        }
+
+        public String getShowDate() {
+            return showDate.get();
+        }
+
+        public String getShowTime() {
+            return showTime.get();
+        }
+
+        public String getStatus() {
+            return status.get();
+        }
     }
 }

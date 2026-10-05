@@ -10,74 +10,89 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.shape.Line?>
 
-<BorderPane xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cineplex.system.controller.TicketController">
+<BorderPane styleClass="root" stylesheets="@/org/cineplex/system/resources/styles/cineplex.css"
+            xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="org.cineplex.system.controller.TicketController">
 
     <top>
-        <VBox alignment="CENTER" spacing="10">
-            <Label style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #2c2c2c;" text="CINEPLEX" />
-            <Line endX="400" startX="0" stroke="#ddd" />
+        <VBox alignment="CENTER" spacing="8.0">
+            <padding>
+                <Insets bottom="10.0" top="10.0" />
+            </padding>
+            <Label styleClass="ticket-brand" text="CINEPLEX STUDIO" />
+            <Separator prefWidth="400.0" />
         </VBox>
     </top>
 
     <center>
-        <VBox alignment="CENTER" spacing="20">
-            
-            <VBox style="-fx-background-color: #2c2c2c; -fx-padding: 15; -fx-background-radius: 5;">
-                <Label fx:id="lblTicketNumber" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;" text="TICKET #001" />
+        <VBox alignment="CENTER" spacing="15.0">
+            <padding>
+                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+            </padding>
+
+            <VBox alignment="CENTER" maxWidth="420.0" spacing="15.0" styleClass="filter-bar">
+                
+                <VBox alignment="CENTER" styleClass="ticket-number-box">
+                    <Label fx:id="lblTicketNumber" styleClass="title-label" text="TICKET #001" />
+                </VBox>
+
+                <GridPane hgap="12.0" vgap="12.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="NEVER" minWidth="100.0" />
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="25.0" />
+                        <RowConstraints minHeight="25.0" />
+                        <RowConstraints minHeight="25.0" />
+                        <RowConstraints minHeight="25.0" />
+                        <RowConstraints minHeight="25.0" />
+                    </rowConstraints>
+                    <children>
+                        <Label styleClass="field-label" text="Película:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <Label fx:id="lblMovie" text="Placeholder" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                        <Label styleClass="field-label" text="Sala:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                        <Label fx:id="lblAuditorium" text="Placeholder" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                        <Label styleClass="field-label" text="Fecha:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                        <Label fx:id="lblDate" text="2026-09-20" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                        <Label styleClass="field-label" text="Hora:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                        <Label fx:id="lblTime" text="15:00" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                        <Label styleClass="field-label" text="Asiento:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                        <Label fx:id="lblSeat" styleClass="field-label" text="Placeholder" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                    </children>
+                </GridPane>
+
+                <Separator prefWidth="200.0" />
+
+                <HBox alignment="CENTER" spacing="10.0">
+                    <Label styleClass="field-label" text="Usuario:" />
+                    <Label fx:id="lblUser" text="Placeholder" />
+                </HBox>
+
+                <HBox alignment="CENTER" spacing="10.0">
+                    <Label styleClass="subtitle-label" text="Emitido:" />
+                    <Label fx:id="lblIssueDate" styleClass="subtitle-label" text="2026-09-19 10:30:00" />
+                </HBox>
             </VBox>
-
-            <GridPane hgap="10" vgap="15">
-                <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Película:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                <Label fx:id="lblMovie" style="-fx-font-size: 16px;" text="Placeholder" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-
-                <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Sala:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
-                <Label fx:id="lblAuditorium" style="-fx-font-size: 16px;" text="Placeholder" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-
-                <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Fecha:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
-                <Label fx:id="lblDate" style="-fx-font-size: 16px;" text="2026-09-20" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-
-                <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Hora:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                <Label fx:id="lblTime" style="-fx-font-size: 16px;" text="15:00" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-
-                <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Asiento:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-                <Label fx:id="lblSeat" style="-fx-font-size: 16px; -fx-text-fill: #28a745; -fx-font-weight: bold;" text="Placeholder" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-            <columnConstraints>
-               <ColumnConstraints />
-               <ColumnConstraints />
-            </columnConstraints>
-            <rowConstraints>
-               <RowConstraints />
-               <RowConstraints />
-               <RowConstraints />
-               <RowConstraints />
-               <RowConstraints />
-            </rowConstraints>
-            </GridPane>
-         <Separator prefWidth="200.0" />
-
-            <HBox alignment="CENTER" spacing="20">
-                <Label style="-fx-font-size: 14px; -fx-font-weight: bold;" text="Usuario:" />
-                <Label fx:id="lblUser" style="-fx-font-size: 14px;" text="Placeholder" />
-            </HBox>
-
-            <HBox alignment="CENTER" spacing="20">
-                <Label style="-fx-font-size: 14px;" text="Emitido:" />
-                <Label fx:id="lblIssueDate" style="-fx-font-size: 14px;" text="2026-09-19 10:30:00" />
-            </HBox>
-
         </VBox>
     </center>
 
     <bottom>
-        <HBox alignment="CENTER" spacing="15">
-            <Button fx:id="btnClose" onAction="#cerrarTicket" style="-fx-background-color: #6c757d; -fx-text-fill: white;                             -fx-font-size: 14px; -fx-padding: 10 20; -fx-cursor: hand;" text="Cerrar" />
+        <HBox alignment="CENTER" spacing="15.0">
+            <padding>
+                <Insets bottom="15.0" top="10.0" />
+            </padding>
+            <Button fx:id="btnClose" onAction="#closeTicket" styleClass="btn-danger" text="Cerrar Ticket" />
         </HBox>
     </bottom>
 
     <padding>
-        <Insets bottom="20" left="30" right="30" top="20" />
+        <Insets bottom="20.0" left="30.0" right="30.0" top="20.0" />
     </padding>
 
 </BorderPane>

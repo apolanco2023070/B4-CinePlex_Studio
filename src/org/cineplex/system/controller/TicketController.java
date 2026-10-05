@@ -48,27 +48,32 @@ public class TicketController {
 
     public void initData(TicketData ticketData) {
         this.ticketData = ticketData;
-        cargarDatosTicket();
+        loadTicketData();
     }
 
-    private void cargarDatosTicket() {
-        lblTicketNumber.setText("TICKET #" + String.format("%03d", ticketData.getTicketNumber()));
+    private void loadTicketData() {
+        Integer number = ticketData.getTicketNumber();
+        lblTicketNumber.setText("TICKET #" + (number != null ? String.format("%03d", number) : "---"));
 
-        lblMovie.setText(ticketData.getMovieTitle());
-        lblAuditorium.setText(ticketData.getAuditoriumName());
-        lblDate.setText(ticketData.getShowDate().toString());
-        lblTime.setText(ticketData.getShowTime().toString());
+        lblMovie.setText(textOrDash(ticketData.getMovieTitle()));
+        lblAuditorium.setText(textOrDash(ticketData.getAuditoriumName()));
+        lblDate.setText(ticketData.getShowDate() != null ? ticketData.getShowDate().toString() : "-");
+        lblTime.setText(ticketData.getShowTime() != null ? ticketData.getShowTime().toString() : "-");
 
-        lblSeat.setText("Asiento " + ticketData.getSeatNumber());
+        lblSeat.setText(ticketData.getSeatNumber() != null ? "Asiento " + ticketData.getSeatNumber() : "-");
 
-        lblUser.setText(ticketData.getUserName());
+        lblUser.setText(textOrDash(ticketData.getUserName()));
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        lblIssueDate.setText(ticketData.getIssueDate().format(formatter));
+        lblIssueDate.setText(ticketData.getIssueDate() != null ? ticketData.getIssueDate().format(formatter) : "-");
+    }
+
+    private String textOrDash(String text) {
+        return (text == null || text.isBlank()) ? "-" : text;
     }
 
     @FXML
-    private void cerrarTicket() {
+    private void closeTicket() {
         Stage stage = (Stage) btnClose.getScene().getWindow();
         stage.close();
     }

@@ -4,48 +4,48 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class ConexionDB {
+public class DatabaseConnection {
 
-    private static ConexionDB instanciaConexionDB;
+    private static DatabaseConnection databaseConnectionInstance;
     private Connection connection;
 
-    private ConexionDB() {
-        conectar();
+    private DatabaseConnection() {
+        connect();
     }
 
-    private void conectar() {
+    private void connect() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             String url = "jdbc:mysql://" + Enviroment.LOCATION_SERVICE + "/" + Enviroment.DATA_BASE;
-            System.out.println("🔍 Java está intentando conectar a: " + url);
-            System.out.println("🔍 Usuario: " + Enviroment.USER);
+            System.out.println("🔍 Java is trying to connect to: " + url);
+            System.out.println("🔍 User: " + Enviroment.USER);
             this.connection = DriverManager.getConnection(
                     "jdbc:mysql://" + Enviroment.LOCATION_SERVICE + "/" + Enviroment.DATA_BASE,
                     Enviroment.USER,
                     Enviroment.PASSWORD);
         } catch (ClassNotFoundException classNotFound) {
-            System.err.println("Error de clase no encontrada: " + classNotFound.getMessage());
+            System.err.println("Class not found error: " + classNotFound.getMessage());
         } catch (SQLException sqlException) {
-            System.err.println("Error de conexión SQL: " + sqlException.getMessage());
+            System.err.println("SQL connection error: " + sqlException.getMessage());
         } catch (Exception e) {
-            System.err.println("Error padre: " + e.getMessage());
+            System.err.println("Unexpected error: " + e.getMessage());
         }
     }
 
-    public static ConexionDB getInstanciaConexionDB() {
-        if (instanciaConexionDB == null) {
-            instanciaConexionDB = new ConexionDB();
+    public static DatabaseConnection getDatabaseConnectionInstance() {
+        if (databaseConnectionInstance == null) {
+            databaseConnectionInstance = new DatabaseConnection();
         }
-        return instanciaConexionDB;
+        return databaseConnectionInstance;
     }
 
     public Connection getConnection() {
         try {
             if (this.connection == null || this.connection.isClosed()) {
-                conectar();
+                connect();
             }
         } catch (SQLException e) {
-            System.err.println("Error al verificar el estado de la conexión: " + e.getMessage());
+            System.err.println("Error checking connection state: " + e.getMessage());
         }
         return this.connection;
     }
@@ -54,13 +54,13 @@ public class ConexionDB {
         this.connection = connection;
     }
 
-    public void cerrarConexion() {
+    public void closeConnection() {
         try {
             if (this.connection != null && !this.connection.isClosed()) {
                 this.connection.close();
             }
         } catch (SQLException e) {
-            System.err.println("Error al cerrar la conexión: " + e.getMessage());
+            System.err.println("Error closing connection: " + e.getMessage());
         }
     }
 }

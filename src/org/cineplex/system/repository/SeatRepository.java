@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import org.cineplex.system.config.ConexionDB;
+import org.cineplex.system.config.DatabaseConnection;
 import org.cineplex.system.model.Seat;
 
 public class SeatRepository {
@@ -14,14 +14,14 @@ public class SeatRepository {
     public void saveSeat(Seat seat) {
         String sql = "{call sp_insert_seat(?, ?)}";
 
-        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection(); CallableStatement cstmt = conn.prepareCall(sql)) {
+        try (Connection conn = DatabaseConnection.getDatabaseConnectionInstance().getConnection(); CallableStatement cstmt = conn.prepareCall(sql)) {
 
             cstmt.setInt(1, seat.getSeatNumber());
             cstmt.setInt(2, seat.getAuditoriumId());
             cstmt.executeUpdate();
 
         } catch (SQLException e) {
-            System.err.println("Error al guardar asiento: " + e.getMessage());
+            System.err.println("Error saving seat: " + e.getMessage());
             throw new RuntimeException("No se pudo registrar el asiento.", e);
         }
     }
@@ -30,7 +30,7 @@ public class SeatRepository {
         List<Seat> seats = new ArrayList<>();
         String sql = "{call sp_get_seats_by_auditorium(?)}";
 
-        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection(); CallableStatement cstmt = conn.prepareCall(sql)) {
+        try (Connection conn = DatabaseConnection.getDatabaseConnectionInstance().getConnection(); CallableStatement cstmt = conn.prepareCall(sql)) {
 
             cstmt.setInt(1, auditoriumId);
 
@@ -45,7 +45,7 @@ public class SeatRepository {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al consultar asientos: " + e.getMessage());
+            System.err.println("Error querying seats: " + e.getMessage());
             throw new RuntimeException("No se pudo cargar los asientos.", e);
         }
         return seats;
@@ -54,7 +54,7 @@ public class SeatRepository {
     public boolean existsByAuditoriumId(Integer auditoriumId) {
         String sql = "{call sp_check_seats_exist(?)}";
 
-        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection(); CallableStatement cstmt = conn.prepareCall(sql)) {
+        try (Connection conn = DatabaseConnection.getDatabaseConnectionInstance().getConnection(); CallableStatement cstmt = conn.prepareCall(sql)) {
 
             cstmt.setInt(1, auditoriumId);
 
@@ -66,21 +66,47 @@ public class SeatRepository {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al verificar asientos: " + e.getMessage());
-            return false;
+            System.err.println("Error checking seats: " + e.getMessage());
+            throw new RuntimeException("No se pudo verificar los asientos de la sala.", e);
+        }
+    }
+
+    /**
+     * Creates seats 1..capacity in a single transaction: either all of them
+     * are created or none.
+     */
+    public void saveSeats(Integer auditoriumId, int capacity) {
+        String sql = "{call sp_insert_seat(?, ?)}";
+
+        try (Connection conn = DatabaseConnection.getDatabaseConnectionInstance().getConnection()) {
+            conn.setAutoCommit(false);
+            try (CallableStatement cstmt = conn.prepareCall(sql)) {
+                for (int i = 1; i <= capacity; i++) {
+                    cstmt.setInt(1, i);
+                    cstmt.setInt(2, auditoriumId);
+                    cstmt.executeUpdate();
+                }
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error saving seats: " + e.getMessage());
+            throw new RuntimeException("No se pudieron generar los asientos.", e);
         }
     }
 
     public void deleteByAuditoriumId(Integer auditoriumId) {
         String sql = "{call sp_delete_seats_by_auditorium(?)}";
 
-        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection(); CallableStatement cstmt = conn.prepareCall(sql)) {
+        try (Connection conn = DatabaseConnection.getDatabaseConnectionInstance().getConnection(); CallableStatement cstmt = conn.prepareCall(sql)) {
 
             cstmt.setInt(1, auditoriumId);
             cstmt.executeUpdate();
 
         } catch (SQLException e) {
-            System.err.println("Error al eliminar asientos: " + e.getMessage());
+            System.err.println("Error deleting seats: " + e.getMessage());
             throw new RuntimeException("No se pudo eliminar los asientos.", e);
         }
     }
@@ -89,7 +115,7 @@ public class SeatRepository {
         List<Seat> availableSeats = new ArrayList<>();
         String sql = "{call sp_get_available_seats_for_screening(?)}";
 
-        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection(); CallableStatement cstmt = conn.prepareCall(sql)) {
+        try (Connection conn = DatabaseConnection.getDatabaseConnectionInstance().getConnection(); CallableStatement cstmt = conn.prepareCall(sql)) {
 
             cstmt.setInt(1, screeningId);
 

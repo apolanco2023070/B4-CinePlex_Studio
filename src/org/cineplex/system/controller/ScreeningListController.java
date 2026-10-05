@@ -28,7 +28,7 @@ import org.cineplex.system.utils.AlertInformation;
 public class ScreeningListController {
 
     @FXML
-    private Button btnRegresar;
+    private Button btnBack;
 
     @FXML
     private TableView<Screening> tblScreenings;
@@ -63,7 +63,7 @@ public class ScreeningListController {
         colAuditorium.setCellValueFactory(new PropertyValueFactory<>("auditoriumName"));
         colDate.setCellValueFactory(new PropertyValueFactory<>("showDate"));
 
-        colTime.setCellValueFactory(new PropertyValueFactory<>("showTimeString"));
+        colTime.setCellValueFactory(new PropertyValueFactory<>("showTime"));
     }
 
     private void loadAllScreenings() {
@@ -112,24 +112,24 @@ public class ScreeningListController {
     }
 
     @FXML
-    private void regresarMenu() {
+    private void goBackToMenu() {
         try {
 
-            Stage stageActual = (Stage) btnRegresar.getScene().getWindow();
+            Stage currentStage = (Stage) btnBack.getScene().getWindow();
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Administrador.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Admin.fxml"));
 
             Parent root = loader.load();
 
-            Scene escenaNueva = new Scene(root);
+            Scene newScene = new Scene(root);
 
-            stageActual.setScene(escenaNueva);
-            stageActual.show();
+            currentStage.setScene(newScene);
+            currentStage.show();
 
         } catch (Exception e) {
             e.printStackTrace();
             AlertInformation.viewAlert("ERROR", "Error de navegación", "No se pudo cargar la vista",
-                    "Detalle: " + e.getMessage() + "\nVerifica la ruta del archivo Administrador.fxml");
+                    "Detalle: " + e.getMessage() + "\nVerifica la ruta del archivo Admin.fxml");
         }
     }
 

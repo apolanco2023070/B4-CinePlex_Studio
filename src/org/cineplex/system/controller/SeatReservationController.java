@@ -1,283 +1,400 @@
 package org.cineplex.system.controller;
 
-import java.util.ArrayList;
+import java.net.URL;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import javafx.collections.FXCollections;
+import java.util.Optional;
+import java.util.ResourceBundle;
+
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
+
+import org.cineplex.system.config.DatabaseConnection;
 import org.cineplex.system.model.Auditorium;
 import org.cineplex.system.model.Movie;
+import org.cineplex.system.model.RoleType;
 import org.cineplex.system.model.Screening;
 import org.cineplex.system.model.Seat;
 import org.cineplex.system.model.TicketData;
+import org.cineplex.system.model.User;
 import org.cineplex.system.repository.AuditoriumRepository;
 import org.cineplex.system.repository.MovieRepository;
-import org.cineplex.system.repository.ReservationRepository;
 import org.cineplex.system.repository.ScreeningRepository;
 import org.cineplex.system.repository.SeatRepository;
 import org.cineplex.system.utils.AlertInformation;
+import org.cineplex.system.utils.SceneManager;
+import org.cineplex.system.utils.Session;
 
-public class SeatReservationController {
+public class SeatReservationController implements Initializable {
 
     @FXML
     private ComboBox<Auditorium> cmbAuditorium;
-
-    @FXML
-    private ComboBox<Seat> cmbSeat;
-
     @FXML
     private ComboBox<Movie> cmbMovie;
-
     @FXML
     private ComboBox<Screening> cmbScreening;
-
     @FXML
-    private Button btnRegresar;
-    
+    private ComboBox<Seat> cmbSeat;
     @FXML
     private TextField txtReservationName;
 
-    private final AuditoriumRepository auditoriumRepository;
-    private final MovieRepository movieRepository;
-    private final ScreeningRepository screeningRepository;
-    private final SeatRepository seatRepository;
-    private final ReservationRepository reservationRepository;
-    private Integer lastReservationId;
-    private Screening lastScreening;
-    private Seat lastSeat;
-    private Auditorium lastAuditorium;
-    private Movie lastMovie;
-    private String lastClienteName;
-
-    public SeatReservationController() {
-        this.auditoriumRepository = new AuditoriumRepository();
-        this.movieRepository = new MovieRepository();
-        this.screeningRepository = new ScreeningRepository();
-        this.seatRepository = new SeatRepository();
-        this.reservationRepository = new ReservationRepository();
-    }
-
     @FXML
-    public void initialize() {
-        configureComboBoxes();
-        loadAuditoriums();
-        loadMovies();
+    private Button btnCreateTicket;
+    @FXML
+    private Button btnBack;
+
+    private final AuditoriumRepository auditoriumRepo = new AuditoriumRepository();
+    private final MovieRepository movieRepo = new MovieRepository();
+    private final ScreeningRepository screeningRepo = new ScreeningRepository();
+    private final SeatRepository seatRepo = new SeatRepository();
+
+    private User loggedUser;
+    private Movie selectedMovie;
+
+    public void setLoggedUser(User user) {
+        this.loggedUser = (user != null) ? user : Session.getCurrentUser();
     }
 
-    private void configureComboBoxes() {
-        cmbMovie.valueProperty().addListener((obs, oldVal, newVal) -> loadScreenings());
-        cmbAuditorium.valueProperty().addListener((obs, oldVal, newVal) -> loadScreenings());
-        cmbScreening.valueProperty().addListener((obs, oldVal, newVal) -> loadAvailableSeats());
-    }
-
-    private void loadAuditoriums() {
-        try {
-            List<Auditorium> auditoriums = auditoriumRepository.getAuditoriums();
-            cmbAuditorium.setItems(FXCollections.observableArrayList(auditoriums));
-        } catch (Exception e) {
-            showAlert("Error", "No se pudieron cargar las salas");
+    public void setSelectedMovie(Movie movie) {
+        this.selectedMovie = movie;
+        if (cmbMovie != null && movie != null && cmbMovie.getItems() != null) {
+            for (Movie m : cmbMovie.getItems()) {
+                if (m.getMovieId() == movie.getMovieId()) {
+                    cmbMovie.getSelectionModel().select(m);
+                    break;
+                }
+            }
         }
     }
 
-    private void loadMovies() {
+    private User currentUser() {
+        return (loggedUser != null) ? loggedUser : Session.getCurrentUser();
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        configureConverters();
+        loadInitialData();
+        configureListeners();
+        loadFilteredScreenings();
+    }
+
+    private void configureConverters() {
+        cmbScreening.setConverter(new StringConverter<Screening>() {
+            @Override
+            public String toString(Screening s) {
+                if (s == null) {
+                    return "";
+                }
+                String title = s.getMovieTitle() != null ? s.getMovieTitle() : "Función";
+                String room = s.getAuditoriumName() != null ? s.getAuditoriumName() : "";
+                return title + " - " + room + " - " + s.getShowDate() + " " + s.getShowTime();
+            }
+
+            @Override
+            public Screening fromString(String string) {
+                return null;
+            }
+        });
+    }
+
+    private void loadInitialData() {
         try {
-            List<Movie> movies = movieRepository.getAllMovies();
-            cmbMovie.setItems(FXCollections.observableArrayList(movies));
+            List<Auditorium> auditoriums = auditoriumRepo.getAuditoriums();
+            if (auditoriums != null && !auditoriums.isEmpty()) {
+                cmbAuditorium.getItems().setAll(auditoriums);
+            }
         } catch (Exception e) {
-            showAlert("Error", "No se pudieron cargar las películas");
+            AlertInformation.viewAlert("ERROR", "Error de Carga", null, "Error al cargar salas: " + e.getMessage());
+        }
+
+        try {
+            List<Movie> movies = movieRepo.getAllMovies();
+            if (movies != null && !movies.isEmpty()) {
+                cmbMovie.getItems().setAll(movies);
+
+                if (this.selectedMovie != null) {
+                    for (Movie m : movies) {
+                        if (m.getMovieId() == this.selectedMovie.getMovieId()) {
+                            cmbMovie.getSelectionModel().select(m);
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            AlertInformation.viewAlert("ERROR", "Error de Carga", null, "Error al cargar películas: " + e.getMessage());
         }
     }
 
-    private void loadScreenings() {
-        Movie selectedMovie = cmbMovie.getValue();
-        Auditorium selectedAuditorium = cmbAuditorium.getValue();
+    private void configureListeners() {
+        cmbMovie.valueProperty().addListener((obs, oldVal, newVal) -> loadFilteredScreenings());
+        cmbAuditorium.valueProperty().addListener((obs, oldVal, newVal) -> loadFilteredScreenings());
+
+        cmbScreening.valueProperty().addListener((obs, oldVal, selectedScreening) -> {
+            if (selectedScreening != null && selectedScreening.getScreeningId() != null) {
+                loadAvailableSeats(selectedScreening.getScreeningId());
+            } else {
+                cmbSeat.getItems().clear();
+            }
+        });
+    }
+
+    private void loadFilteredScreenings() {
+        Movie movie = cmbMovie.getValue();
+        Auditorium auditorium = cmbAuditorium.getValue();
 
         cmbScreening.getItems().clear();
         cmbSeat.getItems().clear();
 
-        if (selectedMovie == null || selectedAuditorium == null) {
-            return;
-        }
-
         try {
-            List<Screening> allScreenings = screeningRepository.getAllScreening();
-            List<Screening> filtered = new ArrayList<>();
-
-            for (Screening s : allScreenings) {
-                if (s.getMovieId() != null && s.getAuditoriumId() != null
-                        && s.getMovieId().equals(selectedMovie.getMovieId())
-                        && s.getAuditoriumId().equals(selectedAuditorium.getAuditoriumId())) {
-                    filtered.add(s);
-                }
-            }
-            cmbScreening.setItems(FXCollections.observableArrayList(filtered));
-        } catch (Exception e) {
-            showAlert("Error", "No se pudieron cargar los horarios");
-        }
-    }
-
-    private void loadAvailableSeats() {
-        Screening selectedScreening = cmbScreening.getValue();
-        cmbSeat.getItems().clear();
-
-        if (selectedScreening == null) {
-            return;
-        }
-
-        try {
-            List<Seat> availableSeats = seatRepository.getAvailableSeatsForScreening(selectedScreening.getScreeningId());
-            cmbSeat.setItems(FXCollections.observableArrayList(availableSeats));
-        } catch (Exception e) {
-            showAlert("Error", "No se pudieron cargar los asientos disponibles");
-        }
-    }
-
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
-    @FXML
-    private void reserveSeat() {
-
-        if (cmbAuditorium.getValue() == null || cmbMovie.getValue() == null
-                || cmbScreening.getValue() == null || cmbSeat.getValue() == null) {
-            showAlert("Campos incompletos", "Selecciona todos los campos");
-            return;
-        }
-
-        String nombreCliente = txtReservationName.getText().trim();
-        if (nombreCliente.isEmpty()) {
-            showAlert("Campo requerido", "Por favor ingrese el nombre del cliente");
-            return;
-        }
-
-        try {
-            Screening screening = cmbScreening.getValue();
-            Seat seat = cmbSeat.getValue();
-            Auditorium auditorium = cmbAuditorium.getValue();
-            Movie movie = cmbMovie.getValue();
-            int currentUserId = 1;
-
-            System.out.println("   - User ID: " + currentUserId);
-            System.out.println("   - Screening ID: " + screening.getScreeningId());
-            System.out.println("   - Seat ID: " + seat.getSeatId());
-            System.out.println("   - Cliente: " + nombreCliente);
-
-            System.out.println(" [DEBUG] Creando reserva en BD...");
-            reservationRepository.createReservation(
-                    currentUserId,
-                    screening.getScreeningId(),
-                    seat.getSeatId(),
-                    "RESERVED"
-            );
-
-            lastReservationId = reservationRepository.getLastReservationId(
-                    screening.getScreeningId(),
-                    seat.getSeatId()
-            );
-
-            System.out.println(" [DEBUG] LastReservationId obtenido: " + lastReservationId);
-
-            if (lastReservationId == null) {
-                showAlert("Error", "No se pudo obtener el ID de la reserva. Verifica que el Stored Procedure sp_get_last_reservation_id exista en la BD.");
+            List<Screening> allScreenings = screeningRepo.getAllScreening();
+            if (allScreenings == null || allScreenings.isEmpty()) {
                 return;
             }
 
-            lastScreening = screening;
-            lastSeat = seat;
-            lastAuditorium = auditorium;
-            lastMovie = movie;
-            lastClienteName = nombreCliente;
+            List<Screening> filtered = allScreenings.stream()
+                    .filter(s -> movie == null
+                            || (s.getMovieId() != null && s.getMovieId().intValue() == movie.getMovieId()))
+                    .filter(s -> auditorium == null
+                            || (s.getAuditoriumId() != null
+                            && s.getAuditoriumId().intValue() == auditorium.getAuditoriumId().intValue()))
+                    .toList();
 
-            Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
-            successAlert.setTitle("Éxito");
-            successAlert.setContentText("Asiento " + seat.getSeatNumber()
-                    + " reservado correctamente para " + nombreCliente + ".\n\n"
-                    + "Ahora puedes generar el ticket.");
-            successAlert.showAndWait();
+            cmbScreening.getItems().setAll(filtered);
 
+        } catch (Exception e) {
+            AlertInformation.viewAlert("ERROR", "Error de Filtrado", null, "Error al filtrar funciones: " + e.getMessage());
+        }
+    }
+
+    private void loadAvailableSeats(Integer screeningId) {
+        try {
+            List<Seat> seats = seatRepo.getAvailableSeatsForScreening(screeningId);
+            if (seats != null) {
+                cmbSeat.getItems().setAll(seats);
+            } else {
+                cmbSeat.getItems().clear();
+            }
+        } catch (Exception e) {
+            AlertInformation.viewAlert("ERROR", "Error de Asientos", null, "Error al obtener asientos disponibles: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void reserveSeat(ActionEvent event) {
+        Screening screening = cmbScreening.getValue();
+        Seat seat = cmbSeat.getValue();
+        String customer = txtReservationName.getText().trim();
+
+        if (screening == null || seat == null || customer.isEmpty()) {
+            AlertInformation.viewAlert("WARNING", "Campos Incompletos", null, "Seleccione la función, el asiento e ingrese el nombre del cliente.");
+            return;
+        }
+
+        if (customer.length() > 100) {
+            AlertInformation.viewAlert("WARNING", "Nombre demasiado largo", null, "El nombre del cliente no puede exceder 100 caracteres.");
+            return;
+        }
+
+        if (screening.getShowDate() != null && screening.getShowTime() != null
+                && LocalDateTime.of(screening.getShowDate(), screening.getShowTime()).isBefore(LocalDateTime.now())) {
+            AlertInformation.viewAlert("WARNING", "Función no disponible", null, "No se puede reservar una función que ya comenzó o ya pasó.");
+            return;
+        }
+
+        User user = currentUser();
+        if (user == null) {
+            AlertInformation.viewAlert("ERROR", "Sesión", null, "Sesión no válida. Inicie sesión de nuevo.");
+            return;
+        }
+
+        String sql = "{CALL sp_insert_reservation(?, ?, ?, ?, ?)}";
+        try (Connection conn = DatabaseConnection.getDatabaseConnectionInstance().getConnection();
+             CallableStatement cstmt = conn.prepareCall(sql)) {
+
+            cstmt.setInt(1, user.getIdUser());
+            cstmt.setInt(2, screening.getScreeningId());
+            cstmt.setInt(3, seat.getSeatId());
+            cstmt.setString(4, "RESERVED");
+            cstmt.setString(5, customer);
+            cstmt.executeUpdate();
+
+            AlertInformation.viewAlert("INFORMATION", "Reserva Exitosa", null, "Se ha registrado la reserva para: " + customer);
+
+            loadAvailableSeats(screening.getScreeningId());
             cmbSeat.getSelectionModel().clearSelection();
-            loadAvailableSeats();
 
-        } catch (Exception e) {
-            showAlert("Error", "No se pudo realizar la reserva: " + e.getMessage());
-            e.printStackTrace();
+        } catch (SQLException e) {
+            AlertInformation.viewAlert("ERROR", "Error al Reservar", null, "No se pudo guardar la reserva: " + e.getMessage());
+            // The seat may have been taken by someone else meanwhile.
+            loadAvailableSeats(screening.getScreeningId());
         }
     }
 
     @FXML
-    private void regresarMenu() {
-        try {
-            Stage stageActual = (Stage) btnRegresar.getScene().getWindow();
+    private void generateTicket(ActionEvent event) {
+        String customer = txtReservationName.getText().trim();
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Administrador.fxml"));
-            Parent root = loader.load();
-
-            Scene escenaNueva = new Scene(root);
-
-            stageActual.setScene(escenaNueva);
-            stageActual.show();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            AlertInformation.viewAlert("ERROR", "Error de navegación", "No se pudo cargar la vista",
-                    "Detalle: " + e.getMessage() + "\nVerifica la ruta del archivo Administrador.fxml");
+        if (customer.isEmpty()) {
+            AlertInformation.viewAlert("WARNING", "Nombre Requerido", null, "Ingrese el nombre del cliente para generar el ticket.");
+            return;
         }
+
+        processAndShowTicket(customer);
     }
 
     @FXML
-    private void generateTicket() {
-        if (lastReservationId == null) {
-            showAlert("Sin reserva", "Primero debes reservar un asiento antes de generar el ticket.");
-            return;
-        }
+    private void searchAndReprintTicket(ActionEvent event) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Buscar Ticket");
+        dialog.setHeaderText("Búsqueda / Reimpresión de Ticket");
+        dialog.setContentText("Ingrese el nombre del cliente:");
 
-        if (lastScreening == null || lastSeat == null || lastAuditorium == null || lastMovie == null) {
-            showAlert("Error", "No se encontraron los datos de la reserva.");
-            return;
-        }
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(name -> {
+            if (!name.trim().isEmpty()) {
+                processAndShowTicket(name.trim());
+            }
+        });
+    }
 
-        if (lastClienteName == null || lastClienteName.trim().isEmpty()) {
-            showAlert("Campo requerido", "Por favor ingrese el nombre del cliente");
-            return;
+    /**
+     * Finds the window to navigate in: first from the clicked node, then from
+     * the back button, and finally the application's primary stage.
+     */
+    private Stage resolveStage(ActionEvent event) {
+        if (event != null && event.getSource() instanceof javafx.scene.Node) {
+            javafx.scene.Node source = (javafx.scene.Node) event.getSource();
+            if (source.getScene() != null && source.getScene().getWindow() instanceof Stage) {
+                return (Stage) source.getScene().getWindow();
+            }
         }
+        if (btnBack != null && btnBack.getScene() != null
+                && btnBack.getScene().getWindow() instanceof Stage) {
+            return (Stage) btnBack.getScene().getWindow();
+        }
+        return SceneManager.getSceneManagerInstance().getPrimaryStage();
+    }
 
+    @FXML
+    private void goBackToMenu(ActionEvent event) {
         try {
-            TicketData ticketData = new TicketData();
-            ticketData.setTicketNumber(lastReservationId);
-            ticketData.setMovieTitle(lastMovie.getTitle());
-            ticketData.setAuditoriumName(lastAuditorium.getName());
-            ticketData.setShowDate(lastScreening.getShowDate());
-            ticketData.setShowTime(lastScreening.getShowTime());
-            ticketData.setSeatNumber(lastSeat.getSeatNumber());
-            ticketData.setUserName(lastClienteName);
-            ticketData.setIssueDate(java.time.LocalDateTime.now());
+            Stage stage = resolveStage(event);
+            if (stage == null) {
+                AlertInformation.viewAlert("ERROR", "Navegación", null, "No se pudo recuperar la ventana principal.");
+                return;
+            }
 
+            User user = currentUser();
+            boolean isAdmin = user != null
+                    && user.getRole() != null
+                    && user.getRole().is(RoleType.ADMINISTRATOR);
+
+            if (isAdmin) {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Admin.fxml"));
+                Parent root = loader.load();
+
+                AdminController controller = loader.getController();
+                if (controller != null) {
+                    controller.setLoggedUser(user);
+                }
+
+                stage.setScene(new Scene(root, 480, 620));
+                stage.setTitle("Panel de Administrador - CinePlex");
+                stage.centerOnScreen();
+            } else {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Billboard.fxml"));
+                Parent root = loader.load();
+
+                BillboardController controller = loader.getController();
+                if (controller != null) {
+                    controller.setLoggedUser(user);
+                }
+
+                stage.setScene(new Scene(root, 700, 500));
+                stage.setTitle("CinePlex - Cartelera");
+                stage.centerOnScreen();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            AlertInformation.viewAlert("ERROR", "Navegación", null, "No se pudo volver: " + e.getMessage());
+        }
+    }
+
+    private void processAndShowTicket(String customer) {
+        TicketData ticketData = null;
+        String sql = "{CALL sp_get_ticket_by_customer(?)}";
+
+        try (Connection conn = DatabaseConnection.getDatabaseConnectionInstance().getConnection();
+             CallableStatement cstmt = conn.prepareCall(sql)) {
+
+            cstmt.setString(1, customer);
+
+            try (ResultSet rs = cstmt.executeQuery()) {
+                if (rs.next()) {
+                    ticketData = new TicketData();
+                    ticketData.setTicketNumber(rs.getInt("ticket_number"));
+                    ticketData.setMovieTitle(rs.getString("movie_title"));
+                    ticketData.setAuditoriumName(rs.getString("auditorium_name"));
+                    ticketData.setSeatNumber(rs.getInt("seat_number"));
+                    ticketData.setUserName(rs.getString("customer_name"));
+                    ticketData.setShowDate(rs.getDate("show_date").toLocalDate());
+                    ticketData.setShowTime(rs.getTime("show_time").toLocalTime());
+                    ticketData.setIssueDate(rs.getTimestamp("issue_date").toLocalDateTime());
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            AlertInformation.viewAlert("ERROR", "Error de Ticket", null, "No se pudo consultar el ticket: " + e.getMessage());
+            return;
+        }
+
+        if (ticketData == null) {
+            AlertInformation.viewAlert("WARNING", "Ticket no encontrado", null,
+                    "No se encontró ninguna reserva activa a nombre de: " + customer);
+            return;
+        }
+
+        openTicketWindow(ticketData);
+    }
+
+    private void openTicketWindow(TicketData data) {
+        try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/TicketView.fxml"));
             Parent root = loader.load();
 
             TicketController controller = loader.getController();
-            controller.initData(ticketData);
+            if (controller != null) {
+                controller.initData(data);
+            }
 
-            Stage stage = new Stage();
-            stage.setTitle("Ticket - CinePlex");
-            stage.setScene(new Scene(root, 500, 650));
-            stage.setResizable(false);
-            stage.showAndWait();
+            Stage ticketStage = new Stage();
+            ticketStage.setTitle("CinePlex Studio - Comprobante de Ticket");
+            ticketStage.initModality(Modality.APPLICATION_MODAL);
+            ticketStage.setScene(new Scene(root));
+            ticketStage.show();
 
         } catch (Exception e) {
-            showAlert("Error", "No se pudo generar el ticket: " + e.getMessage());
             e.printStackTrace();
+            AlertInformation.viewAlert("ERROR", "Error de Vista", null, "No se pudo abrir el ticket: " + e.getMessage());
         }
     }
 }

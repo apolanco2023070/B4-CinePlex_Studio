@@ -6,35 +6,21 @@
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" spacing="20.0" style="-fx-background-color: #f0f0f0;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/21.0.1" fx:controller="org.cineplex.system.controller.LoginController">
+<VBox alignment="CENTER" spacing="20.0" styleClass="root" stylesheets="@/org/cineplex/system/resources/styles/cineplex.css"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="org.cineplex.system.controller.LoginController">
     <padding>
         <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
     </padding>
-    
-    <Label style="-fx-text-fill: #2c3e50;" text="CinePlex">
-        <font>
-            <Font size="32.0" />
-        </font>
-    </Label>
-    <Label style="-fx-text-fill: #34495e;" text="Iniciar Sesión">
-        <font>
-            <Font size="18.0" />
-        </font>
-    </Label>
-    
-    <VBox alignment="CENTER" maxWidth="300" spacing="10.0">
-        <!-- ✅ CAMBIO 1: fx:id actualizado -->
+
+    <Label styleClass="title-label" text="CinePlex Studio" />
+    <Label styleClass="subtitle-label" text="Iniciar Sesión" />
+
+    <VBox alignment="CENTER" maxWidth="320" spacing="12.0" styleClass="filter-bar">
         <TextField fx:id="usernameField" promptText="Usuario" />
-        
-        <!-- ✅ CAMBIO 2: fx:id actualizado -->
         <PasswordField fx:id="passwordField" promptText="Contraseña" />
-        
-        <!-- ✅ CAMBIO 3: fx:id actualizado -->
-        <Label fx:id="lblErrorMessage" style="-fx-text-fill: red;" wrapText="true" />
-        
-        <!-- ✅ CAMBIO 4: onAction actualizado -->
-        <Button onAction="#handleLogin" prefWidth="300" style="-fx-background-color: #3498db; -fx-text-fill: white;" text="Iniciar Sesión" />
+        <Label fx:id="lblErrorMessage" styleClass="error-label" wrapText="true" />
+        <Button onAction="#handleLogin" prefWidth="300" text="Ingresar al Sistema" />
     </VBox>
 </VBox>

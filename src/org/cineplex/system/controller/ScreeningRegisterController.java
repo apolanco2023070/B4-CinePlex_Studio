@@ -1,11 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package org.cineplex.system.controller;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -22,10 +22,6 @@ import org.cineplex.system.repository.ScreeningRepository;
 import org.cineplex.system.utils.AlertInformation;
 import org.cineplex.system.utils.Validations;
 
-/**
- *
- * @author informatica
- */
 public class ScreeningRegisterController {
 
     @FXML
@@ -73,19 +69,23 @@ public class ScreeningRegisterController {
 
     private void configureComboBoxes() {
         cmbMovies.setConverter(new javafx.util.StringConverter<Movie>() {
+            @Override
             public String toString(Movie m) {
                 return m == null ? "" : m.getTitle();
             }
 
+            @Override
             public Movie fromString(String s) {
                 return null;
             }
         });
         cmbAuditoriums.setConverter(new javafx.util.StringConverter<Auditorium>() {
+            @Override
             public String toString(Auditorium a) {
                 return a == null ? "" : a.getName();
             }
 
+            @Override
             public Auditorium fromString(String s) {
                 return null;
             }
@@ -96,13 +96,47 @@ public class ScreeningRegisterController {
         try {
             cmbMovies.setItems(FXCollections.observableArrayList(movieRepository.getAllMovies()));
         } catch (Exception e) {
-            System.err.println("Error al cargar películas: " + e.getMessage());
-            e.printStackTrace();
+            AlertInformation.viewAlert("ERROR", "Error de carga", "No se pudieron cargar las películas", e.getMessage());
         }
     }
 
     private void loadAuditoriums() {
-        cmbAuditoriums.setItems(FXCollections.observableArrayList(auditoriumRepository.getAuditoriums()));
+        try {
+            cmbAuditoriums.setItems(FXCollections.observableArrayList(auditoriumRepository.getAuditoriums()));
+        } catch (Exception e) {
+            AlertInformation.viewAlert("ERROR", "Error de carga", "No se pudieron cargar las salas", e.getMessage());
+        }
+    }
+
+    /**
+     * True if the new screening overlaps another one in the same room and date,
+     * taking each movie's duration into account.
+     */
+    private boolean overlapsExisting(Movie movie, Auditorium auditorium, LocalDate date, LocalTime time) {
+        Map<Integer, Integer> durationByMovie = new HashMap<>();
+        for (Movie m : cmbMovies.getItems()) {
+            durationByMovie.put(m.getMovieId(), m.getDuration());
+        }
+
+        LocalDateTime newStart = LocalDateTime.of(date, time);
+        LocalDateTime newEnd = newStart.plusMinutes(movie.getDuration());
+
+        List<Screening> existing = screeningRepository.getAllScreening();
+        for (Screening s : existing) {
+            if (s.getAuditoriumId() == null
+                    || s.getAuditoriumId().intValue() != auditorium.getAuditoriumId().intValue()
+                    || !date.equals(s.getShowDate())) {
+                continue;
+            }
+            int duration = durationByMovie.getOrDefault(s.getMovieId(), 0);
+            LocalDateTime start = LocalDateTime.of(s.getShowDate(), s.getShowTime());
+            LocalDateTime end = start.plusMinutes(duration);
+
+            if (newStart.isBefore(end) && start.isBefore(newEnd)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @FXML
@@ -123,12 +157,25 @@ public class ScreeningRegisterController {
         }
 
         try {
-            LocalTime time = LocalTime.parse(timeText);
-            Screening screening = new Screening(selectedMovie.getMovieId(), selectedAuditorium.getAuditoriumId(), date, time);
+            // "9:30" is accepted by the regex but LocalTime.parse needs "09:30".
+            String[] parts = timeText.split(":");
+            LocalTime time = LocalTime.of(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]));
 
+            if (LocalDateTime.of(date, time).isBefore(LocalDateTime.now())) {
+                AlertInformation.viewAlert("ERROR", "Fecha inválida", "Validación", "No se puede programar una función en el pasado.");
+                return;
+            }
+
+            if (overlapsExisting(selectedMovie, selectedAuditorium, date, time)) {
+                AlertInformation.viewAlert("ERROR", "Conflicto de horario", "Validación",
+                        "La sala ya tiene una función que se traslapa con ese horario.");
+                return;
+            }
+
+            Screening screening = new Screening(selectedMovie.getMovieId(), selectedAuditorium.getAuditoriumId(), date, time);
             screeningRepository.saveScreening(screening);
 
-            AlertInformation.viewAlert("INFORMATION", "Éxito", "Función Registrada", "La función se programó correctamente.");
+            AlertInformation.viewAlert("INFORMATION", "Éxito", "Función registrada", "La función se programó correctamente.");
 
             if (onScreeningSaved != null) {
                 onScreeningSaved.run();
@@ -137,7 +184,11 @@ public class ScreeningRegisterController {
             ((Stage) btnSave.getScene().getWindow()).close();
 
         } catch (Exception e) {
-            AlertInformation.viewAlert("ERROR", "Error", "No se pudo guardar", e.getMessage());
+            String message = e.getMessage() == null ? "" : e.getMessage();
+            if (message.contains("Duplicate entry")) {
+                message = "Ya existe una función en esa sala, fecha y hora.";
+            }
+            AlertInformation.viewAlert("ERROR", "Error", "No se pudo guardar", message);
         }
     }
 

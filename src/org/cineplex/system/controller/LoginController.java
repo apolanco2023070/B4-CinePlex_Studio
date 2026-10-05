@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import org.cineplex.system.model.RoleType;
 import org.cineplex.system.model.User;
 import org.cineplex.system.service.AuthService;
+import org.cineplex.system.utils.Session;
 
 public class LoginController {
 
@@ -30,55 +31,58 @@ public class LoginController {
         String username = usernameField.getText();
         String password = passwordField.getText();
 
-        AuthService.ResultadoLogin loginResult = authService.login(username, password, RoleType.ADMINISTRATOR);
+        AuthService.LoginResult loginResult = authService.authenticate(username, password);
 
-        if (loginResult.exito) {
-            lblErrorMessage.setText("");
-            openAdministratorModule(loginResult.usuario);
+        if (!loginResult.success) {
+            lblErrorMessage.setText(loginResult.message);
+            return;
+        }
+
+        lblErrorMessage.setText("");
+        User user = loginResult.user;
+        Session.setCurrentUser(user);
+
+        if (user.getRole().getRoleType() == RoleType.ADMINISTRATOR) {
+            openAdministratorModule(user);
         } else {
-            loginResult = authService.login(username, password, RoleType.MANAGER);
-
-            if (loginResult.exito) {
-                lblErrorMessage.setText("");
-                openManagerModule(loginResult.usuario);
-            } else {
-                lblErrorMessage.setText(loginResult.mensaje);
-            }
+            openManagerModule(user);
         }
     }
 
     private void openAdministratorModule(User loggedUser) {
         try {
-
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Administrador.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Admin.fxml"));
             Parent root = loader.load();
 
-            AdministradorController controller = loader.getController();
-            controller.setUsuarioLogueado(loggedUser);
+            AdminController controller = loader.getController();
+            controller.setLoggedUser(loggedUser);
 
             Stage stage = (Stage) usernameField.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Administrator Panel - CinePlex");
+
+            stage.setScene(new Scene(root, 480, 620));
+            stage.setTitle("Panel de Administrador - CinePlex");
+            stage.centerOnScreen();
         } catch (Exception e) {
-            lblErrorMessage.setText("Error loading module: " + e.getMessage());
+            lblErrorMessage.setText("Error al cargar el módulo de Administrador: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     private void openManagerModule(User loggedUser) {
         try {
-
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Gerente.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Manager.fxml"));
             Parent root = loader.load();
 
             ManagerController controller = loader.getController();
             controller.setLoggedUser(loggedUser);
 
             Stage stage = (Stage) usernameField.getScene().getWindow();
-            stage.setScene(new Scene(root));
-            stage.setTitle("Manager Panel - CinePlex");
+
+            stage.setScene(new Scene(root, 480, 500));
+            stage.setTitle("Panel de Gerente - CinePlex");
+            stage.centerOnScreen();
         } catch (Exception e) {
-            lblErrorMessage.setText("Error loading module: " + e.getMessage());
+            lblErrorMessage.setText("Error al cargar el módulo de Gerente: " + e.getMessage());
             e.printStackTrace();
         }
     }

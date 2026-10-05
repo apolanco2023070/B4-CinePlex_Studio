@@ -1,75 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 
-<BorderPane xmlns="http://javafx.com/javafx/21" 
-            xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane styleClass="root" stylesheets="@/org/cineplex/system/resources/styles/cineplex.css"
+            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
             fx:controller="org.cineplex.system.controller.ReservationConsultationController">
 
     <top>
-        <HBox alignment="CENTER" spacing="10" style="-fx-background-color: #16a085; -fx-padding: 15;">
-            <Label text="🎫 Consultar y Cancelar Reservas" 
-                   style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+        <HBox alignment="CENTER" spacing="10">
+            <padding>
+                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+            </padding>
+            <Label styleClass="title-label" text="🎫 Consultar y Cancelar Reservas" />
         </HBox>
     </top>
 
     <center>
-        <VBox spacing="15" style="-fx-background-color: #ecf0f1;">
+        <VBox spacing="15.0">
             <padding>
-                <Insets bottom="20" left="20" right="20" top="20"/>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
             </padding>
 
-            <!-- Filtros -->
-            <HBox spacing="10" alignment="CENTER_LEFT" 
-                  style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 8;">
-                <Label text="🎬 Película:" style="-fx-font-weight: bold;"/>
-                <ComboBox fx:id="comboBoxMovies" promptText="Todas" 
-                          HBox.hgrow="ALWAYS" style="-fx-pref-width: 250px;"/>
+            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="filter-bar">
+                <Label styleClass="field-label" text="🎬 Película:" />
+                <ComboBox fx:id="comboBoxMovies" prefWidth="250.0" promptText="Todas" HBox.hgrow="ALWAYS" />
                 
-                <Label text="📅 Fecha:" style="-fx-font-weight: bold; -fx-margin-left: 20;"/>
-                <DatePicker fx:id="datePickerFecha" promptText="Todas"
-                          style="-fx-pref-width: 150px;"/>
+                <Label styleClass="field-label" text="📅 Fecha:">
+                    <HBox.margin>
+                        <Insets left="10.0" />
+                    </HBox.margin>
+                </Label>
+                <DatePicker fx:id="datePickerDate" prefWidth="150.0" promptText="Todas" />
                 
-                <Button fx:id="btnFilter" text="🔍 Filtrar" 
-                        onAction="#filtrarReservas"
-                        style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 5; -fx-cursor: hand;"/>
-                
-                <Button fx:id="btnClear" text="🔄 Limpiar" 
-                        onAction="#limpiarFiltros"
-                        style="-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                <Button fx:id="btnFilter" onAction="#filterReservations" styleClass="btn-secondary" text="🔍 Filtrar" />
+                <Button fx:id="btnClear" onAction="#clearFilters" styleClass="btn-ghost" text="🔄 Limpiar" />
             </HBox>
 
-            <!-- Tabla de Reservas -->
-            <TableView fx:id="tableViewReservations" VBox.vgrow="ALWAYS" 
-                       style="-fx-background-color: white; -fx-background-radius: 8;">
+            <TableView fx:id="tableViewReservations" VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="colUsuario" text="Usuario" prefWidth="150"/>
-                    <TableColumn fx:id="colPelicula" text="Película" prefWidth="200"/>
-                    <TableColumn fx:id="colSala" text="Sala" prefWidth="100"/>
-                    <TableColumn fx:id="colAsiento" text="Asiento" prefWidth="80"/>
-                    <TableColumn fx:id="colFecha" text="Fecha Función" prefWidth="100"/>
-                    <TableColumn fx:id="colHora" text="Hora" prefWidth="80"/>
-                    <TableColumn fx:id="colEstado" text="Estado" prefWidth="100"/>
-                    <TableColumn fx:id="colAcciones" text="Acciones" prefWidth="120"/>
+                    <TableColumn fx:id="colUser" prefWidth="150.0" text="Usuario" />
+                    <TableColumn fx:id="colMovie" prefWidth="200.0" text="Película" />
+                    <TableColumn fx:id="colAuditorium" prefWidth="100.0" text="Sala" />
+                    <TableColumn fx:id="colSeat" prefWidth="80.0" text="Asiento" />
+                    <TableColumn fx:id="colDate" prefWidth="100.0" text="Fecha Función" />
+                    <TableColumn fx:id="colTime" prefWidth="80.0" text="Hora" />
+                    <TableColumn fx:id="colStatus" prefWidth="100.0" text="Estado" />
+                    <TableColumn fx:id="colActions" prefWidth="120.0" text="Acciones" />
                 </columns>
             </TableView>
 
-            <HBox spacing="10" alignment="CENTER">
-                <Button fx:id="btnRefresh" text="🔄 Actualizar" 
-                        onAction="#cargarReservas"
-                        style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 20; -fx-background-radius: 5; -fx-cursor: hand;"/>
+            <HBox alignment="CENTER" spacing="10.0">
+                <Button fx:id="btnRefresh" onAction="#loadReservations" styleClass="btn-success" text="🔄 Actualizar" />
             </HBox>
         </VBox>
     </center>
 
     <bottom>
-        <HBox spacing="10" alignment="CENTER_RIGHT" 
-              style="-fx-background-color: #ecf0f1; -fx-padding: 15;">
-            <Button fx:id="btnBack" text="⬅ Volver al Panel" 
-                    onAction="#volverAlPanel"
-                    style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8 15; -fx-background-radius: 5; -fx-cursor: hand;"/>
+        <HBox alignment="CENTER_RIGHT" spacing="10.0">
+            <padding>
+                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+            </padding>
+            <Button fx:id="btnBack" onAction="#goBackToPanel" styleClass="btn-danger" text="⬅ Volver al Panel" />
         </HBox>
     </bottom>
 

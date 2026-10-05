@@ -23,7 +23,7 @@ public class TicketData {
     private String userName;
     private LocalDateTime issueDate;
 
-    // Getters y Setters
+    // Getters and Setters
     public Integer getTicketNumber() {
         return ticketNumber;
     }

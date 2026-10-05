@@ -4,93 +4,101 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import org.cineplex.system.repository.UsuarioFactory;
+import org.cineplex.system.repository.UserFactory;
+import org.cineplex.system.utils.AlertInformation;
 import org.cineplex.system.utils.Validations;
 
 public class UserManagementController {
 
+    /** role_id of MANAGER in the 'role' table (see ddl.sql initial data). */
+    private static final int MANAGER_ROLE_ID = 2;
+
     @FXML
     private TextField txtFullName;
-    
+
     @FXML
     private TextField txtUsername;
-    
+
     @FXML
     private PasswordField txtPassword;
-    
+
     @FXML
     private TextField txtEmail;
-    
-    @FXML
-    private Label lblMensaje;
-
-    private final UsuarioFactory usuarioDAO = new UsuarioFactory();
-    private final Validations validaciones = new Validations();
 
     @FXML
-    public void registrarGerente() {
+    private Label lblMessage;
+
+    private final UserFactory userFactory = new UserFactory();
+    private final Validations validations = new Validations();
+
+    @FXML
+    public void registerManager() {
         String fullName = txtFullName.getText().trim();
         String username = txtUsername.getText().trim();
         String password = txtPassword.getText().trim();
         String email = txtEmail.getText().trim();
 
-        if (validaciones.emptyText(fullName) || validaciones.emptyText(username)
-                || validaciones.emptyText(password) || validaciones.emptyText(email)) {
-            mostrarAlerta("Error", "Todos los campos son obligatorios.");
+        if (validations.emptyText(fullName) || validations.emptyText(username)
+                || validations.emptyText(password) || validations.emptyText(email)) {
+            showError("Todos los campos son obligatorios.");
+            return;
+        }
+
+        if (!validations.validateLengthText(fullName, 100)
+                || !validations.validateLengthText(username, 50)
+                || !validations.validateLengthText(email, 150)) {
+            showError("Nombre (máx 100), usuario (máx 50) o correo (máx 150) exceden la longitud permitida.");
             return;
         }
 
         if (password.length() < 6) {
-            mostrarAlerta("Error", "La contraseña debe tener al menos 6 caracteres.");
+            showError("La contraseña debe tener al menos 6 caracteres.");
             return;
         }
 
-        if (!email.contains("@") || !email.contains(".")) {
-            mostrarAlerta("Error", "El email no es válido.");
+        if (!email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
+            showError("El correo electrónico no es válido.");
             return;
         }
 
-        boolean exito = usuarioDAO.registrarUsuario(fullName, username, password, email, 2);
-
-        if (exito) {
-            mostrarAlerta("Éxito", "Gerente registrado correctamente.");
-            limpiarFormulario();
-        } else {
-            mostrarAlerta("Error", "No se pudo registrar. El usuario o email ya existe.");
+        try {
+            userFactory.registerUser(fullName, username, password, email, MANAGER_ROLE_ID);
+            AlertInformation.viewAlert("INFORMATION", "Éxito", null, "Gerente registrado correctamente.");
+            clearForm();
+        } catch (IllegalArgumentException e) {
+            showError(e.getMessage());
+        } catch (RuntimeException e) {
+            showError("No se pudo registrar el gerente. " + e.getMessage());
         }
     }
 
     @FXML
-    public void volverPanel() {
+    public void goBackToPanel() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Administrador.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Admin.fxml"));
             Parent root = loader.load();
-            Stage stage = (Stage) lblMensaje.getScene().getWindow();
+            Stage stage = (Stage) lblMessage.getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.setTitle("Panel Administrador - CinePlex");
+            stage.setTitle("Panel de Administrador - CinePlex");
         } catch (Exception e) {
             e.printStackTrace();
+            showError("No se pudo volver al panel: " + e.getMessage());
         }
     }
 
-    private void limpiarFormulario() {
+    private void clearForm() {
         txtFullName.clear();
         txtUsername.clear();
         txtPassword.clear();
         txtEmail.clear();
-        lblMensaje.setText("");
+        lblMessage.setText("");
     }
 
-    private void mostrarAlerta(String titulo, String mensaje) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(titulo);
-        alert.setHeaderText(null);
-        alert.setContentText(mensaje);
-        alert.showAndWait();
+    private void showError(String message) {
+        AlertInformation.viewAlert("ERROR", "Error", null, message);
     }
 }

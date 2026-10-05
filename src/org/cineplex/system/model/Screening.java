@@ -95,4 +95,5 @@ public class Screening {
     public String getShowTimeString() {
         return showTime != null ? showTime.toString() : "";
     }
+    
 }

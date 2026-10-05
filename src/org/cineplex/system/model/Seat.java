@@ -22,7 +22,7 @@ public class Seat {
         this.auditoriumId = auditoriumId;
     }
 
-    // Getters y Setters
+    // Getters and Setters
     public Integer getSeatId() {
         return seatId;
     }

@@ -24,7 +24,12 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
-import org.cineplex.system.config.ConexionDB;
+import org.cineplex.system.config.DatabaseConnection;
+import org.cineplex.system.model.Auditorium;
+import org.cineplex.system.model.Movie;
+import org.cineplex.system.repository.AuditoriumRepository;
+import org.cineplex.system.repository.MovieRepository;
+import javafx.util.StringConverter;
 
 import java.net.URL;
 import java.sql.CallableStatement;
@@ -49,52 +54,56 @@ public class ScreeningConsultationController implements Initializable {
     @FXML
     private Button btnClear;
     @FXML
-    private TableView<Funcion> tableViewScreenings;
+    private TableView<ScreeningRow> tableViewScreenings;
     @FXML
-    private TableColumn<Funcion, String> colMovie;
+    private TableColumn<ScreeningRow, String> colMovie;
     @FXML
-    private TableColumn<Funcion, String> colAuditorium;
+    private TableColumn<ScreeningRow, String> colAuditorium;
     @FXML
-    private TableColumn<Funcion, String> colDate;
+    private TableColumn<ScreeningRow, String> colDate;
     @FXML
-    private TableColumn<Funcion, String> colTime;
+    private TableColumn<ScreeningRow, String> colTime;
     @FXML
-    private TableColumn<Funcion, String> colDuration;
+    private TableColumn<ScreeningRow, String> colDuration;
     @FXML
-    private TableColumn<Funcion, Void> colActions;
+    private TableColumn<ScreeningRow, Void> colActions;
     @FXML
     private Button btnRefresh;
     @FXML
     private Button btnBack;
 
-    private ObservableList<Funcion> funcionesList;
+    private ObservableList<ScreeningRow> screeningsList;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
-            configurarTabla();
-            cargarCombos();
-            cargarFunciones();
+            configureTable();
+            loadCombos();
+            loadScreenings();
         } catch (Exception e) {
-            mostrarError("Error de inicialización", "No se pudo cargar la vista: " + e.getMessage());
+            showError("Error de inicialización", "No se pudo cargar la vista: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private void configurarTabla() {
-        colMovie.setCellValueFactory(new PropertyValueFactory<>("pelicula"));
-        colAuditorium.setCellValueFactory(new PropertyValueFactory<>("sala"));
-        colDate.setCellValueFactory(new PropertyValueFactory<>("fecha"));
-        colTime.setCellValueFactory(new PropertyValueFactory<>("hora"));
-        colDuration.setCellValueFactory(new PropertyValueFactory<>("duracion"));
+    private void configureTable() {
+        colMovie.setCellValueFactory(new PropertyValueFactory<>("movie"));
+        colAuditorium.setCellValueFactory(new PropertyValueFactory<>("auditorium"));
+        colDate.setCellValueFactory(new PropertyValueFactory<>("date"));
+        colTime.setCellValueFactory(new PropertyValueFactory<>("time"));
+        colDuration.setCellValueFactory(new PropertyValueFactory<>("duration"));
 
-        // Configurar el botón de editar en cada fila
         colActions.setCellFactory(param -> new TableCell<>() {
-            private final Button btnEdit = new Button("️ Editar");
+            private final Button btnEdit = new Button("Editar");
 
             {
-                btnEdit.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;");
-                btnEdit.setOnAction(event -> editarFuncion(getTableView().getItems().get(getIndex())));
+                
+                btnEdit.setOnAction(event -> {
+                    int index = getIndex();
+                    if (index >= 0 && index < getTableView().getItems().size()) {
+                        editScreening(getTableView().getItems().get(index));
+                    }
+                });
             }
 
             @Override
@@ -104,52 +113,51 @@ public class ScreeningConsultationController implements Initializable {
             }
         });
 
-        funcionesList = FXCollections.observableArrayList();
-        tableViewScreenings.setItems(funcionesList);
+        screeningsList = FXCollections.observableArrayList();
+        tableViewScreenings.setItems(screeningsList);
     }
 
-    private void cargarCombos() {
-        cargarComboSP(comboBoxMovies, "{CALL sp_get_movies_for_combo()}", "Todas las películas");
-        cargarComboSP(comboBoxAuditoriums, "{CALL sp_get_auditoriums_for_combo()}", "Todas las salas");
+    private void loadCombos() {
+        loadComboFromSP(comboBoxMovies, "{CALL sp_get_movies_for_combo()}", "Todas las películas");
+        loadComboFromSP(comboBoxAuditoriums, "{CALL sp_get_auditoriums_for_combo()}", "Todas las salas");
     }
 
     /**
-     * Método auxiliar genérico para cargar ComboBox usando Stored Procedures.
+     * Generic helper method to load a ComboBox using stored procedures.
      */
-    private void cargarComboSP(ComboBox<String> combo, String spCall, String defaultText) {
+    private void loadComboFromSP(ComboBox<String> combo, String spCall, String defaultText) {
         combo.getItems().add(defaultText);
         combo.setValue(defaultText);
 
-        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection(); CallableStatement cstmt = conn.prepareCall(spCall); ResultSet rs = cstmt.executeQuery()) {
+        try (Connection conn = DatabaseConnection.getDatabaseConnectionInstance().getConnection(); CallableStatement cstmt = conn.prepareCall(spCall); ResultSet rs = cstmt.executeQuery()) {
 
             while (rs.next()) {
-                // Ambos SP devuelven: (1: id, 2: nombre/title)
                 combo.getItems().add(rs.getString(2));
             }
         } catch (SQLException e) {
-            mostrarError("Error de carga", "No se pudieron cargar los datos: " + e.getMessage());
+            showError("Error de carga", "No se pudieron cargar los datos: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    public void cargarFunciones() {
-        filtrarFunciones();
+    @FXML
+    public void loadScreenings() {
+        filterScreenings();
     }
 
     @FXML
-    private void filtrarFunciones() {
-        funcionesList.clear();
+    private void filterScreenings() {
+        screeningsList.clear();
 
-        String peliculaSeleccionada = comboBoxMovies.getValue();
-        String salaSeleccionada = comboBoxAuditoriums.getValue();
+        String selectedMovie = comboBoxMovies.getValue();
+        String selectedAuditorium = comboBoxAuditoriums.getValue();
 
-        // Si el usuario selecciona "Todas...", enviamos null al SP para que ignore ese filtro
-        String pMovie = ("Todas las películas".equals(peliculaSeleccionada)) ? null : peliculaSeleccionada;
-        String pAuditorium = ("Todas las salas".equals(salaSeleccionada)) ? null : salaSeleccionada;
+        String pMovie = ("Todas las películas".equals(selectedMovie)) ? null : selectedMovie;
+        String pAuditorium = ("Todas las salas".equals(selectedAuditorium)) ? null : selectedAuditorium;
 
         String sql = "{CALL sp_get_screenings_filtered(?, ?)}";
 
-        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection(); CallableStatement cstmt = conn.prepareCall(sql)) {
+        try (Connection conn = DatabaseConnection.getDatabaseConnectionInstance().getConnection(); CallableStatement cstmt = conn.prepareCall(sql)) {
 
             cstmt.setString(1, pMovie);
             cstmt.setString(2, pAuditorium);
@@ -159,248 +167,280 @@ public class ScreeningConsultationController implements Initializable {
                 DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
                 while (rs.next()) {
-                    LocalDate fecha = rs.getDate("show_date").toLocalDate();
-                    LocalTime hora = rs.getTime("show_time").toLocalTime();
+                    LocalDate date = rs.getDate("show_date").toLocalDate();
+                    LocalTime time = rs.getTime("show_time").toLocalTime();
 
-                    Funcion funcion = new Funcion(
+                    ScreeningRow screening = new ScreeningRow(
                             rs.getInt("screening_id"),
+                            rs.getInt("movie_id"),
+                            rs.getInt("auditorium_id"),
                             rs.getString("title"),
                             rs.getString("auditorium_name"),
-                            fecha.format(dateFormatter),
-                            hora.format(timeFormatter),
+                            date.format(dateFormatter),
+                            time.format(timeFormatter),
                             rs.getInt("duration") + " min"
                     );
-                    funcionesList.add(funcion);
+                    screeningsList.add(screening);
                 }
             }
         } catch (SQLException e) {
-            mostrarError("Error al cargar funciones", e.getMessage());
+            showError("Error al cargar funciones", e.getMessage());
             e.printStackTrace();
         }
     }
 
     @FXML
-    private void limpiarFiltros() {
+    private void clearFilters() {
         comboBoxMovies.setValue("Todas las películas");
         comboBoxAuditoriums.setValue("Todas las salas");
-        cargarFunciones();
+        loadScreenings();
     }
 
-    // ==========================================
-    // LÓGICA DE EDICIÓN (HU27)
-    // ==========================================
-    private void editarFuncion(Funcion funcion) {
-        Dialog<Funcion> dialog = new Dialog<>();
+ 
+    private void editScreening(ScreeningRow screening) {
+        ObservableList<Movie> movies;
+        ObservableList<Auditorium> auditoriums;
+        try {
+            movies = FXCollections.observableArrayList(new MovieRepository().getAllMovies());
+            auditoriums = FXCollections.observableArrayList(new AuditoriumRepository().getAuditoriums());
+        } catch (Exception e) {
+            showError("Error de carga", "No se pudieron cargar películas y salas: " + e.getMessage());
+            return;
+        }
+
+        Dialog<ScreeningRow> dialog = new Dialog<>();
         dialog.setTitle("Editar Función");
-        dialog.setHeaderText("Modificar: " + funcion.getPelicula());
+        dialog.setHeaderText("Modificar: " + screening.getMovie());
 
-        ButtonType btnGuardar = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(btnGuardar, ButtonType.CANCEL);
+        ButtonType btnSave = new ButtonType("Guardar", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(btnSave, ButtonType.CANCEL);
 
-        ComboBox<String> cmbPeliculas = new ComboBox<>(comboBoxMovies.getItems());
-        ComboBox<String> cmbSalas = new ComboBox<>(comboBoxAuditoriums.getItems());
-        DatePicker dpFecha = new DatePicker(LocalDate.parse(funcion.getFecha(), DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        TextField txtHora = new TextField(funcion.getHora());
-        txtHora.setPromptText("HH:mm");
+        ComboBox<Movie> cmbMovies = new ComboBox<>(movies);
+        cmbMovies.setConverter(new StringConverter<Movie>() {
+            @Override
+            public String toString(Movie m) {
+                return m == null ? "" : m.getTitle();
+            }
 
-        cmbPeliculas.setValue(funcion.getPelicula());
-        cmbSalas.setValue(funcion.getSala());
+            @Override
+            public Movie fromString(String s) {
+                return null;
+            }
+        });
+        ComboBox<Auditorium> cmbAuditoriums = new ComboBox<>(auditoriums);
+        cmbAuditoriums.setConverter(new StringConverter<Auditorium>() {
+            @Override
+            public String toString(Auditorium a) {
+                return a == null ? "" : a.getName();
+            }
+
+            @Override
+            public Auditorium fromString(String s) {
+                return null;
+            }
+        });
+
+        DatePicker dpDate = new DatePicker(LocalDate.parse(screening.getDate(), DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        TextField txtTime = new TextField(screening.getTime());
+        txtTime.setPromptText("HH:mm");
+
+        for (Movie m : movies) {
+            if (m.getMovieId() == screening.getMovieId()) {
+                cmbMovies.setValue(m);
+                break;
+            }
+        }
+        for (Auditorium a : auditoriums) {
+            if (a.getAuditoriumId() != null && a.getAuditoriumId() == screening.getAuditoriumId()) {
+                cmbAuditoriums.setValue(a);
+                break;
+            }
+        }
 
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
         grid.add(new Label("Película:"), 0, 0);
-        grid.add(cmbPeliculas, 1, 0);
+        grid.add(cmbMovies, 1, 0);
         grid.add(new Label("Sala:"), 0, 1);
-        grid.add(cmbSalas, 1, 1);
+        grid.add(cmbAuditoriums, 1, 1);
         grid.add(new Label("Fecha:"), 0, 2);
-        grid.add(dpFecha, 1, 2);
+        grid.add(dpDate, 1, 2);
         grid.add(new Label("Hora:"), 0, 3);
-        grid.add(txtHora, 1, 3);
+        grid.add(txtTime, 1, 3);
 
         dialog.getDialogPane().setContent(grid);
 
-        // Validación en tiempo real
-        javafx.scene.Node btnGuardarNode = dialog.getDialogPane().lookupButton(btnGuardar);
-        btnGuardarNode.setDisable(true);
-        Runnable validar = () -> btnGuardarNode.setDisable(
-                cmbPeliculas.getValue() == null || cmbSalas.getValue() == null
-                || dpFecha.getValue() == null || !txtHora.getText().matches("\\d{2}:\\d{2}")
+        javafx.scene.Node btnSaveNode = dialog.getDialogPane().lookupButton(btnSave);
+        Runnable validate = () -> btnSaveNode.setDisable(
+                cmbMovies.getValue() == null || cmbAuditoriums.getValue() == null
+                || dpDate.getValue() == null || !txtTime.getText().matches("([01]\\d|2[0-3]):[0-5]\\d")
         );
-        cmbPeliculas.valueProperty().addListener((o, ov, nv) -> validar.run());
-        cmbSalas.valueProperty().addListener((o, ov, nv) -> validar.run());
-        dpFecha.valueProperty().addListener((o, ov, nv) -> validar.run());
-        txtHora.textProperty().addListener((o, ov, nv) -> validar.run());
+        validate.run();
+        cmbMovies.valueProperty().addListener((o, ov, nv) -> validate.run());
+        cmbAuditoriums.valueProperty().addListener((o, ov, nv) -> validate.run());
+        dpDate.valueProperty().addListener((o, ov, nv) -> validate.run());
+        txtTime.textProperty().addListener((o, ov, nv) -> validate.run());
 
         dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == btnGuardar) {
-                return new Funcion(funcion.getId(), cmbPeliculas.getValue(), cmbSalas.getValue(),
-                        dpFecha.getValue().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
-                        txtHora.getText(), funcion.getDuracion());
+            if (dialogButton == btnSave) {
+                return new ScreeningRow(screening.getId(),
+                        cmbMovies.getValue().getMovieId(),
+                        cmbAuditoriums.getValue().getAuditoriumId(),
+                        cmbMovies.getValue().getTitle(),
+                        cmbAuditoriums.getValue().getName(),
+                        dpDate.getValue().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                        txtTime.getText(),
+                        cmbMovies.getValue().getDuration() + " min");
             }
             return null;
         });
 
-        dialog.showAndWait().ifPresent(funcionEditada -> {
-            if (guardarCambios(funcionEditada)) {
-                mostrarExito("Éxito", "La función se actualizó correctamente.");
-                cargarFunciones();
+        dialog.showAndWait().ifPresent(editedScreening -> {
+            if (saveChanges(editedScreening)) {
+                showSuccess("Éxito", "La función se actualizó correctamente.");
+                loadScreenings();
             }
         });
     }
 
-    private boolean guardarCambios(Funcion f) {
-        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection()) {
+    private boolean saveChanges(ScreeningRow f) {
+        String sql = "{CALL sp_update_screening(?, ?, ?, ?, ?)}";
 
-            // Obtener IDs de película y sala
-            int movieId = obtenerIdPelicula(conn, f.getPelicula());
-            int auditoriumId = obtenerIdSala(conn, f.getSala());
+        try (Connection conn = DatabaseConnection.getDatabaseConnectionInstance().getConnection();
+             CallableStatement cstmt = conn.prepareCall(sql)) {
 
-            if (movieId == 0 || auditoriumId == 0) {
-                mostrarError("Error", "No se pudieron obtener los IDs de película o sala.");
-                return false;
-            }
-
-            // Llamar al SP de actualización
-            CallableStatement cstmt = conn.prepareCall("{CALL sp_update_screening(?, ?, ?, ?, ?)}");
             cstmt.setInt(1, f.getId());
-            cstmt.setInt(2, movieId);
-            cstmt.setInt(3, auditoriumId);
-            cstmt.setDate(4, Date.valueOf(LocalDate.parse(f.getFecha(), DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
-            cstmt.setTime(5, Time.valueOf(LocalTime.parse(f.getHora())));
+            cstmt.setInt(2, f.getMovieId());
+            cstmt.setInt(3, f.getAuditoriumId());
+            cstmt.setDate(4, Date.valueOf(LocalDate.parse(f.getDate(), DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
+            cstmt.setTime(5, Time.valueOf(LocalTime.parse(f.getTime())));
 
             cstmt.executeUpdate();
             return true;
 
         } catch (SQLException e) {
-            if (e.getMessage() != null && e.getMessage().contains("CONFLICTO")) {
-                mostrarError("Conflicto de horario", "Ya existe una función en esa sala, fecha y hora.");
+            String message = e.getMessage() == null ? "" : e.getMessage();
+            if (message.contains("CONFLICTO")) {
+                showError("Conflicto de horario", "Ya existe una función en esa sala, fecha y hora.");
+            } else if (message.contains("RESERVAS")) {
+                showError("Función con reservas", "La función tiene reservas activas; no se puede cambiar de sala.");
             } else {
-                mostrarError("Error", "No se pudo actualizar: " + e.getMessage());
+                showError("Error", "No se pudo actualizar: " + message);
             }
             e.printStackTrace();
+            return false;
+        } catch (RuntimeException e) {
+            showError("Error", "Datos de fecha u hora inválidos: " + e.getMessage());
             return false;
         }
     }
 
-    private int obtenerIdPelicula(Connection conn, String titulo) {
-        try (CallableStatement cstmt = conn.prepareCall("{CALL sp_get_movie_id_by_title(?, ?)}")) {
-            cstmt.setString(1, titulo);
-            cstmt.registerOutParameter(2, java.sql.Types.INTEGER);
-            cstmt.execute();
-            return cstmt.getInt(2);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return 0;
-        }
-    }
-
-    private int obtenerIdSala(Connection conn, String nombre) {
-        try (CallableStatement cstmt = conn.prepareCall("{CALL sp_get_auditorium_id_by_name(?, ?)}")) {
-            cstmt.setString(1, nombre);
-            cstmt.registerOutParameter(2, java.sql.Types.INTEGER);
-            cstmt.execute();
-            return cstmt.getInt(2);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return 0;
-        }
-    }
-
     @FXML
-    private void volverAlPanel() {
+    private void goBackToPanel() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Administrador.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/cineplex/system/view/Admin.fxml"));
             Parent root = loader.load();
 
             Stage stage = (Stage) btnBack.getScene().getWindow();
             stage.setScene(new Scene(root));
             stage.setTitle("Panel de Administrador - CinePlex");
         } catch (Exception e) {
-            mostrarError("Error de navegación", "No se pudo volver al panel: " + e.getMessage());
+            showError("Error de navegación", "No se pudo volver al panel: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    private void mostrarError(String titulo, String contenido) {
+    private void showError(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(titulo);
+        alert.setTitle(title);
         alert.setHeaderText(null);
-        alert.setContentText(contenido);
+        alert.setContentText(content);
         alert.showAndWait();
     }
 
-    private void mostrarExito(String titulo, String contenido) {
+    private void showSuccess(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(titulo);
+        alert.setTitle(title);
         alert.setHeaderText(null);
-        alert.setContentText(contenido);
+        alert.setContentText(content);
         alert.showAndWait();
     }
 
-    // ==========================================
-    // Clase interna para el modelo de la tabla
-    // ==========================================
-    public static class Funcion {
+  
+    public static class ScreeningRow {
 
         private final int id;
-        private final SimpleStringProperty pelicula;
-        private final SimpleStringProperty sala;
-        private final SimpleStringProperty fecha;
-        private final SimpleStringProperty hora;
-        private final SimpleStringProperty duracion;
+        private final int movieId;
+        private final int auditoriumId;
+        private final SimpleStringProperty movie;
+        private final SimpleStringProperty auditorium;
+        private final SimpleStringProperty date;
+        private final SimpleStringProperty time;
+        private final SimpleStringProperty duration;
 
-        public Funcion(int id, String pelicula, String sala, String fecha, String hora, String duracion) {
+        public ScreeningRow(int id, int movieId, int auditoriumId, String movie, String auditorium,
+                String date, String time, String duration) {
             this.id = id;
-            this.pelicula = new SimpleStringProperty(pelicula);
-            this.sala = new SimpleStringProperty(sala);
-            this.fecha = new SimpleStringProperty(fecha);
-            this.hora = new SimpleStringProperty(hora);
-            this.duracion = new SimpleStringProperty(duracion);
+            this.movieId = movieId;
+            this.auditoriumId = auditoriumId;
+            this.movie = new SimpleStringProperty(movie);
+            this.auditorium = new SimpleStringProperty(auditorium);
+            this.date = new SimpleStringProperty(date);
+            this.time = new SimpleStringProperty(time);
+            this.duration = new SimpleStringProperty(duration);
         }
 
         public int getId() {
             return id;
         }
 
-        public String getPelicula() {
-            return pelicula.get();
+        public int getMovieId() {
+            return movieId;
         }
 
-        public String getSala() {
-            return sala.get();
+        public int getAuditoriumId() {
+            return auditoriumId;
         }
 
-        public String getFecha() {
-            return fecha.get();
+        public String getMovie() {
+            return movie.get();
         }
 
-        public String getHora() {
-            return hora.get();
+        public String getAuditorium() {
+            return auditorium.get();
         }
 
-        public String getDuracion() {
-            return duracion.get();
+        public String getDate() {
+            return date.get();
         }
 
-        public StringProperty peliculaProperty() {
-            return pelicula;
+        public String getTime() {
+            return time.get();
         }
 
-        public StringProperty salaProperty() {
-            return sala;
+        public String getDuration() {
+            return duration.get();
         }
 
-        public StringProperty fechaProperty() {
-            return fecha;
+        public StringProperty movieProperty() {
+            return movie;
         }
 
-        public StringProperty horaProperty() {
-            return hora;
+        public StringProperty auditoriumProperty() {
+            return auditorium;
         }
 
-        public StringProperty duracionProperty() {
-            return duracion;
+        public StringProperty dateProperty() {
+            return date;
+        }
+
+        public StringProperty timeProperty() {
+            return time;
+        }
+
+        public StringProperty durationProperty() {
+            return duration;
         }
     }
 }

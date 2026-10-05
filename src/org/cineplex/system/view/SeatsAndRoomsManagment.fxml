@@ -10,61 +10,61 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="423.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.cineplex.system.controller.SeatsController">
-   <children>
-      <Label text="Gestión de asientos y salas" underline="true">
-         <font>
-            <Font size="21.0" />
-         </font>
-      </Label>
-      <Separator prefWidth="200.0" />
-      <GridPane>
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-         <children>
-            <Label fx:id="lblRooms" text="Sala" />
-            <Label fx:id="lblCapacity" text="Capacidad" GridPane.rowIndex="1" />
-            <Button fx:id="btnRegisterRoom" mnemonicParsing="false" onMouseClicked="#saveAuditorium" text="Registrar Sala" GridPane.rowIndex="2" />
-            <ComboBox fx:id="cmbRooms" prefWidth="150.0" promptText="Salas Disponibles" GridPane.columnIndex="1" />
-            <TextField fx:id="txtCapacity" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <Button fx:id="btnRegisterSeats" mnemonicParsing="false" onAction="#generateSeats" text="Generar asientos" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-         </children>
-         <VBox.margin>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </VBox.margin>
-      </GridPane>
-      <Separator prefWidth="200.0" />
-      <Label text="Asientos de la sala seleccionada">
-         <font>
-            <Font size="16.0" />
-         </font>
-      </Label>
-      <TableView fx:id="tblSeats" prefHeight="225.0" prefWidth="590.0">
-        <columns>
-          <TableColumn fx:id="colNumber" prefWidth="75.0" text="Número" />
-            <TableColumn fx:id="colStatus" prefWidth="75.0" text="Estado" />
-        </columns>
-         <padding>
-            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-         </padding>
-      </TableView>
-      <Button fx:id="btnRegresar" mnemonicParsing="false" onAction="#regresarMenu" text="Regresar" />
-   </children>
-   <opaqueInsets>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-   </opaqueInsets>
+<VBox prefHeight="550.0" prefWidth="650.0" spacing="15.0" styleClass="root" stylesheets="@/org/cineplex/system/resources/styles/cineplex.css"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="org.cineplex.system.controller.SeatsController">
    <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      <Insets bottom="aadm20.0" left="20.0" right="20.0" top="20.0" />
    </padding>
+
+   <children>
+      <Label styleClass="title-label" text="Gestión de Asientos y Salas" />
+      <Separator prefWidth="200.0" />
+
+      <VBox spacing="12.0" styleClass="filter-bar">
+         <GridPane hgap="12.0" vgap="12.0">
+            <columnConstraints>
+               <ColumnConstraints hgrow="NEVER" minWidth="100.0" />
+               <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" />
+            </columnConstraints>
+            <rowConstraints>
+               <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+               <RowConstraints minHeight="30.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+            <children>
+               <Label fx:id="lblRooms" styleClass="field-label" text="Sala:" />
+               <ComboBox fx:id="cmbRooms" prefWidth="250.0" promptText="Salas Disponibles" GridPane.columnIndex="1" />
+
+               <Label fx:id="lblCapacity" styleClass="field-label" text="Capacidad:" GridPane.rowIndex="1" />
+               <TextField fx:id="txtCapacity" prefWidth="250.0" promptText="Ingrese capacidad" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            </children>
+         </GridPane>
+
+         <HBox alignment="CENTER_RIGHT" spacing="10.0">
+            <children>
+               <Button fx:id="btnRegisterRoom" mnemonicParsing="false" onAction="#saveAuditorium" styleClass="btn-secondary" text="Registrar Sala" />
+               <Button fx:id="btnRegisterSeats" mnemonicParsing="false" onAction="#generateSeats" styleClass="btn-success" text="Generar Asientos" />
+            </children>
+         </HBox>
+      </VBox>
+
+      <Separator prefWidth="200.0" />
+
+      <Label styleClass="subtitle-label" text="Asientos de la sala seleccionada" />
+
+      <TableView fx:id="tblSeats" VBox.vgrow="ALWAYS">
+         <columns>
+            <TableColumn fx:id="colNumber" prefWidth="280.0" text="Número" />
+            <TableColumn fx:id="colStatus" prefWidth="280.0" text="Estado" />
+         </columns>
+      </TableView>
+
+      <HBox alignment="CENTER_RIGHT">
+         <Button fx:id="btnBack" mnemonicParsing="false" onAction="#goBackToMenu" styleClass="btn-danger" text="Regresar" />
+      </HBox>
+   </children>
 </VBox>

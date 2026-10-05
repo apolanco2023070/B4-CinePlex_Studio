@@ -5,8 +5,8 @@
 package org.cineplex.system.model;
 
 /**
- * Enum que representa los tipos de rol disponibles en el sistema. Los valores
- * deben coincidir exactamente con los almacenados en la tabla 'role' de la BD.
+ * Enum representing the role types available in the system. The values
+ * must match exactly those stored in the 'role' table of the DB.
  */
 
 public enum RoleType {

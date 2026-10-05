@@ -2,7 +2,7 @@ package org.cineplex.system.repository;
 
 import org.cineplex.system.model.Screening;
 import java.sql.Connection;
-import org.cineplex.system.config.ConexionDB;
+import org.cineplex.system.config.DatabaseConnection;
 import java.sql.CallableStatement;
 import java.util.ArrayList;
 import java.sql.Date;
@@ -15,7 +15,7 @@ public class ScreeningRepository {
 
     public void saveScreening(Screening screening) {
         String sql = "{call sp_insert_screening(?, ?, ?, ?)}";
-        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection(); CallableStatement cstmt = conn.prepareCall(sql)) {
+        try (Connection conn = DatabaseConnection.getDatabaseConnectionInstance().getConnection(); CallableStatement cstmt = conn.prepareCall(sql)) {
 
             cstmt.setInt(1, screening.getMovieId());
             cstmt.setInt(2, screening.getAuditoriumId());
@@ -32,7 +32,7 @@ public class ScreeningRepository {
         List<Screening> list = new ArrayList<>();
         String sql = "{call sp_get_all_screenings()}";
 
-        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection(); CallableStatement cstmt = conn.prepareCall(sql); ResultSet rs = cstmt.executeQuery()) {
+        try (Connection conn = DatabaseConnection.getDatabaseConnectionInstance().getConnection(); CallableStatement cstmt = conn.prepareCall(sql); ResultSet rs = cstmt.executeQuery()) {
 
             while (rs.next()) {
                 Screening s = new Screening();
@@ -49,7 +49,7 @@ public class ScreeningRepository {
                 list.add(s);
             }
         } catch (SQLException e) {
-            System.err.println("Error al consultar funciones: " + e.getMessage());
+            System.err.println("Error querying screenings: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Error al consultar funciones: " + e.getMessage(), e);
         }

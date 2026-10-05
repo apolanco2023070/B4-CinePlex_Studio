@@ -6,14 +6,15 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.cineplex.system.config.ConexionDB;
+import org.cineplex.system.config.DatabaseConnection;
 
 public class UserRepository {
 
+   
     public User findByUsername(String username) {
-        String sql = "{CALL sp_obtener_usuario_por_username(?)}";
+        String sql = "{CALL sp_get_user_by_username(?)}";
 
-        try (Connection conn = ConexionDB.getInstanciaConexionDB().getConnection(); 
+        try (Connection conn = DatabaseConnection.getDatabaseConnectionInstance().getConnection();
                 CallableStatement cstmt = conn.prepareCall(sql)) {
 
             cstmt.setString(1, username);
@@ -31,7 +32,7 @@ public class UserRepository {
             }
         } catch (SQLException e) {
             System.err.println("Error in UserRepository: " + e.getMessage());
-            e.printStackTrace();
+            throw new IllegalStateException("No se pudo consultar el usuario: " + e.getMessage(), e);
         }
         return null;
     }
