@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" spacing="20.0" styleClass="root" stylesheets="@/org/cineplex/system/resources/styles/cineplex.css"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="org.cineplex.system.controller.UserManagementController">
+    <padding>
+        <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+    </padding>
+
+    <Label styleClass="title-label" text="Gestión de Cuentas de Gerentes" />
+
+    <VBox maxWidth="450.0" spacing="15.0" styleClass="filter-bar">
+        <GridPane alignment="CENTER" hgap="10" vgap="15">
+            <columnConstraints>
+                <ColumnConstraints hgrow="NEVER" minWidth="130.0" />
+                <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="30.0" />
+                <RowConstraints minHeight="30.0" />
+                <RowConstraints minHeight="30.0" />
+                <RowConstraints minHeight="30.0" />
+            </rowConstraints>
+            <children>
+                <Label styleClass="field-label" text="Nombre Completo:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <TextField fx:id="txtFullName" promptText="Ej: Juan Pérez" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                <Label styleClass="field-label" text="Usuario:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <TextField fx:id="txtUsername" promptText="Ej: juan.perez" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                <Label styleClass="field-label" text="Contraseña:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <PasswordField fx:id="txtPassword" promptText="Mínimo 6 caracteres" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                <Label styleClass="field-label" text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                <TextField fx:id="txtEmail" promptText="Ej: juan@cineplex.com" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            </children>
+        </GridPane>
+
+        <Label fx:id="lblMessage" alignment="CENTER" maxWidth="400" styleClass="error-label" wrapText="true" />
+
+        <HBox alignment="CENTER" spacing="10">
+            <Button onAction="#registerManager" styleClass="btn-success" text="Registrar Gerente" />
+            <Button onAction="#goBackToPanel" styleClass="btn-ghost" text="Volver al Panel" />
+        </HBox>
+    </VBox>
+</VBox>
